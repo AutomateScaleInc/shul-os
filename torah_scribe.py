@@ -207,10 +207,10 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
     """Incrementally fetch up to max_chapters of the next un-ingested classical commentator book."""
     with torah_db.get_conn() as conn:
         for commentator, sef_prefix, book_title in COMMENTARY_EXPANSION_QUEUE:
-            row = conn.execute("SELECT chapters FROM books WHERE title = ?", (book_title,)).fetchone()
+            row = conn.execute("SELECT chapters_count FROM books WHERE title = ?", (book_title,)).fetchone()
             if not row:
                 continue
-            total_ch = int(row["chapters"])
+            total_ch = int(row["chapters_count"])
             done_chs = {
                 int(r[0])
                 for r in conn.execute(
@@ -326,7 +326,7 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
     # Pull real classical commentaries for the first few verses
     comm_lines = []
     for v in verses[:8]:
-        cs = torah_db.get_verse_commentaries(v["ref"], limit=2)
+        cs = torah_db.get_verse_commentaries(v["book_title"], int(v["chapter"]), int(v["verse"]))[:2]
         for c in cs:
             if len(comm_lines) < 6:
                 comm_lines.append(f"- {c['commentator']} on {v['ref']}: {c['en_text'][:220]}")
@@ -398,7 +398,7 @@ def mission_enrich_next_tanakh_book() -> tuple[bool, str, int]:
         "Jeremiah", "Ezekiel", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",
     ]
     with torah_db.get_conn() as conn:
-        all_books = [dict(r) for r in conn.execute("SELECT title, he_title, section, chapters FROM books ORDER BY book_order")]
+        all_books = [dict(r) for r in conn.execute("SELECT title, he_title, section, chapters_count AS chapters FROM books ORDER BY book_order")]
         existing = {r[0] for r in conn.execute("SELECT slug FROM documents WHERE category = 'scribe_book'")}
 
     book_map = {b["title"]: b for b in all_books}
