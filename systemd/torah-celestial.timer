@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Torah Sanctuary OS Celestial & Zmanim Sync every 2 minutes
+
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=2min
+Unit=torah-celestial.service
+
+[Install]
+WantedBy=timers.target

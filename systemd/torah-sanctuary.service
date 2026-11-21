@@ -1,0 +1,15 @@
+[Unit]
+Description=Torah Sanctuary — Synagogue Tanakh, Commentary & Storyteller Web Server
+After=network-online.target ollama.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/torah-sanctuary
+Environment="TORAH_PORT=8080"
+Environment="TORAH_HOST=0.0.0.0"
+ExecStart=/usr/bin/python3 %h/torah-sanctuary/server.py
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

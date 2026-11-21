@@ -1,0 +1,25 @@
+{
+  "synagogue_name": "Torah Sanctuary · Synagogue Study Station",
+  "ollama_url": "http://127.0.0.1:11434",
+  "ollama_model": "qwen2.5:1.5b",
+  "cloud_provider": "none",
+  "cloud_model": "",
+  "cloud_api_key": "",
+  "calendar_ics_url": "",
+  "mailing_webhook_url": "",
+  "voice_profile": "grand_narrator",
+  "auto_speak": true,
+  "presence_sleep_minutes": 5,
+  "default_theme": "sanctuary",
+  "os_color_temp_sync": true,
+  "location": {
+    "city": "Brussels, Belgium",
+    "lat": 50.8503,
+    "lon": 4.3517,
+    "tz": "Europe/Brussels",
+    "elevation_m": 58,
+    "candle_lighting_offset_min": 18,
+    "havdalah_deg": 8.5,
+    "in_israel": false
+  }
+}

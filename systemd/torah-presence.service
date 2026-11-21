@@ -1,0 +1,14 @@
+[Unit]
+Description=Torah Sanctuary — Standalone Camera & HID Presence Wake/Sleep Daemon
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/torah-sanctuary
+Environment="WAYLAND_DISPLAY=wayland-1"
+ExecStart=%h/.local/share/cam-switcher-venv/bin/python3 %h/torah-sanctuary/torah-presence.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

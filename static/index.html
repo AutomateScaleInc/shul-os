@@ -1,0 +1,2530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torah Sanctuary — Study, Stories &amp; Interpretation</title>
+<style>
+  :root {
+    --bg: #0c1322;
+    --bg-elev: #131e33;
+    --bg-card: #182540;
+    --bg-hover: #213254;
+    --border: rgba(218, 180, 102, 0.24);
+    --border-strong: rgba(218, 180, 102, 0.52);
+    --text: #f4efe6;
+    --text-muted: #b7c2d6;
+    --gold: #e4bc69;
+    --gold-soft: rgba(228, 188, 105, 0.14);
+    --accent: #5cb6e5;
+    --ok: #6ad39a;
+    --font-scale: 1;
+    --serif: "Noto Serif", Georgia, "Times New Roman", serif;
+    --sans: "Noto Sans", system-ui, -apple-system, sans-serif;
+    --hebrew: "Noto Serif Hebrew", "Noto Sans Hebrew", "Times New Roman", serif;
+  }
+  [data-theme="parchment"] {
+    --bg: #f6f0e4;
+    --bg-elev: #fbf7ef;
+    --bg-card: #ffffff;
+    --bg-hover: #efe6d4;
+    --border: rgba(122, 86, 30, 0.22);
+    --border-strong: rgba(122, 86, 30, 0.5);
+    --text: #1f2430;
+    --text-muted: #5a6170;
+    --gold: #9a6918;
+    --gold-soft: rgba(154, 105, 24, 0.11);
+    --accent: #1d5f8a;
+    --ok: #1f7d4b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: calc(16px * var(--font-scale));
+    line-height: 1.6;
+  }
+  .app {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 22px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-emblem {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--gold-soft);
+    border: 1px solid var(--border-strong);
+    display: grid; place-items: center;
+    color: var(--gold);
+    font-size: 1.35rem;
+  }
+  .brand h1 {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+  }
+  .brand .sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.16s ease;
+  }
+  nav button:hover { background: var(--bg-hover); color: var(--text); }
+  nav button.active {
+    background: var(--gold-soft);
+    color: var(--gold);
+    border-color: var(--border-strong);
+  }
+  .hdr-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tool-btn {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+  .tool-btn:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+  .status-pill {
+    font-size: 0.76rem;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+
+  main {
+    overflow-y: auto;
+    padding: 22px 26px;
+  }
+  .view { display: none; max-width: 1220px; margin: 0 auto; }
+  .view.active { display: block; }
+
+  .he {
+    font-family: var(--hebrew);
+    direction: rtl;
+    text-align: right;
+    font-size: 1.28em;
+    line-height: 1.85;
+    color: var(--gold);
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2, .card h3 {
+    font-family: var(--serif);
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .muted { color: var(--text-muted); }
+
+  /* ASK / CONVERSE VIEW */
+  .ask-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 960px) { .ask-layout { grid-template-columns: 1fr; } }
+  .mode-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mode-pill {
+    background: var(--bg-elev);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+  .mode-pill.active {
+    background: var(--gold);
+    color: #0e1422;
+    border-color: var(--gold);
+  }
+  .chat-feed {
+    min-height: 360px;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 14px;
+  }
+  .msg {
+    padding: 15px 18px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .msg.user {
+    background: var(--gold-soft);
+    border-color: var(--border-strong);
+    margin-left: 40px;
+  }
+  .msg.assistant {
+    background: var(--bg-card);
+  }
+  .msg-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .msg-body p { margin-bottom: 10px; }
+  .msg-body ul, .msg-body ol { margin: 8px 0 10px 22px; }
+  .msg-body h3, .msg-body h4 { font-family: var(--serif); color: var(--gold); margin: 12px 0 6px; }
+  .msg-body strong { color: var(--gold); }
+  .composer {
+    display: flex;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 10px;
+  }
+  .composer input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 1rem;
+    padding: 6px 8px;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #101624;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.92rem;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary {
+    background: var(--bg-elev);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .btn-secondary:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+  .btn-mic.listening { background: #c93b3b; color: #fff; border-color: #c93b3b; }
+
+  .starter-btn {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg-elev); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 12px; margin-bottom: 8px; cursor: pointer;
+    font-size: 0.86rem; line-height: 1.4;
+  }
+  .starter-btn:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+
+  .source-chip {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+  }
+  .source-chip .ref { font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+
+  /* READER */
+  .reader-grid {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 900px) { .reader-grid { grid-template-columns: 1fr; } }
+  .book-list {
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .sec-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin: 12px 0 6px;
+    font-weight: 700;
+  }
+  .book-btn {
+    width: 100%;
+    display: flex; justify-content: space-between; align-items: center;
+    background: transparent; color: var(--text);
+    border: 1px solid transparent; border-radius: 8px;
+    padding: 6px 10px; cursor: pointer; font-size: 0.88rem;
+  }
+  .book-btn:hover { background: var(--bg-hover); }
+  .book-btn.active { background: var(--gold-soft); border-color: var(--border-strong); color: var(--gold); font-weight: 700; }
+
+  .verse-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .verse-row:hover { background: var(--bg-hover); }
+  .verse-num {
+    display: inline-block; min-width: 28px;
+    font-weight: 700; color: var(--gold); font-size: 0.86rem;
+  }
+  .comm-badge {
+    display: inline-block; margin-left: 8px;
+    font-size: 0.72rem; padding: 2px 7px; border-radius: 999px;
+    background: var(--gold-soft); color: var(--gold); border: 1px solid var(--border);
+  }
+  .comm-drawer {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin: 6px 0 14px;
+  }
+  .comm-item { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .comm-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+  }
+  .story-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    cursor: pointer;
+    transition: transform 0.14s ease, border-color 0.14s ease;
+  }
+  .story-card:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .story-card .he-sm { font-family: var(--hebrew); color: var(--gold); font-size: 1.05rem; }
+  .story-card h3 { font-family: var(--serif); color: var(--text); margin: 4px 0 6px; font-size: 1.08rem; }
+  .story-card .refs { font-size: 0.78rem; color: var(--accent); font-weight: 600; margin-top: 8px; }
+
+  .search-bar {
+    display: flex; gap: 10px; margin-bottom: 16px;
+  }
+  .search-bar input, select, .form-input {
+    background: var(--bg-card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 0.95rem;
+  }
+  .search-bar input { flex: 1; }
+  .chapter-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+  .ch-pill {
+    padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg-elev); color: var(--text); cursor: pointer; font-size: 0.84rem;
+  }
+  .ch-pill.active { background: var(--gold); color: #0e1422; border-color: var(--gold); font-weight: 700; }
+
+  /* TODAY'S DAILY READING & SANCTUARY SCROLL */
+  .day-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 980px) { .day-strip { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); } }
+  .day-pill {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 9px 10px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    transition: all 0.16s ease;
+  }
+  .day-pill:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+  .day-pill.active {
+    background: var(--gold-soft);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold);
+  }
+  .day-pill .d-top { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--gold); }
+  .day-pill .d-ref { font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .today-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+  @media (max-width: 980px) { .today-grid { grid-template-columns: 1fr; } }
+  .spotlight-card {
+    background: linear-gradient(160deg, var(--bg-card), var(--bg-elev));
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: calc(100vh - 295px);
+    position: relative;
+    overflow: hidden;
+  }
+  .spot-progress {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: rgba(228, 188, 105, 0.14);
+  }
+  .spot-progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    transition: width 0.25s linear;
+  }
+  .spot-he {
+    font-family: var(--hebrew);
+    direction: rtl;
+    text-align: right;
+    font-size: 1.9rem;
+    line-height: 1.9;
+    color: var(--gold);
+    margin: 14px 0 12px;
+  }
+  .spot-en {
+    font-family: var(--serif);
+    font-size: 1.38rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+  .spot-comm {
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 0.96rem;
+  }
+  .spot-comm .c-label {
+    font-weight: 700; color: var(--gold); font-size: 0.84rem;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+  }
+  .daily-stream {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px;
+    max-height: calc(100vh - 295px);
+    overflow-y: auto;
+  }
+  .stream-item {
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .stream-item:hover { background: var(--bg-hover); }
+  .stream-item.active {
+    background: var(--gold-soft);
+    border-color: var(--border-strong);
+  }
+  .stream-item .s-ref { font-size: 0.8rem; font-weight: 700; color: var(--gold); }
+  .stream-item .s-en { font-size: 0.88rem; color: var(--text); margin-top: 2px; }
+  .stream-item .s-comm { font-size: 0.78rem; color: var(--accent); margin-top: 3px; }
+
+  /* PERSISTENT BOTTOM SANCTUARY SCROLLING TICKER */
+  .ticker-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border-strong);
+    padding: 8px 16px;
+    overflow: hidden;
+  }
+  .ticker-badge {
+    flex-shrink: 0;
+    background: var(--gold);
+    color: #0e1422;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 5px 11px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .ticker-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  }
+  .ticker-track {
+    display: inline-flex;
+    white-space: nowrap;
+    gap: 48px;
+    font-size: 0.96rem;
+    color: var(--text);
+    will-change: transform;
+    animation: sanctuary-marquee 130s linear infinite;
+  }
+  .ticker-track.paused { animation-play-state: paused; }
+  .ticker-track .t-item { display: inline-flex; align-items: center; gap: 8px; }
+  .ticker-track .t-sep { color: var(--gold); opacity: 0.7; }
+  @keyframes sanctuary-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* VISUAL ART, CHARACTERS, SYMBOLS & FULL-SCREEN RABBI PRESENTATIONS */
+  .art-banner {
+    width: 100%; height: 210px; object-fit: cover;
+    border-radius: 12px; border: 1px solid var(--border);
+    margin-bottom: 12px; display: block;
+  }
+  .story-card .art-thumb {
+    width: 100%; height: 155px; object-fit: cover;
+    border-radius: 10px; margin-bottom: 10px;
+    border: 1px solid var(--border); display: block;
+  }
+  .sym-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .sym-head { display: flex; align-items: center; gap: 14px; }
+  .sym-icon {
+    width: 62px; height: 62px; flex-shrink: 0;
+    border-radius: 14px; background: var(--gold-soft);
+    border: 1px solid var(--border-strong);
+    color: var(--gold); padding: 9px;
+    display: grid; place-items: center;
+  }
+  .sym-icon svg { width: 100%; height: 100%; }
+  .today-box {
+    background: linear-gradient(135deg, rgba(92,182,229,0.12), var(--gold-soft));
+    border: 1px solid var(--border-strong);
+    border-radius: 12px; padding: 14px 16px; margin-top: 10px;
+  }
+  .today-box h4 { color: var(--accent); margin: 0 0 6px; font-family: var(--serif); }
+  .trait-pill {
+    display: inline-block; font-size: 0.75rem; font-weight: 600;
+    padding: 3px 9px; border-radius: 999px; margin: 2px 4px 2px 0;
+    background: var(--gold-soft); color: var(--gold); border: 1px solid var(--border);
+  }
+
+  /* FULL-SCREEN CINEMATIC PRESENTATION OVERLAY */
+  #presModal {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #080d18;
+    color: #f5f0e6;
+    display: none;
+    flex-direction: column;
+  }
+  #presModal.open { display: flex; }
+  .pres-bg {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+    opacity: 0.24; filter: blur(4px) saturate(1.1); pointer-events: none;
+  }
+  .pres-topbar {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 16px 32px;
+    background: rgba(8,13,24,0.78);
+    border-bottom: 1px solid rgba(228,188,105,0.28);
+  }
+  .pres-stage {
+    position: relative; z-index: 2; flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px 56px; overflow-y: auto;
+  }
+  .pres-slide {
+    width: 100%; max-width: 1380px;
+    background: rgba(14, 22, 40, 0.86);
+    border: 1px solid rgba(228,188,105,0.42);
+    border-radius: 22px;
+    padding: 38px 46px;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.65);
+  }
+  .pres-title-hero {
+    display: grid; grid-template-columns: 1.15fr 1fr; gap: 36px; align-items: center;
+  }
+  @media (max-width: 960px) { .pres-title-hero { grid-template-columns: 1fr; } }
+  .pres-art-frame {
+    width: 100%; border-radius: 16px; border: 2px solid rgba(228,188,105,0.55);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.6); display: block;
+  }
+  .pres-kicker {
+    font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.14em;
+    color: #5cb6e5; font-weight: 700; margin-bottom: 8px;
+  }
+  .pres-h1 {
+    font-family: var(--serif); font-size: 2.8rem; line-height: 1.15;
+    color: #e4bc69; margin-bottom: 10px;
+  }
+  .pres-he-big {
+    font-family: var(--hebrew); direction: rtl; font-size: 2.3rem;
+    color: #f3d796; line-height: 1.7; margin: 10px 0 14px;
+  }
+  .pres-body { font-family: var(--serif); font-size: 1.35rem; line-height: 1.7; color: #f4efe6; }
+  .pres-point {
+    background: rgba(228,188,105,0.11); border-left: 4px solid #e4bc69;
+    border-radius: 0 12px 12px 0; padding: 14px 20px; margin-bottom: 14px;
+    font-size: 1.22rem; line-height: 1.55;
+  }
+  .pres-footer {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 14px 32px;
+    background: rgba(8,13,24,0.85);
+    border-top: 1px solid rgba(228,188,105,0.28);
+  }
+  .pres-dots { display: flex; gap: 8px; }
+  .pres-dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: rgba(228,188,105,0.25); cursor: pointer; border: none;
+  }
+  .pres-dot.active { background: #e4bc69; transform: scale(1.25); }
+
+  /* Live Celestial & Jewish Time Ribbon + Sky Observatory */
+  .celestial-ribbon {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+    padding: 5px 20px;
+    background: linear-gradient(90deg, rgba(16,26,46,0.96), rgba(22,36,62,0.96), rgba(16,26,46,0.96));
+    border-bottom: 1px solid rgba(228,188,105,0.28);
+    font-size: 0.82rem; color: var(--text);
+    cursor: pointer;
+  }
+  [data-theme="parchment"] .celestial-ribbon {
+    background: linear-gradient(90deg, #efe4cc, #f6eedc, #efe4cc);
+  }
+  .cel-group { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cel-chip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .cel-he { font-family: var(--hebrew); color: var(--gold); font-size: 0.95rem; font-weight: 600; }
+  .cel-shabbat {
+    background: rgba(228,188,105,0.2); border: 1px solid var(--gold); color: var(--gold);
+    padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 0.76rem;
+  }
+  .sky-dome-wrap {
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background: #070d1b;
+    margin-bottom: 16px;
+  }
+  .sky-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .zman-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px; border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .zman-row.passed { opacity: 0.58; }
+  .zman-row.next {
+    background: var(--gold-soft); border: 1px solid var(--gold); opacity: 1; font-weight: 700;
+  }
+  .zman-row.active {
+    background: rgba(92,182,229,0.12); border: 1px solid rgba(92,182,229,0.45); opacity: 1;
+  }
+  .sky-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .sky-stat {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  }
+  .sky-stat .k { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .sky-stat .v { font-size: 1.08rem; font-weight: 700; color: var(--gold); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="brand-emblem">✡</div>
+      <div>
+        <h1 id="siteTitle">Torah Sanctuary</h1>
+        <div class="sub">Tanakh · Classical Commentaries · Torah Stories · History</div>
+      </div>
+    </div>
+    <nav id="mainNav">
+      <button class="active" data-view="today">Today's Reading</button>
+      <button data-view="sky">🌙 Sky &amp; Zmanim</button>
+      <button data-view="stories">Torah Stories</button>
+      <button data-view="characters">Characters</button>
+      <button data-view="symbols">Symbols &amp; Art</button>
+      <button data-view="ask">Ask &amp; Interpret</button>
+      <button data-view="parasha">Parashah</button>
+      <button data-view="reader">Tanakh</button>
+      <button data-view="shul">Shul &amp; Mailings</button>
+      <button data-view="history">History</button>
+      <button data-view="settings">Settings</button>
+    </nav>
+    <div class="hdr-tools">
+      <button class="btn-primary" style="padding:6px 12px;font-size:0.84rem;" onclick="openPresentation('parasha','')" title="Launch Full-Screen Presentation for Rabbi & Community">🎬 Present</button>
+      <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Talk to Torah Sanctuary (Offline Local Whisper + Deep Narrator Voice)">🎙 Talk</button>
+      <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹ Stop Voice</button>
+      <button class="tool-btn" onclick="adjustFont(-0.1)" title="Smaller text">A-</button>
+      <button class="tool-btn" onclick="adjustFont(0.1)" title="Larger text">A+</button>
+      <button class="tool-btn" onclick="toggleTheme()" id="themeBtn">Parchment</button>
+      <div class="status-pill" id="statusPill"><span class="dot"></span><span>Loading...</span></div>
+    </div>
+  </header>
+
+  <div class="celestial-ribbon" id="celestialRibbon" onclick="switchView('sky')" title="Click to open the Sacred Celestial, Sun, Moon & Jewish Calendar Observatory">
+    <div class="cel-group" id="celRibbonLeft"><span class="muted">Calculating live Sun, Moon &amp; Hebrew Calendar...</span></div>
+    <div class="cel-group" id="celRibbonRight"></div>
+  </div>
+
+  <main>
+    <!-- 0. TODAY'S DAILY TORAH READING (LIVING SANCTUARY SHOWCASE) -->
+    <section id="view-today" class="view active">
+      <div class="day-strip" id="dayStrip"></div>
+      <div class="today-grid">
+        <div class="spotlight-card" id="spotlightCard">
+          <div class="spot-progress"><div class="spot-progress-bar" id="spotProgressBar"></div></div>
+          <div id="spotlightContent">
+            <div class="muted">Loading today's Torah portion...</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn-secondary" onclick="stepSlide(-1)">◀ Prev</button>
+              <button class="btn-secondary" id="spotPauseBtn" onclick="toggleSpotPause()">⏸ Pause</button>
+              <button class="btn-secondary" onclick="stepSlide(1)">Next ▶</button>
+              <span class="muted" id="spotCounter" style="font-size:0.84rem;margin-left:6px;"></span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="spotActions"></div>
+          </div>
+        </div>
+        <div class="daily-stream">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div>
+              <h3 id="streamTitle" style="margin:0;font-family:var(--serif);color:var(--gold);">Today's Aliyah</h3>
+              <div id="streamSub" class="muted" style="font-size:0.8rem;"></div>
+            </div>
+            <button class="tool-btn" onclick="switchView('ask')">Ask a Question →</button>
+          </div>
+          <div id="dailyStreamList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 0A. SACRED CELESTIAL, SUN, MOON & JEWISH YEAR OBSERVATORY -->
+    <section id="view-sky" class="view">
+      <div class="card" id="skyHero">Loading real-time Solar, Lunar &amp; Halachic Observatory...</div>
+      <div class="sky-dome-wrap" id="skyDomeWrap"></div>
+      <div class="sky-grid">
+        <div class="card" id="skyMoonCard">Loading lunar ephemeris...</div>
+        <div class="card" id="skySolarMizrachCard">Loading solar &amp; Mizrach compass...</div>
+      </div>
+      <div class="sky-grid" style="margin-top:16px;">
+        <div class="card" id="skyZmanimCard">Loading Halachic Zmanim...</div>
+        <div class="card" id="skyYearCard">Loading Jewish Year, Tekufah &amp; Living OS Sync...</div>
+      </div>
+    </section>
+
+    <!-- 0B. SHUL CALENDAR, RABBI MICHOEL'S PROGRAMS & MAILINGS (theshul.eu) -->
+    <section id="view-shul" class="view">
+      <div class="card" id="shulHero">Loading The European Synagogue (theshul.eu) calendar &amp; Brussels Shabbat times...</div>
+      <div class="ask-layout">
+        <div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+              <div>
+                <h2 style="margin:0;">Upcoming Shul Calendar &amp; Rabbi Michoel's Programs</h2>
+                <div class="muted" style="font-size:0.84rem;">Featured items automatically appear in the scrolling Sanctuary ticker &amp; Weekly Mailing.</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-secondary" onclick="loadShul(true)">↻ Refresh Calendar</button>
+                <button class="btn-primary" onclick="toggleAddEvent()">+ Add Event</button>
+              </div>
+            </div>
+            <div id="addEventBox" style="display:none;background:var(--bg-elev);border:1px solid var(--border-strong);border-radius:12px;padding:14px;margin-bottom:14px;">
+              <h3 style="margin-top:0;">Add Shul Event or Rabbi Michoel Program</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <input class="form-input" id="evTitle" placeholder="Event Title (e.g. Rabbi Michoel's Tuesday Torah Class)">
+                <input class="form-input" id="evHost" placeholder="Host / Organizer" value="Rabbi Michoel Rosenblum">
+                <input class="form-input" id="evDate" placeholder="Date (e.g. 2026-11-24 or Every Tuesday)">
+                <input class="form-input" id="evTime" placeholder="Time (e.g. 19:30)">
+                <input class="form-input" id="evCategory" placeholder="Category (Torah Class, Shabbat, Kids, Community)" value="Rabbi Michoel Program">
+                <input class="form-input" id="evLocation" placeholder="Location" value="Rue Froissart 109, 1040 Brussels">
+              </div>
+              <input class="form-input" style="width:100%;margin-top:10px;" id="evDesc" placeholder="Description / RSVP notes">
+              <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+                <button class="btn-primary" onclick="submitNewEvent()">Save Event to Calendar &amp; Ticker</button>
+                <button class="btn-secondary" onclick="toggleAddEvent()">Cancel</button>
+                <span id="evMsg" class="muted" style="font-size:0.84rem;"></span>
+              </div>
+            </div>
+            <div id="shulEventsList"></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+              <div>
+                <h2 style="margin:0;">Weekly Shul Mailing Generator</h2>
+                <div class="muted" style="font-size:0.84rem;">Auto-combines this week's Parashah, Brussels Shabbat times, and all upcoming Shul &amp; Rabbi Michoel events.</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-primary" onclick="buildWeeklyMailing()">✉ Build This Week's Mailing</button>
+                <button class="btn-secondary" onclick="copyMailing('html')">Copy HTML</button>
+                <button class="btn-secondary" onclick="copyMailing('text')">Copy Plain Text</button>
+                <button class="btn-secondary" onclick="downloadMailingHtml()">⬇ Download HTML</button>
+                <button class="btn-secondary" onclick="pushMailingWebhook()">🚀 Push to Mailing Webhook</button>
+              </div>
+            </div>
+            <div id="mailingStatus" class="muted" style="font-size:0.85rem;margin-bottom:8px;">Click "Build This Week's Mailing" to generate a ready-to-send newsletter for Mailchimp, Brevo, Chabad CRM, or email.</div>
+            <div id="mailingPreview" style="display:none;background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;padding:14px;max-height:380px;overflow:auto;"></div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card">
+            <h3>Join The Shul Mailing List</h3>
+            <p class="muted" style="font-size:0.85rem;margin-bottom:10px;">Receive weekly Parashah insights, Brussels Shabbat times, and Rabbi Michoel's upcoming events from <strong>theshul.eu</strong>.</p>
+            <div style="display:grid;gap:8px;">
+              <input class="form-input" id="subName" placeholder="Your Name">
+              <input class="form-input" id="subEmail" type="email" placeholder="Email Address">
+              <select id="subInterests">
+                <option value="Weekly Parashah & Shul Updates">Weekly Parashah &amp; Shul Updates</option>
+                <option value="Rabbi Michoel's Torah Classes">Rabbi Michoel's Torah Classes</option>
+                <option value="Kids & Family Programs (Kids@theshul.eu)">Kids &amp; Family Programs</option>
+                <option value="All Community Mailings & Holidays">All Community Mailings &amp; Holidays</option>
+              </select>
+              <button class="btn-primary" onclick="submitSubscriber()">Subscribe to Mailings</button>
+              <div id="subMsg" class="muted" style="font-size:0.84rem;"></div>
+            </div>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+              <span class="muted" id="subCount" style="font-size:0.82rem;">0 local subscribers</span>
+              <a class="tool-btn" style="text-decoration:none;" href="/api/shul/subscribers.csv">⬇ Export CSV</a>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Upcoming Jewish Calendar (Brussels)</h3>
+            <div id="shulHolidaysList" class="muted" style="font-size:0.86rem;">Loading...</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 1. ASK & INTERPRET -->
+    <section id="view-ask" class="view">
+      <div class="ask-layout">
+        <div>
+          <div class="mode-bar" id="modeBar">
+            <button class="mode-pill active" data-mode="all">⚖ All Perspectives</button>
+            <button class="mode-pill" data-mode="scholar">📖 Torah Scholar (PaRDeS)</button>
+            <button class="mode-pill" data-mode="storyteller">✨ Storyteller (Kids &amp; Families)</button>
+            <button class="mode-pill" data-mode="history">🏛 History &amp; Archaeology</button>
+          </div>
+          <div class="chat-feed" id="chatFeed">
+            <div class="msg assistant">
+              <div class="msg-head"><span>Torah Sanctuary</span><span>100% Local Authoritative Corpus</span></div>
+              <div class="msg-body">
+                <p><strong>Shalom &amp; Welcome!</strong> Ask any question about the Torah, Prophets, Writings (Tanakh / Old Testament), weekly Parashah, Rashi, Ramban, Ibn Ezra, Sforno, Midrash, or biblical history.</p>
+                <p class="muted">Choose a perspective above — from vivid <strong>Storyteller Mode</strong> for children and families to deep <strong>PaRDeS Scholar</strong> interpretation or <strong>History &amp; Archaeology</strong>.</p>
+              </div>
+            </div>
+          </div>
+          <form class="composer" onsubmit="sendQuestion(event)">
+            <button type="button" class="btn-secondary btn-mic" id="micBtn" onclick="toggleVoice()" title="Speak your question">🎙 Speak</button>
+            <input id="questionInput" type="text" placeholder="Ask about a verse (e.g. Genesis 1:1), story, Parashah, Rashi, or historical question..." autocomplete="off">
+            <button type="submit" class="btn-primary" id="sendBtn">Ask</button>
+          </form>
+        </div>
+        <aside>
+          <div class="card">
+            <h3>Suggested Questions</h3>
+            <button class="starter-btn" onclick="quickAsk('Tell the story of Moses and the Burning Bush for a family, and share what Rashi teaches about it.', 'storyteller')">✨ Tell the story of Moses &amp; the Burning Bush</button>
+            <button class="starter-btn" onclick="quickAsk('Explain Genesis 1:1 through PaRDeS — what do Rashi and Ramban say?', 'scholar')">📖 Explain Genesis 1:1 (Rashi &amp; Ramban)</button>
+            <button class="starter-btn" onclick="quickAsk('Why do we read the Book of Ruth on Shavuot, and what does it teach about chesed?', 'all')">🌾 Why do we read Ruth on Shavuot?</button>
+            <button class="starter-btn" onclick="quickAsk('What did the Dead Sea Scrolls and the Ketef Hinnom silver scrolls reveal about the Tanakh?', 'history')">🏛 Dead Sea Scrolls &amp; Biblical Archaeology</button>
+            <button class="starter-btn" onclick="quickAsk('How does the Jewish Tanakh ordering differ from the Christian Old Testament?', 'history')">📜 Tanakh vs. Old Testament Ordering</button>
+          </div>
+          <div class="card" id="sourcesPanel">
+            <h3>Grounded Sources</h3>
+            <div id="sourcesList" class="muted" style="font-size:0.86rem;">Ask a question to inspect the exact Hebrew &amp; English verses and classical commentaries used.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. WEEKLY PARASHAH -->
+    <section id="view-parasha" class="view">
+      <div class="card" id="parashaHero">Loading this week's Parashah...</div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+          <h3 style="margin:0;">Read the Portion (Click Any Verse for Commentators)</h3>
+          <select id="parashaSelect" onchange="loadParasha(this.value)"></select>
+        </div>
+        <div id="parashaVerses"></div>
+      </div>
+    </section>
+
+    <!-- 3. TANAKH READER -->
+    <section id="view-reader" class="view">
+      <div class="search-bar">
+        <input id="searchInput" type="text" placeholder="Search all 23,206 verses &amp; 21,000+ commentaries (e.g. 'choose life', 'Genesis 28:12', 'shepherd')..." onkeydown="if(event.key==='Enter') runGlobalSearch()">
+        <button class="btn-primary" onclick="runGlobalSearch()">Search</button>
+      </div>
+      <div id="searchResultsBox" style="display:none;" class="card"></div>
+      <div class="reader-grid">
+        <div class="card book-list" id="bookList">Loading 39 books...</div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <h2 id="readerBookTitle" style="margin:0;">Genesis</h2>
+              <div id="readerBookHe" class="he" style="text-align:left;font-size:1.1rem;">בראשית</div>
+            </div>
+            <div class="muted" style="font-size:0.85rem;">Click any verse to open Rashi, Ramban, Ibn Ezra &amp; Sforno</div>
+          </div>
+          <div class="chapter-pills" id="chapterPills"></div>
+          <div id="chapterVerses"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TORAH STORIES -->
+    <section id="view-stories" class="view">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 style="margin:0;">Illustrated Torah &amp; Tanakh Stories</h2>
+          <p class="muted">Every story with illuminated artwork, Main Characters, Sacred Symbols, Rashi &amp; PaRDeS, <strong>Applying It in Today's Terms</strong>, and a one-click 7-Slide Synagogue Presentation.</p>
+        </div>
+        <button class="btn-primary" onclick="openPresentation('parasha','')">🎬 Present This Week's Parashah</button>
+      </div>
+      <div id="storyDetail" style="display:none;" class="card"></div>
+      <div class="cards-grid" id="storiesGrid"></div>
+    </section>
+
+    <!-- 4B. MAIN CHARACTERS GALLERY -->
+    <section id="view-characters" class="view">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 style="margin:0;">Main Characters of the Torah &amp; Tanakh</h2>
+          <p class="muted">Meet the central figures — their Hebrew name meanings, defining traits, what Rashi &amp; the Sages say, and how their choices speak to modern life today.</p>
+        </div>
+      </div>
+      <div id="characterDetail" style="display:none;" class="card"></div>
+      <div class="cards-grid" id="charactersGrid"></div>
+    </section>
+
+    <!-- 4C. SACRED SYMBOLS & VISUAL ATLAS -->
+    <section id="view-symbols" class="view">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 style="margin:0;">Sacred Jewish Symbols &amp; Illuminated Art Atlas</h2>
+          <p class="muted">Explore the visual emblems of the Torah — from the Menorah, Luchot, and Jacob's Ladder to the Mezuzah and Rainbow Covenant — with verses, classical meaning, and modern relevance.</p>
+        </div>
+        <button class="btn-secondary" onclick="openPresentation('story','01-creation-and-shabbat')">🎬 Present Creation &amp; Shabbat</button>
+      </div>
+      <div class="cards-grid" id="symbolsGrid"></div>
+    </section>
+
+    <!-- 5. HISTORY & GUIDES -->
+    <section id="view-history" class="view">
+      <div class="card">
+        <h2 style="margin:0;">Historical, Archaeological &amp; Interpretive Library</h2>
+        <p class="muted">Second Temple Judaism, Dead Sea Scrolls, Biblical Archaeology, Tanakh vs. Old Testament Canon, Festivals, PaRDeS &amp; Classical Commentators.</p>
+      </div>
+      <div id="historyDetail" style="display:none;" class="card"></div>
+      <div class="cards-grid" id="historyGrid"></div>
+    </section>
+
+    <!-- 6. LIBRARY & SETTINGS -->
+    <section id="view-settings" class="view">
+      <div class="cards-grid">
+        <div class="card">
+          <h2>Local Offline Library Status</h2>
+          <div id="healthDetails" class="muted">Loading...</div>
+        </div>
+        <div class="card">
+          <h2>Synagogue &amp; Hybrid AI Settings</h2>
+          <p class="muted" style="font-size:0.86rem;margin-bottom:12px;">Works 100% offline using local Ollama. Optionally add an OpenAI, Anthropic, or Gemini key for cloud-enhanced scholarly depth when connected to Wi-Fi.</p>
+          <div style="display:grid;gap:10px;">
+            <label>Synagogue / Station Name<br><input class="form-input" style="width:100%" id="cfgSynName"></label>
+            <label>Sacred Sky Location Preset (Sun, Moon &amp; Exact Halachic Zmanim)<br>
+              <select id="cfgCityPreset" style="width:100%" onchange="applyCityPreset(this.value)">
+                <option value="">Custom Coordinates Below</option>
+                <option value="brussels">Brussels, Belgium (50.85°N, 4.35°E · Europe/Brussels)</option>
+                <option value="antwerp">Antwerp, Belgium (51.22°N, 4.40°E · Europe/Brussels)</option>
+                <option value="jerusalem">Jerusalem, Israel (31.77°N, 35.21°E · Asia/Jerusalem)</option>
+                <option value="tel_aviv">Tel Aviv, Israel (32.09°N, 34.78°E · Asia/Jerusalem)</option>
+                <option value="london">London, UK (51.51°N, -0.13°E · Europe/London)</option>
+                <option value="paris">Paris, France (48.86°N, 2.35°E · Europe/Paris)</option>
+                <option value="new_york">New York, NY (40.71°N, -74.01°W · America/New_York)</option>
+                <option value="miami">Miami, FL (25.76°N, -80.19°W · America/New_York)</option>
+                <option value="los_angeles">Los Angeles, CA (34.05°N, -118.24°W · America/Los_Angeles)</option>
+              </select>
+            </label>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;">
+              <input class="form-input" id="cfgLocCity" placeholder="City Name">
+              <input class="form-input" id="cfgLocLat" placeholder="Lat" type="number" step="0.0001">
+              <input class="form-input" id="cfgLocLon" placeholder="Lon" type="number" step="0.0001">
+              <input class="form-input" id="cfgLocTz" placeholder="Timezone">
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
+            <label>Local Ollama Model<br><input class="form-input" style="width:100%" id="cfgOllamaModel" value="qwen2.5:3b"></label>
+            <label>Optional Cloud AI Provider<br>
+              <select id="cfgCloudProv" style="width:100%">
+                <option value="none">Offline Only (Local Ollama)</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="anthropic">Anthropic Claude</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </label>
+            <label>Cloud Model (optional override)<br><input class="form-input" style="width:100%" id="cfgCloudModel" placeholder="Leave blank for recommended default"></label>
+            <label>Cloud API Key (stored locally with 0600 perms)<br><input class="form-input" style="width:100%" type="password" id="cfgCloudKey" placeholder="Optional API key"></label>
+            <label>Local Neural Voice Profile (100% Offline Piper + Bass Mastering)<br>
+              <select id="cfgVoiceProf" style="width:100%">
+                <option value="grand_narrator">Grand Torah Narrator (Deep Bass-Baritone · James Earl Jones Style)</option>
+                <option value="warm_baritone">Warm Scholar Baritone (Studio Crisp)</option>
+                <option value="storyteller">Gentle Family Storyteller</option>
+              </select>
+            </label>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgAutoSpeak" checked> Auto-Speak AI Replies Aloud</label>
+              <button type="button" class="btn-secondary" onclick="testNarratorVoice()">🔊 Test Voice (Genesis 1:1–3)</button>
+            </div>
+            <label>Shul Calendar ICS Feed URL (Google Calendar / Chabad iCal .ics)<br><input class="form-input" style="width:100%" id="cfgIcsUrl" placeholder="https://.../calendar.ics (syncs Rabbi Michoel's events automatically)"></label>
+            <label>Mailing / Newsletter Webhook URL (Mailchimp / Brevo / Zapier / CRM)<br><input class="form-input" style="width:100%" id="cfgMailHook" placeholder="https://... (receives signups & weekly newsletter pushes)"></label>
+            <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+            <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ticker-bar">
+    <div class="ticker-badge" id="tickerBadge">Today's Torah</div>
+    <div class="ticker-viewport">
+      <div class="ticker-track" id="tickerTrack">Loading today's Torah portion...</div>
+    </div>
+    <button class="tool-btn" id="tickerPauseBtn" onclick="toggleTickerPause()" title="Pause/Resume scrolling ticker">⏸</button>
+  </footer>
+</div>
+
+<!-- FULL-SCREEN CINEMATIC SYNAGOGUE PRESENTATION OVERLAY -->
+<div id="presModal">
+  <div class="pres-bg" id="presBg"></div>
+  <div class="pres-topbar">
+    <div>
+      <div style="font-family:var(--serif);color:#e4bc69;font-size:1.15rem;font-weight:700;" id="presDeckTitle">Torah Presentation</div>
+      <div style="font-size:0.82rem;color:#b7c2d6;" id="presDeckSub"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="presPicker" class="form-input" style="padding:6px 10px;font-size:0.85rem;" onchange="switchPresentationFromPicker(this.value)"></select>
+      <button class="btn-secondary" id="presNarrateBtn" onclick="narrateCurrentSlide()">🔊 Narrate Slide</button>
+      <button class="btn-secondary" id="presAutoBtn" onclick="togglePresAuto()">▶ Auto-Play</button>
+      <button class="btn-primary" onclick="closePresentation()">✕ Exit</button>
+    </div>
+  </div>
+  <div class="pres-stage">
+    <div class="pres-slide" id="presSlideBox"></div>
+  </div>
+  <div class="pres-footer">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn-secondary" onclick="stepPres(-1)">◀ Previous</button>
+      <button class="btn-primary" onclick="stepPres(1)">Next Slide ▶</button>
+      <span style="color:#b7c2d6;font-size:0.9rem;margin-left:8px;" id="presCounter">1 / 7</span>
+    </div>
+    <div class="pres-dots" id="presDots"></div>
+    <div style="color:#b7c2d6;font-size:0.82rem;">Use ← / → keys · Space to narrate · Esc to exit</div>
+  </div>
+</div>
+
+<script>
+let currentMode = 'all';
+let chatHistory = [];
+let booksCache = [];
+let currentBook = 'Genesis';
+let currentChapter = 1;
+let fontScale = 1.0;
+let recognition = null;
+let ttsAudio = null;
+
+let dailyData = null;
+let spotIdx = 0;
+let spotPaused = false;
+let spotTickMs = 0;
+const SPOT_DURATION_MS = 13000;
+let lastInteractionTs = Date.now();
+let currentViewName = 'today';
+
+['mousemove', 'mousedown', 'keydown', 'touchstart', 'wheel'].forEach(ev => {
+  window.addEventListener(ev, () => { lastInteractionTs = Date.now(); }, { passive: true });
+});
+
+// Navigation
+document.querySelectorAll('#mainNav button').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.view));
+});
+function switchView(name) {
+  currentViewName = name;
+  document.querySelectorAll('#mainNav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  if (name === 'today' && !dailyData) loadToday();
+  if (name === 'sky') loadCelestial();
+  if (name === 'shul' && !window._shulLoaded) loadShul(false);
+  if (name === 'parasha' && !window._parashaLoaded) loadParasha('');
+  if (name === 'reader' && !booksCache.length) loadBooks();
+  if (name === 'stories' && !window._storiesLoaded) loadStories();
+  if (name === 'characters' && !window._charactersLoaded) loadCharacters();
+  if (name === 'symbols' && !window._symbolsLoaded) loadSymbols();
+  if (name === 'history' && !window._historyLoaded) loadHistory();
+  if (name === 'settings') loadSettings();
+}
+
+async function loadToday(dayIdx = null) {
+  const url = dayIdx === null ? '/api/today' : '/api/today?day=' + encodeURIComponent(dayIdx);
+  const r = await fetch(url);
+  dailyData = await r.json();
+  spotIdx = 0;
+  spotTickMs = 0;
+
+  // Render 7-day Aliyah strip
+  const strip = document.getElementById('dayStrip');
+  strip.innerHTML = (dailyData.daily_schedule || []).map(d => `
+    <button class="day-pill ${d.day_index === dailyData.selected_day_index ? 'active' : ''}" onclick="loadToday(${d.day_index})">
+      <div class="d-top">
+        <span>${esc(d.day_en.slice(0, 3))}${d.is_today ? ' · TODAY' : ''}</span>
+        <span style="font-family:var(--hebrew);">${esc(d.aliyah_he)}</span>
+      </div>
+      <div class="d-ref">${esc(d.ref)}</div>
+    </button>`).join('');
+
+  document.getElementById('streamTitle').textContent = `Parashat ${dailyData.parasha.en_name} · ${dailyData.aliyah_en}`;
+  document.getElementById('streamSub').textContent = `${dailyData.date_str} · ${dailyData.aliyah_ref} (${dailyData.verses_count} verses)`;
+
+  // Render daily stream list
+  const sList = document.getElementById('dailyStreamList');
+  sList.innerHTML = (dailyData.slides || []).map((s, i) => `
+    <div class="stream-item ${i === 0 ? 'active' : ''}" id="stream-item-${i}" onclick="jumpSlide(${i})">
+      <div class="s-ref">${esc(s.title)} ${s.kind === 'banner' ? '· Daily Overview' : (s.kind === 'story' ? '· Torah Story' : '')}</div>
+      <div class="s-en">${esc((s.en_text || '').slice(0, 125))}${(s.en_text || '').length > 125 ? '...' : ''}</div>
+      ${s.commentator ? `<div class="s-comm">✦ ${esc(s.commentator)}</div>` : ''}
+    </div>`).join('');
+
+  // Render persistent bottom scrolling marquee ticker strictly for TODAY's portion
+  document.getElementById('tickerBadge').textContent = `${dailyData.day_en}: ${dailyData.parasha.en_name}`;
+  const items = dailyData.ticker_items || [];
+  const onePass = items.map(t => `<span class="t-item">${esc(t)}<span class="t-sep">❖</span></span>`).join('');
+  const track = document.getElementById('tickerTrack');
+  track.innerHTML = onePass + onePass; // seamless loop
+  // Adjust duration smoothly based on text length (~65 chars/sec readable sanctuary pace)
+  const totalChars = items.reduce((a, b) => a + b.length, 0);
+  const durSec = Math.max(55, Math.min(240, Math.round(totalChars / 18)));
+  track.style.animationDuration = durSec + 's';
+
+  renderSpotlight();
+}
+
+function renderSpotlight() {
+  if (!dailyData || !dailyData.slides || !dailyData.slides.length) return;
+  const s = dailyData.slides[spotIdx] || dailyData.slides[0];
+  const rich = dailyData.rich || {};
+  document.getElementById('spotCounter').textContent = `${spotIdx + 1} / ${dailyData.slides.length}`;
+  const richBar = (rich.characters && rich.characters.length) ? `
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center;">
+      ${rich.characters.map(c => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('characters'); openCharacter('${esc(c.slug)}')">👤 ${esc(c.name)}</button>`).join('')}
+      ${(rich.symbols || []).map(sym => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('symbols')">✡ ${esc(sym.name)}</button>`).join('')}
+    </div>` : '';
+  const todayHint = (rich.today_points && rich.today_points.length) ? `
+    <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+      <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying Today's Portion in Today's Terms</h4>
+      <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">${rich.today_points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
+    </div>` : '';
+  document.getElementById('spotlightContent').innerHTML = `
+    <div>
+      ${rich.art ? `<div style="position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--border-strong);margin-bottom:10px;height:clamp(135px, 16vh, 210px);">
+        <img src="${esc(rich.art)}" alt="${esc(dailyData.parasha.en_name)}" style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;" onclick="openPresentation('parasha','')">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(11,17,32,0.12) 0%, rgba(11,17,32,0.78) 100%);display:flex;align-items:flex-end;justify-content:space-between;padding:12px 16px;">
+          <div>
+            <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:#f3d796;font-weight:700;">${esc(s.kicker)}</div>
+            <div style="font-family:var(--serif);font-size:1.55rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${esc(s.title)}</div>
+          </div>
+          <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.3rem;text-shadow:0 2px 10px rgba(0,0,0,0.6);">${esc(s.he_kicker || '')}</div>
+        </div>
+      </div>` : `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:0.84rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;">${esc(s.kicker)}</span>
+        <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(s.he_kicker || '')}</span>
+      </div>
+      <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
+      ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
+      <div class="spot-en">${esc(s.en_text)}</div>
+      ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${esc(s.commentary)}</div></div>` : ''}
+      ${todayHint}
+      ${richBar}
+    </div>`;
+
+  const acts = document.getElementById('spotActions');
+  const readTxt = `${s.title}. ${s.en_text}. ${s.commentator ? s.commentator + ' explains: ' + s.commentary : ''}`;
+  let actHtml = `<button class="btn-secondary" onclick="openPresentation('parasha','')">🎬 Full Presentation</button>`;
+  actHtml += `<button class="btn-secondary" onclick="speakText(this.dataset.txt)" data-txt="${esc(readTxt)}">🔊 Read Aloud</button>`;
+  if (s.kind === 'verse') {
+    actHtml += `<button class="btn-primary" onclick="quickAsk('Explain ${esc(s.ref)} from today\\'s Aliyah of Parashat ${esc(dailyData.parasha.en_name)} with Rashi, Ramban, and how to apply it in today\\'s terms.', 'all')">📖 Interpret &amp; Apply Today</button>`;
+  } else {
+    actHtml += `<button class="btn-primary" onclick="quickAsk('Tell the story of today\\'s Torah reading (${esc(dailyData.parasha.en_name)}, ${esc(dailyData.aliyah_ref)}) warmly for families and apply it in today\\'s terms.', 'storyteller')">✨ Tell Today's Story</button>`;
+  }
+  acts.innerHTML = actHtml;
+
+  // Highlight and smoothly scroll active item into view in right-hand daily stream
+  document.querySelectorAll('.stream-item').forEach((el, i) => el.classList.toggle('active', i === spotIdx));
+  const activeEl = document.getElementById('stream-item-' + spotIdx);
+  if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function jumpSlide(i) {
+  spotIdx = i;
+  spotTickMs = 0;
+  renderSpotlight();
+}
+function stepSlide(delta) {
+  if (!dailyData || !dailyData.slides.length) return;
+  spotIdx = (spotIdx + delta + dailyData.slides.length) % dailyData.slides.length;
+  spotTickMs = 0;
+  renderSpotlight();
+}
+function toggleSpotPause() {
+  spotPaused = !spotPaused;
+  document.getElementById('spotPauseBtn').textContent = spotPaused ? '▶ Resume' : '⏸ Pause';
+}
+function toggleTickerPause() {
+  const tr = document.getElementById('tickerTrack');
+  const paused = tr.classList.toggle('paused');
+  document.getElementById('tickerPauseBtn').textContent = paused ? '▶' : '⏸';
+}
+
+// Smooth spotlight progression + 90s idle return to Today's Reading + midnight auto-refresh
+setInterval(() => {
+  if (currentViewName === 'today' && !spotPaused && dailyData && dailyData.slides.length > 1) {
+    spotTickMs += 250;
+    const pct = Math.min(100, (spotTickMs / SPOT_DURATION_MS) * 100);
+    const bar = document.getElementById('spotProgressBar');
+    if (bar) bar.style.width = pct + '%';
+    if (spotTickMs >= SPOT_DURATION_MS) {
+      spotTickMs = 0;
+      spotIdx = (spotIdx + 1) % dailyData.slides.length;
+      renderSpotlight();
+    }
+  }
+  // If a visitor walked away from another tab for > 90s (and isn't mid-typing or presenting), gently return to Today's Reading
+  if (currentViewName !== 'today' && !document.getElementById('presModal').classList.contains('open') && (Date.now() - lastInteractionTs) > 90000) {
+    const activeTag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();
+    if (activeTag !== 'input' && activeTag !== 'textarea') {
+      switchView('today');
+    }
+  }
+}, 250);
+
+// Auto-refresh daily portion every 30 minutes (so midnight / Shabbat transition flips automatically!)
+setInterval(() => {
+  if (!dailyData || dailyData.selected_day_index === dailyData.today_index) {
+    loadToday(null);
+  }
+}, 1800000);
+
+// Mode selector
+document.querySelectorAll('#modeBar .mode-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    currentMode = p.dataset.mode;
+    document.querySelectorAll('#modeBar .mode-pill').forEach(x => x.classList.toggle('active', x === p));
+  });
+});
+
+function adjustFont(delta) {
+  fontScale = Math.max(0.85, Math.min(1.45, +(fontScale + delta).toFixed(2)));
+  document.documentElement.style.setProperty('--font-scale', fontScale);
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  if (cur === 'parchment') {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('themeBtn').textContent = 'Parchment';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'parchment');
+    document.getElementById('themeBtn').textContent = 'Evening';
+  }
+}
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function renderMarkdown(md) {
+  let h = esc(md || '');
+  h = h.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+  h = h.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  h = h.replace(/^- (.+)$/gm, '<li>$1</li>');
+  h = h.replace(/(<li>.*<\/li>\n?)+/g, m => '<ul>' + m + '</ul>');
+  h = h.replace(/\n{2,}/g, '</p><p>');
+  h = '<p>' + h + '</p>';
+  h = h.replace(/<p>(<h[34]>|<ul)/g, '$1').replace(/(<\/h[34]>|<\/ul>)<\/p>/g, '$1');
+  return h;
+}
+
+// Local Neural Deep Bass-Baritone Voice (Piper + ffmpeg mastering, chunked for fast startup!)
+let ttsQueueId = 0;
+let currentVoiceProfile = 'grand_narrator';
+let autoSpeakReplies = true;
+let mediaRecorder = null;
+let recChunks = [];
+let recStream = null;
+let lastAskWasVoice = false;
+
+function stopSpeaking() {
+  ttsQueueId++;
+  if (ttsAudio) {
+    try { ttsAudio.pause(); ttsAudio.currentTime = 0; } catch (e) {}
+    ttsAudio = null;
+  }
+  const btn = document.getElementById('stopSpeakBtn');
+  if (btn) btn.style.display = 'none';
+}
+
+function splitSpeechChunks(text) {
+  const clean = String(text || '').replace(/[#*_`>|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 2400);
+  if (!clean) return [];
+  const sents = clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
+  const chunks = [];
+  let buf = '';
+  for (const s of sents) {
+    if ((buf + ' ' + s).trim().length > 260 && buf) {
+      chunks.push(buf.trim());
+      buf = s;
+    } else {
+      buf = (buf + ' ' + s).trim();
+    }
+  }
+  if (buf) chunks.push(buf);
+  return chunks;
+}
+
+async function fetchTtsUrl(chunkText, profile) {
+  const r = await fetch('/api/tts', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ text: chunkText, profile: profile || currentVoiceProfile })
+  });
+  if (!r.ok) throw new Error('TTS HTTP ' + r.status);
+  const blob = await r.blob();
+  return URL.createObjectURL(blob);
+}
+
+async function speakText(text, profileOverride = null) {
+  stopSpeaking();
+  const myId = ++ttsQueueId;
+  const chunks = splitSpeechChunks(text);
+  if (!chunks.length) return;
+  const prof = profileOverride || currentVoiceProfile;
+  const stopBtn = document.getElementById('stopSpeakBtn');
+  if (stopBtn) stopBtn.style.display = 'inline-block';
+
+  try {
+    let nextPromise = fetchTtsUrl(chunks[0], prof);
+    for (let i = 0; i < chunks.length; i++) {
+      if (myId !== ttsQueueId) break;
+      const audioUrl = await nextPromise;
+      if (myId !== ttsQueueId) { URL.revokeObjectURL(audioUrl); break; }
+      if (i + 1 < chunks.length) {
+        nextPromise = fetchTtsUrl(chunks[i + 1], prof);
+      }
+      await new Promise((resolve) => {
+        ttsAudio = new Audio(audioUrl);
+        ttsAudio.onended = () => { URL.revokeObjectURL(audioUrl); resolve(); };
+        ttsAudio.onerror = () => { URL.revokeObjectURL(audioUrl); resolve(); };
+        ttsAudio.play().catch(() => { URL.revokeObjectURL(audioUrl); resolve(); });
+      });
+    }
+  } catch (e) {}
+  if (myId === ttsQueueId && stopBtn) stopBtn.style.display = 'none';
+}
+
+function testNarratorVoice() {
+  const sel = document.getElementById('cfgVoiceProf');
+  const prof = sel ? sel.value : currentVoiceProfile;
+  speakText("In the beginning, when God began to create heaven and earth, the earth was unformed and void, with darkness over the surface of the deep. And God said, Let there be light. And there was light.", prof);
+}
+
+function setMicVisual(state) {
+  ['micBtn', 'hdrMicBtn'].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    if (state === 'listening') {
+      b.classList.add('listening');
+      b.textContent = '⏹ Stop & Ask';
+    } else if (state === 'transcribing') {
+      b.classList.remove('listening');
+      b.textContent = '⏳ Listening...';
+    } else {
+      b.classList.remove('listening');
+      b.textContent = id === 'hdrMicBtn' ? '🎙 Talk' : '🎙 Speak';
+    }
+  });
+}
+
+async function toggleVoice() {
+  stopSpeaking();
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Microphone access unavailable in this browser context.');
+    return;
+  }
+  try {
+    recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recChunks = [];
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+    mediaRecorder = new MediaRecorder(recStream, { mimeType: mime });
+    mediaRecorder.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) recChunks.push(ev.data); };
+    mediaRecorder.onstop = async () => {
+      if (recStream) { recStream.getTracks().forEach(t => t.stop()); recStream = null; }
+      setMicVisual('transcribing');
+      try {
+        const blob = new Blob(recChunks, { type: mime });
+        const r = await fetch('/api/stt', { method: 'POST', headers: {'Content-Type': mime}, body: blob });
+        const d = await r.json();
+        setMicVisual('idle');
+        if (d.ok && d.text && d.text.trim()) {
+          switchView('ask');
+          document.getElementById('questionInput').value = d.text.trim();
+          lastAskWasVoice = true;
+          sendQuestion(new Event('submit'));
+        } else {
+          switchView('ask');
+          document.getElementById('questionInput').placeholder = 'Did not catch that — tap Speak and try again...';
+        }
+      } catch (e) {
+        setMicVisual('idle');
+      }
+    };
+    mediaRecorder.start();
+    setMicVisual('listening');
+  } catch (e) {
+    setMicVisual('idle');
+    alert('Could not access Sentinel microphone: ' + e.message);
+  }
+}
+
+function quickAsk(q, mode) {
+  switchView('ask');
+  if (mode) {
+    currentMode = mode;
+    document.querySelectorAll('#modeBar .mode-pill').forEach(x => x.classList.toggle('active', x.dataset.mode === mode));
+  }
+  document.getElementById('questionInput').value = q;
+  sendQuestion(new Event('submit'));
+}
+
+async function sendQuestion(ev) {
+  ev.preventDefault();
+  const inp = document.getElementById('questionInput');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  const feed = document.getElementById('chatFeed');
+
+  const uDiv = document.createElement('div');
+  uDiv.className = 'msg user';
+  uDiv.innerHTML = `<div class="msg-head"><span>You</span><span>${esc(currentMode)}</span></div><div class="msg-body">${esc(q)}</div>`;
+  feed.appendChild(uDiv);
+
+  const aDiv = document.createElement('div');
+  aDiv.className = 'msg assistant';
+  aDiv.innerHTML = `<div class="msg-head"><span>Torah Sanctuary</span><span class="backend-tag">Searching library...</span></div><div class="msg-body"><p class="muted">Consulting local Tanakh, Rashi, Ramban &amp; Midrash...</p></div>`;
+  feed.appendChild(aDiv);
+  feed.scrollTop = feed.scrollHeight;
+
+  const bodyEl = aDiv.querySelector('.msg-body');
+  const tagEl = aDiv.querySelector('.backend-tag');
+  let fullText = '';
+
+  try {
+    const resp = await fetch('/api/ask/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ question: q, mode: currentMode, history: chatHistory })
+    });
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n\n');
+      buf = lines.pop();
+      for (const block of lines) {
+        if (!block.startsWith('data:')) continue;
+        try {
+          const evObj = JSON.parse(block.slice(5).trim());
+          if (evObj.type === 'sources') renderSources(evObj.sources);
+          else if (evObj.type === 'token') {
+            fullText += evObj.text;
+            bodyEl.innerHTML = renderMarkdown(fullText);
+            feed.scrollTop = feed.scrollHeight;
+          } else if (evObj.type === 'done') {
+            tagEl.innerHTML = `${esc(evObj.backend)} &nbsp; <button class="tool-btn" style="padding:2px 8px;font-size:0.75rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(fullText)}">🔊 Read Aloud</button>`;
+            if (autoSpeakReplies || lastAskWasVoice) {
+              lastAskWasVoice = false;
+              speakText(fullText);
+            }
+          }
+        } catch (e) {}
+      }
+    }
+    chatHistory.push({ role: 'user', content: q }, { role: 'assistant', content: fullText });
+    if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
+  } catch (e) {
+    bodyEl.innerHTML = `<p style="color:#f07c7c;">Error contacting server: ${esc(e.message)}</p>`;
+  }
+}
+
+function renderSources(src) {
+  const el = document.getElementById('sourcesList');
+  if (!src) return;
+  let html = '';
+  (src.verses || []).slice(0, 4).forEach(v => {
+    html += `<div class="source-chip"><div class="ref">${esc(v.ref)}</div><div>${esc(v.en_text)}</div><div class="he" style="font-size:1rem;margin-top:4px;">${esc(v.he_text)}</div></div>`;
+  });
+  (src.commentaries || []).slice(0, 3).forEach(c => {
+    html += `<div class="source-chip"><div class="ref">${esc(c.commentator)} on ${esc(c.target_ref)}</div><div>${esc((c.en_text||'').slice(0, 260))}...</div></div>`;
+  });
+  (src.documents || []).forEach(d => {
+    html += `<div class="source-chip"><div class="ref">${esc(d.title)} (${esc(d.category)})</div><div class="muted">${esc(d.subtitle)}</div></div>`;
+  });
+  el.innerHTML = html || '<span class="muted">General Torah scholarship response.</span>';
+}
+
+// Parashah
+async function loadParasha(slug) {
+  window._parashaLoaded = true;
+  const r = await fetch('/api/parasha' + (slug ? '?slug=' + encodeURIComponent(slug) : ''));
+  const d = await r.json();
+  const p = d.current;
+  const sel = document.getElementById('parashaSelect');
+  if (!sel.options.length) {
+    (d.all || []).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.slug;
+      opt.textContent = `${item.order_num}. ${item.en_name} (${item.he_name}) — ${item.ref}`;
+      sel.appendChild(opt);
+    });
+  }
+  sel.value = p.slug;
+  document.getElementById('parashaHero').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div class="muted" style="font-size:0.84rem;text-transform:uppercase;letter-spacing:0.08em;">Parashat Hashavua · ${esc(p.ref)} · Haftarah: ${esc(p.live_haftarah || p.haftarah_ref)}</div>
+        <h2 style="font-size:1.8rem;margin:4px 0;">Parashat ${esc(p.en_name)}</h2>
+        <p style="max-width:720px;">${esc(p.summary)}</p>
+      </div>
+      <div class="he" style="font-size:2.1rem;">פרשת ${esc(p.he_name)}</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+      <button class="btn-primary" onclick="quickAsk('Tell the story of Parashat ${esc(p.en_name)} (${esc(p.ref)}) warmly for families and kids, with Shabbat table questions.', 'storyteller')">✨ Tell This Week's Story</button>
+      <button class="btn-secondary" onclick="quickAsk('Give a deep PaRDeS interpretation of Parashat ${esc(p.en_name)} (${esc(p.ref)}) citing Rashi and Ramban.', 'scholar')">📖 Deep Scholar Commentary</button>
+      <button class="btn-secondary" onclick="speakText('Parashat ${esc(p.en_name)}. ${esc(p.summary)}')">🔊 Read Summary</button>
+    </div>`;
+  renderVerseRows(document.getElementById('parashaVerses'), p.book_slug, p.verses_preview || []);
+}
+
+// Tanakh Reader
+async function loadBooks() {
+  const r = await fetch('/api/books');
+  const d = await r.json();
+  booksCache = d.books || [];
+  const box = document.getElementById('bookList');
+  let html = '';
+  for (const [sec, label] of [['Torah', 'Torah · תורה (5)'], ['Neviim', "Nevi'im · נביאים (21)"], ['Ketuvim', 'Ketuvim · כתובים (13)']]) {
+    html += `<div class="sec-label">${label}</div>`;
+    booksCache.filter(b => b.section === sec).forEach(b => {
+      html += `<button class="book-btn" data-slug="${esc(b.slug)}" onclick="selectBook('${esc(b.slug)}', 1)"><span>${esc(b.title)}</span><span style="font-family:var(--hebrew);color:var(--gold);">${esc(b.he_title)}</span></button>`;
+    });
+  }
+  box.innerHTML = html;
+  selectBook('Genesis', 1);
+}
+
+async function selectBook(slug, ch) {
+  currentBook = slug; currentChapter = ch;
+  document.querySelectorAll('.book-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === slug));
+  const r = await fetch(`/api/chapter?book=${encodeURIComponent(slug)}&chapter=${ch}`);
+  const d = await r.json();
+  if (d.error) return;
+  document.getElementById('readerBookTitle').textContent = `${d.book.title} — Chapter ${ch}`;
+  document.getElementById('readerBookHe').textContent = d.book.he_title;
+  const pills = document.getElementById('chapterPills');
+  let phtml = '';
+  for (let i = 1; i <= d.book.chapters_count; i++) {
+    phtml += `<button class="ch-pill ${i === ch ? 'active' : ''}" onclick="selectBook('${esc(slug)}', ${i})">${i}</button>`;
+  }
+  pills.innerHTML = phtml;
+  renderVerseRows(document.getElementById('chapterVerses'), d.book.slug, d.verses || []);
+}
+
+function renderVerseRows(container, bookSlug, verses) {
+  container.innerHTML = '';
+  verses.forEach(v => {
+    const wrap = document.createElement('div');
+    const row = document.createElement('div');
+    row.className = 'verse-row';
+    const badge = v.commentary_count ? `<span class="comm-badge">${v.commentary_count} comm.</span>` : '';
+    row.innerHTML = `
+      <div><span class="verse-num">${v.chapter}:${v.verse}</span>${esc(v.en_text)}${badge}</div>
+      <div class="he">${esc(v.he_text)}</div>`;
+    const drawer = document.createElement('div');
+    drawer.style.display = 'none';
+    row.addEventListener('click', async () => {
+      if (drawer.style.display === 'block') { drawer.style.display = 'none'; return; }
+      drawer.style.display = 'block';
+      drawer.className = 'comm-drawer';
+      drawer.innerHTML = '<div class="muted">Loading Rashi, Ramban, Ibn Ezra &amp; Sforno...</div>';
+      const r = await fetch(`/api/commentary?book=${encodeURIComponent(bookSlug)}&chapter=${v.chapter}&verse=${v.verse}`);
+      const d = await r.json();
+      let chtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <strong style="color:var(--gold);">${esc(v.ref)} — Classical Commentators</strong>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-primary" style="padding:5px 11px;font-size:0.8rem;" onclick="quickAsk('Explain ${esc(v.ref)} in depth with Rashi, Ramban, and PaRDeS.', 'scholar')">📖 Ask Scholar</button>
+          <button class="btn-secondary" style="padding:5px 11px;font-size:0.8rem;" onclick="quickAsk('Tell the story and family lesson behind ${esc(v.ref)}.', 'storyteller')">✨ Story Mode</button>
+        </div>
+      </div>`;
+      if (!(d.commentaries || []).length) {
+        chtml += '<div class="muted">No verse-linked Torah commentary stored for this verse — click "Ask Scholar" above for an interactive explanation grounded in Tanakh!</div>';
+      } else {
+        d.commentaries.forEach(c => {
+          chtml += `<div class="comm-item"><div style="font-weight:700;color:var(--accent);margin-bottom:3px;">${esc(c.commentator)}</div><div>${esc(c.en_text || '(Hebrew only)')}</div>${c.he_text ? `<div class="he" style="font-size:0.98rem;margin-top:4px;opacity:0.88;">${esc(c.he_text)}</div>` : ''}</div>`;
+        });
+      }
+      drawer.innerHTML = chtml;
+    });
+    wrap.appendChild(row);
+    wrap.appendChild(drawer);
+    container.appendChild(wrap);
+  });
+}
+
+async function runGlobalSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  const box = document.getElementById('searchResultsBox');
+  if (!q) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.innerHTML = '<div class="muted">Searching Tanakh, commentaries, and stories...</div>';
+  const r = await fetch('/api/search?q=' + encodeURIComponent(q));
+  const d = await r.json();
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h3 style="margin:0;">Search Results for "${esc(q)}"</h3><button class="tool-btn" onclick="document.getElementById('searchResultsBox').style.display='none'">Close</button></div>`;
+  const allV = [...(d.exact_verses || []), ...(d.verses || [])];
+  if (allV.length) {
+    html += '<div class="sec-label">Scriptural Verses</div>';
+    allV.slice(0, 8).forEach(v => {
+      html += `<div class="source-chip"><div class="ref">${esc(v.ref)}</div><div>${esc(v.en_text)}</div><div class="he" style="font-size:1rem;">${esc(v.he_text)}</div></div>`;
+    });
+  }
+  if ((d.commentaries || []).length) {
+    html += '<div class="sec-label">Classical Commentaries &amp; Midrash</div>';
+    d.commentaries.slice(0, 5).forEach(c => {
+      html += `<div class="source-chip"><div class="ref">${esc(c.commentator)} on ${esc(c.target_ref)}</div><div>${esc((c.en_text||'').slice(0, 320))}</div></div>`;
+    });
+  }
+  if (!allV.length && !(d.commentaries || []).length) html += '<div class="muted">No exact matches found.</div>';
+  box.innerHTML = html;
+}
+
+// Stories, Characters, Symbols & Full-Screen Rabbi Presentations
+let storiesCache = [];
+let charactersCache = [];
+let symbolsCache = [];
+
+async function loadStories() {
+  window._storiesLoaded = true;
+  const r = await fetch('/api/documents?category=story');
+  const d = await r.json();
+  storiesCache = d.documents || [];
+  const grid = document.getElementById('storiesGrid');
+  grid.innerHTML = storiesCache.map(doc => {
+    const en = doc.enrichment || {};
+    const chars = (en.characters || []).map(c => `<span class="trait-pill">${esc(c.name)}</span>`).join('');
+    return `
+    <div class="story-card" onclick="openDoc('storyDetail', '${esc(doc.slug)}')">
+      ${en.art ? `<img class="art-thumb" src="${esc(en.art)}" alt="${esc(doc.title)}" loading="lazy">` : ''}
+      <div class="he-sm">${esc(doc.he_title)}</div>
+      <h3>${esc(doc.title)}</h3>
+      <div class="muted" style="font-size:0.86rem;">${esc(doc.subtitle)}</div>
+      ${chars ? `<div style="margin-top:7px;">${chars}</div>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;">
+        <div class="refs" style="margin:0;">📖 ${esc(doc.refs)}</div>
+        <button class="btn-primary" style="padding:4px 10px;font-size:0.78rem;" onclick="event.stopPropagation(); openPresentation('story','${esc(doc.slug)}')">🎬 Present</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadCharacters() {
+  window._charactersLoaded = true;
+  const r = await fetch('/api/characters');
+  charactersCache = (await r.json()).characters || [];
+  const grid = document.getElementById('charactersGrid');
+  grid.innerHTML = charactersCache.map(c => `
+    <div class="story-card" onclick="openCharacter('${esc(c.slug)}')">
+      <img class="art-thumb" src="${esc(c.art)}" alt="${esc(c.name)}" loading="lazy">
+      <div class="he-sm">${esc(c.he_name)} · <span class="muted" style="font-family:var(--sans);font-size:0.78rem;">"${esc(c.he_meaning)}"</span></div>
+      <h3>${esc(c.name)}</h3>
+      <div style="font-size:0.86rem;color:var(--accent);font-weight:600;margin-bottom:6px;">${esc(c.archetype)}</div>
+      <div>${(c.traits || []).map(t => `<span class="trait-pill">${esc(t)}</span>`).join('')}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+        <span class="muted" style="font-size:0.78rem;">${esc(c.era)}</span>
+        <button class="btn-primary" style="padding:4px 10px;font-size:0.78rem;" onclick="event.stopPropagation(); openPresentation('character','${esc(c.slug)}')">🎬 Present</button>
+      </div>
+    </div>`).join('');
+}
+
+function openCharacter(slug) {
+  const c = charactersCache.find(x => x.slug === slug);
+  if (!c) return;
+  const box = document.getElementById('characterDetail');
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:22px;align-items:start;">
+      <div>
+        <img src="${esc(c.art)}" style="width:100%;border-radius:14px;border:1px solid var(--border-strong);margin-bottom:10px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="openPresentation('character','${esc(c.slug)}')">🎬 Full Presentation</button>
+          <button class="btn-secondary" onclick="speakText('${esc(c.name)}. ${esc(c.story)} In today\\'s terms: ${esc(c.today)}')">🔊 Listen</button>
+          <button class="btn-secondary" onclick="quickAsk('Tell us deeply about ${esc(c.name)} (${esc(c.refs)}) — what do Rashi and the Sages teach, and how does this apply in today\\'s terms?', 'all')">Ask AI</button>
+          <button class="tool-btn" onclick="document.getElementById('characterDetail').style.display='none'">Close</button>
+        </div>
+      </div>
+      <div>
+        <div class="he" style="text-align:left;font-size:1.5rem;">${esc(c.he_name)}</div>
+        <h2 style="margin:2px 0 4px;">${esc(c.name)} <span class="muted" style="font-size:0.95rem;font-family:var(--sans);">("${esc(c.he_meaning)}")</span></h2>
+        <div style="color:var(--accent);font-weight:600;margin-bottom:10px;">${esc(c.archetype)} · ${esc(c.refs)}</div>
+        <p style="margin-bottom:12px;">${esc(c.story)}</p>
+        <div class="spot-comm"><div class="c-label">What Rashi &amp; the Sages Say</div><div>${esc(c.sages_say)}</div></div>
+        <div class="today-box"><h4>✦ Applying ${esc(c.name)} in Today's Terms</h4><p style="margin:0;">${esc(c.today)}</p></div>
+      </div>
+    </div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function loadSymbols() {
+  window._symbolsLoaded = true;
+  const r = await fetch('/api/symbols');
+  symbolsCache = (await r.json()).symbols || [];
+  const grid = document.getElementById('symbolsGrid');
+  grid.innerHTML = symbolsCache.map(s => `
+    <div class="sym-card">
+      <div class="sym-head">
+        <div class="sym-icon">${s.svg}</div>
+        <div>
+          <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(s.he_name)}</div>
+          <h3 style="margin:2px 0;font-size:1.08rem;">${esc(s.name)}</h3>
+          <div style="font-size:0.78rem;color:var(--accent);font-weight:600;">📖 ${esc(s.source_ref)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.9rem;">${esc(s.meaning)}</div>
+      <div class="muted" style="font-size:0.84rem;border-left:2px solid var(--gold);padding-left:10px;"><strong>Classical Sages:</strong> ${esc(s.classical)}</div>
+      <div class="today-box" style="margin-top:4px;padding:10px 12px;">
+        <h4 style="font-size:0.88rem;">✦ In Today's Terms</h4>
+        <div style="font-size:0.86rem;">${esc(s.today)}</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn-secondary" style="padding:5px 10px;font-size:0.8rem;" onclick="speakText('${esc(s.name)}. ${esc(s.meaning)} In today\\'s terms: ${esc(s.today)}')">🔊 Listen</button>
+        <button class="btn-secondary" style="padding:5px 10px;font-size:0.8rem;" onclick="quickAsk('Explain the deeper meaning of the Jewish symbol ${esc(s.name)} (${esc(s.source_ref)}) and how it applies today.', 'all')">Ask Deeper</button>
+      </div>
+    </div>`).join('');
+}
+
+async function loadHistory() {
+  window._historyLoaded = true;
+  const [r1, r2] = await Promise.all([fetch('/api/documents?category=history'), fetch('/api/documents?category=guide')]);
+  const docs = [...((await r1.json()).documents || []), ...((await r2.json()).documents || [])];
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = docs.map(doc => `
+    <div class="story-card" onclick="openDoc('historyDetail', '${esc(doc.slug)}')">
+      <div class="he-sm">${esc(doc.he_title)}</div>
+      <h3>${esc(doc.title)}</h3>
+      <div class="muted" style="font-size:0.88rem;">${esc(doc.subtitle)}</div>
+      <div class="refs">${doc.category === 'guide' ? '✦ Study Guide' : '🏛 History &amp; Context'} · ${esc(doc.refs)}</div>
+    </div>`).join('');
+}
+
+async function openDoc(targetId, slug) {
+  const r = await fetch('/api/document?slug=' + encodeURIComponent(slug));
+  const d = (await r.json()).document;
+  const en = d.enrichment || null;
+  const box = document.getElementById(targetId);
+  box.style.display = 'block';
+  const artHtml = en && en.art ? `<img class="art-banner" style="height:260px;" src="${esc(en.art)}" alt="${esc(d.title)}">` : '';
+  const charsHtml = en && (en.characters || []).length ? `<div style="margin:10px 0;"><strong>Main Characters:</strong> ${en.characters.map(c => `<span class="trait-pill">${esc(c.name)}</span>`).join('')}</div>` : '';
+  const symsHtml = en && (en.symbols || []).length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">${en.symbols.map(s => `<div style="display:flex;align-items:center;gap:8px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:6px 10px;"><div style="width:28px;height:28px;color:var(--gold);">${s.svg}</div><span style="font-size:0.84rem;font-weight:600;">${esc(s.name)}</span></div>`).join('')}</div>` : '';
+  const todayHtml = en && (en.today_points || []).length ? `<div class="today-box"><h4>✦ Applying It in Today's Terms — ${esc(en.today_title)}</h4><ul style="margin:6px 0 0 20px;">${en.today_points.map(pt => `<li style="margin-bottom:5px;">${esc(pt)}</li>`).join('')}</ul></div>` : '';
+  box.innerHTML = `
+    ${artHtml}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div>
+        <h2 style="margin:0;">${esc(d.title)}</h2>
+        <div class="muted">${esc(d.subtitle)} · <strong>${esc(d.refs)}</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span class="he" style="font-size:1.4rem;">${esc(d.he_title)}</span>
+        ${d.category === 'story' ? `<button class="btn-primary" onclick="openPresentation('story','${esc(d.slug)}')">🎬 7-Slide Presentation</button>` : ''}
+        <button class="btn-secondary" onclick="speakText(document.getElementById('${targetId}').innerText)">🔊 Read Aloud</button>
+        <button class="btn-secondary" onclick="quickAsk('Discuss ${esc(d.title)} (${esc(d.refs)}) deeper and apply it in today\\'s terms.', '${d.category === 'story' ? 'storyteller' : 'history'}')">Ask AI Deeper</button>
+        <button class="tool-btn" onclick="document.getElementById('${targetId}').style.display='none'">Close</button>
+      </div>
+    </div>
+    ${charsHtml}
+    ${symsHtml}
+    ${todayHtml}
+    <div class="msg-body" style="margin-top:14px;">${renderMarkdown(d.body_md)}</div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// FULL-SCREEN CINEMATIC SYNAGOGUE PRESENTATION ENGINE
+let presDeck = null;
+let presIdx = 0;
+let presAutoTimer = null;
+
+async function populatePresPicker(selectedKey) {
+  const sel = document.getElementById('presPicker');
+  if (!sel) return;
+  if (!storiesCache.length) {
+    try { storiesCache = ((await (await fetch('/api/documents?category=story')).json()).documents) || []; } catch (e) {}
+  }
+  if (!charactersCache.length) {
+    try { charactersCache = ((await (await fetch('/api/characters')).json()).characters) || []; } catch (e) {}
+  }
+  let html = `<optgroup label="This Week's Parashah"><option value="parasha:">✡ This Week's Parashah &amp; Today's Reading</option></optgroup>`;
+  html += `<optgroup label="16 Torah Stories">` + storiesCache.map(s => `<option value="story:${esc(s.slug)}">📖 ${esc(s.title)}</option>`).join('') + `</optgroup>`;
+  html += `<optgroup label="12 Main Characters">` + charactersCache.map(c => `<option value="character:${esc(c.slug)}">👤 ${esc(c.name)}</option>`).join('') + `</optgroup>`;
+  sel.innerHTML = html;
+  if (selectedKey) sel.value = selectedKey;
+}
+
+function switchPresentationFromPicker(val) {
+  const [kind, slug] = String(val || 'parasha:').split(':');
+  openPresentation(kind, slug || '');
+}
+
+async function openPresentation(kind = 'parasha', slug = '') {
+  stopSpeaking();
+  clearPresAuto();
+  const r = await fetch(`/api/presentation?kind=${encodeURIComponent(kind)}&slug=${encodeURIComponent(slug)}`);
+  presDeck = await r.json();
+  presIdx = 0;
+  document.getElementById('presModal').classList.add('open');
+  document.getElementById('presDeckTitle').textContent = presDeck.deck_title || 'Torah Presentation';
+  document.getElementById('presDeckSub').textContent = presDeck.subtitle || '';
+  await populatePresPicker(`${kind}:${slug}`);
+  renderPresSlide();
+}
+
+function closePresentation() {
+  stopSpeaking();
+  clearPresAuto();
+  document.getElementById('presModal').classList.remove('open');
+}
+
+function clearPresAuto() {
+  if (presAutoTimer) { clearInterval(presAutoTimer); presAutoTimer = null; }
+  const b = document.getElementById('presAutoBtn');
+  if (b) b.textContent = '▶ Auto-Play';
+}
+
+function togglePresAuto() {
+  if (presAutoTimer) { clearPresAuto(); return; }
+  document.getElementById('presAutoBtn').textContent = '⏸ Playing...';
+  presAutoTimer = setInterval(() => stepPres(1), 15000);
+}
+
+function stepPres(delta) {
+  if (!presDeck || !presDeck.slides.length) return;
+  stopSpeaking();
+  presIdx = (presIdx + delta + presDeck.slides.length) % presDeck.slides.length;
+  renderPresSlide();
+}
+
+function narrateCurrentSlide() {
+  if (!presDeck || !presDeck.slides[presIdx]) return;
+  const s = presDeck.slides[presIdx];
+  speakText(s.narration || `${s.title}. ${s.body || s.subtitle || ''}`);
+}
+
+function renderPresSlide() {
+  if (!presDeck || !presDeck.slides.length) return;
+  const s = presDeck.slides[presIdx];
+  const bg = document.getElementById('presBg');
+  bg.style.backgroundImage = `url('${s.art || presDeck.art || '/art/sacred-symbols.jpg'}')`;
+  document.getElementById('presCounter').textContent = `${presIdx + 1} / ${presDeck.slides.length}`;
+  document.getElementById('presDots').innerHTML = presDeck.slides.map((_, i) =>
+    `<button class="pres-dot ${i === presIdx ? 'active' : ''}" onclick="presIdx=${i}; stopSpeaking(); renderPresSlide();"></button>`
+  ).join('');
+
+  const box = document.getElementById('presSlideBox');
+  if (s.type === 'title') {
+    box.innerHTML = `
+      <div class="pres-title-hero">
+        <div>
+          <div class="pres-kicker">${esc(s.kicker)}</div>
+          <div class="pres-h1">${esc(s.title)}</div>
+          ${s.he_title ? `<div class="pres-he-big" style="text-align:left;">${esc(s.he_title)}</div>` : ''}
+          <p class="pres-body" style="color:#d6deec;">${esc(s.subtitle)}</p>
+        </div>
+        <div><img class="pres-art-frame" src="${esc(s.art || presDeck.art)}" alt="${esc(s.title)}"></div>
+      </div>`;
+  } else if (s.type === 'story') {
+    box.innerHTML = `
+      <div class="pres-title-hero">
+        <div>
+          <div class="pres-kicker">${esc(s.kicker)}</div>
+          <div class="pres-h1" style="font-size:2.2rem;">${esc(s.title)}</div>
+          ${s.he_text ? `<div class="pres-he-big" style="font-size:1.65rem;">${esc(s.he_text)}</div>` : ''}
+          <div class="pres-body" style="font-size:1.18rem;">${renderMarkdown(s.body)}</div>
+          ${(s.traits || []).length ? `<div style="margin-top:12px;">${s.traits.map(t => `<span class="trait-pill" style="font-size:0.88rem;padding:5px 12px;">${esc(t)}</span>`).join('')}</div>` : ''}
+        </div>
+        <div><img class="pres-art-frame" src="${esc(s.art || presDeck.art)}" alt="${esc(s.title)}"></div>
+      </div>`;
+  } else if (s.type === 'characters') {
+    box.innerHTML = `
+      <div class="pres-kicker">${esc(s.kicker)}</div>
+      <div class="pres-h1" style="font-size:2.2rem;">${esc(s.title)}</div>
+      <div class="cards-grid" style="margin-top:18px;">
+        ${(s.characters || []).map(c => `
+          <div style="background:rgba(24,37,64,0.92);border:1px solid rgba(228,188,105,0.4);border-radius:16px;padding:20px;">
+            <div style="font-family:var(--hebrew);color:#e4bc69;font-size:1.3rem;">${esc(c.he_name || '')}</div>
+            <h3 style="font-family:var(--serif);color:#fff;font-size:1.45rem;margin:4px 0 6px;">${esc(c.name)}</h3>
+            <div style="color:#5cb6e5;font-weight:600;margin-bottom:8px;">${esc(c.archetype || '')}</div>
+            ${c.today ? `<div style="font-size:1rem;color:#e6dfd2;line-height:1.55;">${esc(c.today)}</div>` : ''}
+          </div>`).join('')}
+      </div>`;
+  } else if (s.type === 'symbols') {
+    box.innerHTML = `
+      <div class="pres-kicker">${esc(s.kicker)}</div>
+      <div class="pres-h1" style="font-size:2.2rem;">${esc(s.title)}</div>
+      <div class="cards-grid" style="margin-top:18px;">
+        ${(s.symbols || []).map(sym => `
+          <div style="background:rgba(24,37,64,0.92);border:1px solid rgba(228,188,105,0.4);border-radius:16px;padding:20px;">
+            <div class="sym-head">
+              <div class="sym-icon" style="width:68px;height:68px;">${sym.svg}</div>
+              <div>
+                <div style="font-family:var(--hebrew);color:#e4bc69;font-size:1.25rem;">${esc(sym.he_name)}</div>
+                <h3 style="font-family:var(--serif);color:#fff;margin:2px 0;">${esc(sym.name)}</h3>
+                <div style="color:#5cb6e5;font-size:0.82rem;">${esc(sym.source_ref)}</div>
+              </div>
+            </div>
+            <p style="margin:12px 0 8px;font-size:1rem;">${esc(sym.meaning)}</p>
+            <div style="color:#f3d796;font-size:0.94rem;"><strong>Today:</strong> ${esc(sym.today)}</div>
+          </div>`).join('')}
+      </div>`;
+  } else if (s.type === 'commentators') {
+    box.innerHTML = `
+      <div class="pres-kicker">${esc(s.kicker)}</div>
+      <div class="pres-h1" style="font-size:2.2rem;">${esc(s.title)}</div>
+      <div style="margin-top:16px;">
+        ${(s.items || []).map(it => `
+          <div class="pres-point">
+            <div style="color:#5cb6e5;font-weight:700;font-size:0.95rem;margin-bottom:4px;">${esc(it.author)} ${it.ref ? '· ' + esc(it.ref) : ''}</div>
+            <div>${esc(it.text)}</div>
+          </div>`).join('')}
+      </div>`;
+  } else if (s.type === 'today') {
+    box.innerHTML = `
+      <div class="pres-title-hero">
+        <div>
+          <div class="pres-kicker">${esc(s.kicker)}</div>
+          <div class="pres-h1" style="font-size:2.2rem;">${esc(s.title)}</div>
+          <div style="margin-top:14px;">
+            ${(s.points || []).map(pt => `<div class="pres-point">✦ ${esc(pt)}</div>`).join('')}
+          </div>
+        </div>
+        <div><img class="pres-art-frame" src="${esc(s.art || presDeck.art)}" alt="${esc(s.title)}"></div>
+      </div>`;
+  } else {
+    box.innerHTML = `
+      <div class="pres-kicker">${esc(s.kicker)}</div>
+      <div class="pres-h1" style="font-size:2.3rem;">${esc(s.title)}</div>
+      <div style="margin-top:18px;">
+        ${(s.questions || []).map((q, i) => `<div class="pres-point" style="font-size:1.3rem;"><strong>${i + 1}.</strong> ${esc(q)}</div>`).join('')}
+      </div>
+      <div style="margin-top:20px;display:flex;gap:12px;">
+        <button class="btn-primary" onclick="closePresentation(); quickAsk('Let\\'s discuss ${esc(presDeck.deck_title)} and apply it in today\\'s terms.', 'all')">🎙 Ask &amp; Discuss Live</button>
+        <button class="btn-secondary" onclick="narrateCurrentSlide()">🔊 Hear Questions Aloud</button>
+      </div>`;
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if (!document.getElementById('presModal').classList.contains('open')) return;
+  if (e.key === 'ArrowRight') stepPres(1);
+  else if (e.key === 'ArrowLeft') stepPres(-1);
+  else if (e.key === 'Escape') closePresentation();
+  else if (e.key === ' ') { e.preventDefault(); narrateCurrentSlide(); }
+});
+
+// Health & Settings
+async function loadHealth() {
+  try {
+    const r = await fetch('/api/health');
+    const d = await r.json();
+    document.getElementById('siteTitle').textContent = d.synagogue_name || 'Torah Sanctuary';
+    const pill = document.getElementById('statusPill');
+    const aiState = d.cloud_configured ? `Hybrid (${d.cloud_provider} + Local)` : (d.ollama.model_ready ? `Offline AI Ready (${d.ollama.target_model})` : 'Offline Library Active');
+    pill.innerHTML = `<span class="dot" style="background:${d.ollama.model_ready || d.cloud_configured ? 'var(--ok)' : 'var(--gold)'}"></span><span>${esc(aiState)}</span>`;
+    const hd = document.getElementById('healthDetails');
+    if (hd) {
+      hd.innerHTML = `
+        <p><strong>Books Loaded:</strong> ${d.stats.books} (Complete Tanakh: Torah, Nevi'im, Ketuvim)</p>
+        <p><strong>Verses Indexed (Hebrew + English):</strong> ${d.stats.verses.toLocaleString()}</p>
+        <p><strong>Commentaries &amp; Midrash:</strong> ${d.stats.commentaries.toLocaleString()} (${esc((d.stats.commentators || []).join(', '))})</p>
+        <p><strong>Weekly Parashiyot:</strong> ${d.stats.parashiyot} portions</p>
+        <p><strong>Curated Stories &amp; History Dossiers:</strong> ${d.stats.documents}</p>
+        <p><strong>Local Database Size:</strong> ${d.stats.db_size_mb} MB (100% offline SQLite FTS5)</p>
+        <p><strong>Local Ollama Engine:</strong> ${d.ollama.online ? 'Running' : 'Starting...'} · Model <code>${esc(d.ollama.target_model)}</code> (${d.ollama.model_ready ? 'Ready' : 'Downloading...'})</p>
+        <p><strong>Local Neural Voice AI:</strong> ${d.voice && d.voice.piper_ready ? 'Piper Deep Bass-Baritone TTS Ready' : 'Fallback TTS'} · ${d.voice && d.voice.stt_ready ? 'Offline Whisper STT Ready' : 'Browser Mic'}</p>`;
+    }
+  } catch (e) {}
+}
+
+let latestMailing = null;
+
+async function loadShul(forceRefresh = false) {
+  window._shulLoaded = true;
+  const [evR, subR] = await Promise.all([
+    fetch('/api/shul/events' + (forceRefresh ? '?refresh=1' : '')),
+    fetch('/api/shul/subscribers'),
+  ]);
+  const d = await evR.json();
+  const subs = (await subR.json()).subscribers || [];
+  document.getElementById('subCount').textContent = `${subs.length} subscriber${subs.length === 1 ? '' : 's'} saved`;
+
+  const sh = d.shabbat_times || {};
+  const info = d.shul || {};
+  document.getElementById('shulHero').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div class="muted" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;">${esc(info.address)} · ${esc(info.phone)} · ${esc(info.email_office)}</div>
+        <h2 style="font-size:1.65rem;margin:4px 0;">${esc(info.name)}</h2>
+        <div style="font-size:0.95rem;">Led by <strong>${esc(info.rabbi)}</strong> · Website: <strong style="color:var(--accent);">theshul.eu</strong> · Kids: <strong>${esc(info.email_kids)}</strong></div>
+      </div>
+      <div style="background:var(--gold-soft);border:1px solid var(--border-strong);border-radius:12px;padding:12px 16px;text-align:right;">
+        <div style="font-weight:700;color:var(--gold);font-size:0.9rem;">🕯 Brussels Shabbat Times ${sh.hebrew_date ? '· ' + esc(sh.hebrew_date) : ''}</div>
+        <div style="font-size:1.15rem;font-weight:700;margin-top:3px;">Candle Lighting: ${esc(sh.candle_lighting || 'See theshul.eu')}${sh.havdalah ? ' &nbsp;|&nbsp; Havdalah: ' + esc(sh.havdalah) : ''}</div>
+        <div class="muted" style="font-size:0.8rem;">${esc(sh.parasha || '')} · Live via Hebcal Brussels</div>
+      </div>
+    </div>`;
+
+  const listEl = document.getElementById('shulEventsList');
+  listEl.innerHTML = (d.events || []).map(e => `
+    <div class="source-chip" style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+      <div>
+        <div class="ref">${esc(e.title)} <span class="comm-badge">${esc(e.category)}</span></div>
+        <div style="font-size:0.86rem;color:var(--accent);font-weight:600;">${esc(e.event_date)} · ${esc(e.event_time)} · ${esc(e.host)}</div>
+        <div style="font-size:0.86rem;margin-top:4px;">${esc(e.description)}</div>
+        <div class="muted" style="font-size:0.78rem;margin-top:3px;">📍 ${esc(e.location)}</div>
+      </div>
+      ${e.source === 'local' ? `<button class="tool-btn" style="flex-shrink:0;" onclick="removeEvent(${e.id})" title="Remove event">✕</button>` : '<span class="comm-badge">ICS Sync</span>'}
+    </div>`).join('') || '<div class="muted">No events listed yet.</div>';
+
+  const holEl = document.getElementById('shulHolidaysList');
+  holEl.innerHTML = (sh.upcoming_holidays || []).map(h => `
+    <div style="padding:7px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;">
+      <div><strong>${esc(h.title)}</strong><div class="muted" style="font-size:0.78rem;">${esc(h.date)}</div></div>
+      <div style="font-family:var(--hebrew);color:var(--gold);">${esc(h.hebrew)}</div>
+    </div>`).join('') || '<div class="muted">Offline — connect to Wi-Fi to refresh Brussels holiday dates.</div>';
+}
+
+function toggleAddEvent() {
+  const b = document.getElementById('addEventBox');
+  b.style.display = b.style.display === 'none' ? 'block' : 'none';
+}
+
+async function submitNewEvent() {
+  const payload = {
+    title: document.getElementById('evTitle').value.trim(),
+    host: document.getElementById('evHost').value.trim(),
+    event_date: document.getElementById('evDate').value.trim(),
+    event_time: document.getElementById('evTime').value.trim(),
+    category: document.getElementById('evCategory').value.trim(),
+    location: document.getElementById('evLocation').value.trim(),
+    description: document.getElementById('evDesc').value.trim(),
+    featured_ticker: true,
+  };
+  const r = await fetch('/api/shul/events', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  const d = await r.json();
+  if (r.ok && d.ok) {
+    document.getElementById('evTitle').value = '';
+    document.getElementById('evDesc').value = '';
+    document.getElementById('evMsg').textContent = 'Added to Shul calendar & scrolling ticker!';
+    await loadShul(false);
+    loadToday(null);
+  } else {
+    document.getElementById('evMsg').textContent = d.error || 'Could not save event.';
+  }
+}
+
+async function removeEvent(id) {
+  await fetch('/api/shul/events?id=' + encodeURIComponent(id), { method: 'DELETE' });
+  await loadShul(false);
+  loadToday(null);
+}
+
+async function submitSubscriber() {
+  const name = document.getElementById('subName').value.trim();
+  const email = document.getElementById('subEmail').value.trim();
+  const interests = document.getElementById('subInterests').value;
+  const r = await fetch('/api/shul/subscribe', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name, email, interests}) });
+  const d = await r.json();
+  if (r.ok && d.ok) {
+    document.getElementById('subName').value = '';
+    document.getElementById('subEmail').value = '';
+    document.getElementById('subMsg').textContent = 'Subscribed! ' + (d.webhook_forwarded ? 'Synced to mailing webhook.' : 'Saved locally (ready for CSV export).');
+    loadShul(false);
+  } else {
+    document.getElementById('subMsg').textContent = d.error || 'Please check email address.';
+  }
+}
+
+async function buildWeeklyMailing() {
+  document.getElementById('mailingStatus').textContent = 'Composing weekly mailing from Parashah, Brussels Shabbat times & Shul events...';
+  const r = await fetch('/api/shul/mailing');
+  latestMailing = await r.json();
+  document.getElementById('mailingStatus').textContent = `Ready: "${latestMailing.subject}" (${latestMailing.subscribers_count} kiosk subscribers)`;
+  const prev = document.getElementById('mailingPreview');
+  prev.style.display = 'block';
+  prev.innerHTML = `<pre style="white-space:pre-wrap;font-family:var(--sans);font-size:0.86rem;margin:0;">${esc(latestMailing.plain_text)}</pre>`;
+}
+
+async function copyMailing(kind) {
+  if (!latestMailing) await buildWeeklyMailing();
+  const txt = kind === 'html' ? latestMailing.html : latestMailing.plain_text;
+  try {
+    await navigator.clipboard.writeText(txt);
+    document.getElementById('mailingStatus').textContent = `Copied ${kind.toUpperCase()} newsletter to clipboard!`;
+  } catch (e) {
+    document.getElementById('mailingStatus').textContent = 'Use Download HTML to save the newsletter file.';
+  }
+}
+
+async function downloadMailingHtml() {
+  if (!latestMailing) await buildWeeklyMailing();
+  const blob = new Blob([latestMailing.html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'theshul-weekly-mailing.html';
+  a.click();
+}
+
+async function pushMailingWebhook() {
+  document.getElementById('mailingStatus').textContent = 'Pushing weekly mailing to configured webhook...';
+  const r = await fetch('/api/shul/mailing/push', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+  const d = await r.json();
+  document.getElementById('mailingStatus').textContent = r.ok ? `Pushed to mailing webhook (HTTP ${d.webhook_status})!` : (d.error || 'Webhook push failed.');
+}
+
+let celestialData = null;
+let cityPresetsCache = {};
+
+function renderMoonPhaseSvg(phaseAngleDeg, size = 96) {
+  // Mathematically accurate illuminated lunar disc (0=New, 90=First Qtr, 180=Full, 270=Last Qtr)
+  const r = size / 2 - 4;
+  const cx = size / 2, cy = size / 2;
+  const rad = (phaseAngleDeg * Math.PI) / 180;
+  const rx = Math.abs(Math.cos(rad) * r);
+  const waxing = phaseAngleDeg < 180;
+  // Build illuminated path: outer limb arc + terminator ellipse arc
+  let litPath = '';
+  if (phaseAngleDeg >= 176 && phaseAngleDeg <= 184) {
+    litPath = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#moonLitGrad)"/>`;
+  } else if (phaseAngleDeg <= 4 || phaseAngleDeg >= 356) {
+    litPath = '';
+  } else {
+    const outerSweep = waxing ? 1 : 0;
+    const termSweep = waxing ? (phaseAngleDeg < 90 ? 0 : 1) : (phaseAngleDeg < 270 ? 0 : 1);
+    litPath = `<path d="M ${cx} ${cy - r} A ${r} ${r} 0 0 ${outerSweep} ${cx} ${cy + r} A ${rx.toFixed(2)} ${r} 0 0 ${termSweep} ${cx} ${cy - r} Z" fill="url(#moonLitGrad)"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;flex-shrink:0;">
+    <defs>
+      <radialGradient id="moonLitGrad" cx="42%" cy="38%" r="65%">
+        <stop offset="0%" stop-color="#fff8e3"/>
+        <stop offset="65%" stop-color="#ebd49b"/>
+        <stop offset="100%" stop-color="#bda366"/>
+      </radialGradient>
+    </defs>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#141e33" stroke="rgba(228,188,105,0.45)" stroke-width="1.5"/>
+    ${litPath}
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(228,188,105,0.55)" stroke-width="1.2"/>
+  </svg>`;
+}
+
+function renderSkyDomeSvg(cel) {
+  const W = 1100, H = 290;
+  const padL = 42, padR = 42, horizonY = 198, topY = 26, botY = 268;
+  const xForHr = hr => padL + (hr / 24) * (W - padL - padR);
+  const yForAlt = alt => {
+    const clamped = Math.max(-50, Math.min(70, alt));
+    if (clamped >= 0) return horizonY - (clamped / 70) * (horizonY - topY);
+    return horizonY + (Math.abs(clamped) / 50) * (botY - horizonY);
+  };
+  const sunPts = (cel.sun_arc || []).map(p => `${xForHr(p.hour).toFixed(1)},${yForAlt(p.alt).toFixed(1)}`).join(' ');
+  const moonPts = (cel.moon_arc || []).map(p => `${xForHr(p.hour).toFixed(1)},${yForAlt(p.alt).toFixed(1)}`).join(' ');
+
+  const nowX = xForHr(cel.local_hour_float || 12);
+  const sunY = yForAlt(cel.sun.altitude_deg);
+  const moonY = yForAlt(cel.moon.altitude_deg);
+  const mood = (cel.watch && cel.watch.mood) || 'night';
+
+  const grads = {
+    dawn: ['#162142', '#3a345e', '#b96c4f'],
+    morning: ['#163a70', '#2b6cb0', '#79b3dc'],
+    midday: ['#15417a', '#2663a8', '#5fa0d8'],
+    golden: ['#162952', '#523b5e', '#d6894b'],
+    twilight: ['#0b1329', '#1c264a', '#593d54'],
+    night: ['#050914', '#0b1428', '#14203b'],
+  };
+  const [g0, g1, g2] = grads[mood] || grads.night;
+  const starOpacity = cel.sun.altitude_deg < -8 ? 0.92 : (cel.sun.altitude_deg < -2 ? 0.55 : 0.08);
+  const starCoords = [[85,48],[145,74],[210,36],[290,82],[360,44],[440,68],[520,38],[610,72],[695,46],[770,84],[845,42],[920,66],[990,50],[1030,92],[175,112],[490,104],[735,110],[880,102]];
+  const starsSvg = starCoords.map(([sx, sy], i) => `<circle cx="${sx}" cy="${sy}" r="${i % 3 === 0 ? 1.8 : 1.1}" fill="#f7ebd0" opacity="${(starOpacity * (0.55 + (i % 4) * 0.14)).toFixed(2)}"/>`).join('');
+
+  // Mark key solar Zmanim along horizon
+  const zMarkers = ['sunrise', 'chatzot', 'sunset', 'tzeit'].map(k => {
+    const z = (cel.zmanim || []).find(item => item.key === k);
+    if (!z || !z.time || !z.time.includes(':')) return '';
+    const [hh, mm] = z.time.split(':').map(Number);
+    const zx = xForHr(hh + mm / 60);
+    const shortLbl = k === 'sunrise' ? 'Netz' : (k === 'chatzot' ? 'Chatzot' : (k === 'sunset' ? 'Shkiah' : 'Tzeit'));
+    return `<g>
+      <line x1="${zx.toFixed(1)}" y1="${horizonY - 6}" x2="${zx.toFixed(1)}" y2="${horizonY + 8}" stroke="#e4bc69" stroke-width="1.3" opacity="0.8"/>
+      <text x="${zx.toFixed(1)}" y="${horizonY + 22}" text-anchor="middle" fill="#e4bc69" font-size="11" font-weight="600">${shortLbl} ${z.time}</text>
+    </g>`;
+  }).join('');
+
+  // Mini accurate moon at live coordinates
+  const mr = 14;
+  const mRad = ((cel.moon.phase_angle_deg || 0) * Math.PI) / 180;
+  const mRx = Math.abs(Math.cos(mRad) * mr);
+  const mWax = (cel.moon.phase_angle_deg || 0) < 180;
+  const mOuter = mWax ? 1 : 0;
+  const mTerm = mWax ? (cel.moon.phase_angle_deg < 90 ? 0 : 1) : (cel.moon.phase_angle_deg < 270 ? 0 : 1);
+  const miniMoonLit = (cel.moon.phase_angle_deg >= 176 && cel.moon.phase_angle_deg <= 184)
+    ? `<circle cx="${nowX.toFixed(1)}" cy="${moonY.toFixed(1)}" r="${mr}" fill="#fff4d2"/>`
+    : (cel.moon.phase_angle_deg <= 4 || cel.moon.phase_angle_deg >= 356 ? '' :
+      `<path d="M ${nowX.toFixed(1)} ${(moonY - mr).toFixed(1)} A ${mr} ${mr} 0 0 ${mOuter} ${nowX.toFixed(1)} ${(moonY + mr).toFixed(1)} A ${mRx.toFixed(2)} ${mr} 0 0 ${mTerm} ${nowX.toFixed(1)} ${(moonY - mr).toFixed(1)} Z" fill="#fff4d2"/>`);
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;">
+    <defs>
+      <linearGradient id="skyBg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${g0}"/>
+        <stop offset="56%" stop-color="${g1}"/>
+        <stop offset="72%" stop-color="${g2}"/>
+        <stop offset="73%" stop-color="#0a1120"/>
+        <stop offset="100%" stop-color="#050912"/>
+      </linearGradient>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff3b8" stop-opacity="1"/>
+        <stop offset="45%" stop-color="#f5b841" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#f5b841" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="${W}" height="${H}" fill="url(#skyBg)"/>
+    ${starsSvg}
+    <!-- Horizon -->
+    <line x1="${padL}" y1="${horizonY}" x2="${W - padR}" y2="${horizonY}" stroke="rgba(228,188,105,0.55)" stroke-width="1.5"/>
+    <text x="${padL}" y="${horizonY - 6}" fill="rgba(243,234,216,0.65)" font-size="10">HORIZON 0°</text>
+    <text x="${W - padR}" y="${horizonY - 6}" text-anchor="end" fill="rgba(243,234,216,0.65)" font-size="10">${esc(cel.location.city)} · ${esc(cel.local_time)}</text>
+    <!-- Current local time vertical marker -->
+    <line x1="${nowX.toFixed(1)}" y1="16" x2="${nowX.toFixed(1)}" y2="${H - 12}" stroke="rgba(255,255,255,0.22)" stroke-dasharray="4 4" stroke-width="1"/>
+    <!-- 24h Moon & Sun Arcs -->
+    <polyline points="${moonPts}" fill="none" stroke="rgba(165,208,248,0.65)" stroke-width="2" stroke-dasharray="5 5"/>
+    <polyline points="${sunPts}" fill="none" stroke="rgba(245,193,86,0.85)" stroke-width="2.4"/>
+    ${zMarkers}
+    <!-- Live Sun Position -->
+    <circle cx="${nowX.toFixed(1)}" cy="${sunY.toFixed(1)}" r="26" fill="url(#sunGlow)" opacity="${cel.sun.above_horizon ? '0.95' : '0.35'}"/>
+    <circle cx="${nowX.toFixed(1)}" cy="${sunY.toFixed(1)}" r="10" fill="${cel.sun.above_horizon ? '#ffe680' : '#c97b3e'}" stroke="#fff" stroke-width="1.2"/>
+    <text x="${(nowX + 16).toFixed(1)}" y="${(sunY + 4).toFixed(1)}" fill="#ffe8a3" font-size="12" font-weight="700">☀ Sun ${cel.sun.altitude_deg >= 0 ? '+' : ''}${cel.sun.altitude_deg}° ${cel.sun.compass}</text>
+    <!-- Live Moon Position (exact illuminated phase!) -->
+    <circle cx="${nowX.toFixed(1)}" cy="${moonY.toFixed(1)}" r="${mr + 6}" fill="rgba(175,214,255,0.18)"/>
+    <circle cx="${nowX.toFixed(1)}" cy="${moonY.toFixed(1)}" r="${mr}" fill="#121c31" stroke="#b9d6f2" stroke-width="1.2"/>
+    ${miniMoonLit}
+    <text x="${(nowX + 20).toFixed(1)}" y="${(moonY + 4).toFixed(1)}" fill="#d8ecff" font-size="12" font-weight="700">Moon ${cel.moon.illumination_pct}% · ${cel.moon.altitude_deg >= 0 ? '+' : ''}${cel.moon.altitude_deg}° ${cel.moon.compass}</text>
+    <!-- Hour axis -->
+    ${[0, 3, 6, 9, 12, 15, 18, 21, 24].map(h => `<text x="${xForHr(h).toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="rgba(183,194,214,0.75)" font-size="10">${String(h).padStart(2, '0')}:00</text>`).join('')}
+  </svg>`;
+}
+
+function renderCelestialRibbon(cel) {
+  if (!cel) return;
+  const he = cel.hebrew_date || {};
+  const sun = cel.sun || {};
+  const moon = cel.moon || {};
+  const nz = cel.next_zman || null;
+  const w = cel.watch || {};
+  const left = document.getElementById('celRibbonLeft');
+  const right = document.getElementById('celRibbonRight');
+  if (!left || !right) return;
+
+  left.innerHTML = `
+    <span class="cel-chip"><strong>✡ ${esc(he.en_str || '')}</strong> <span class="cel-he">${esc(he.he_str || '')}</span>${cel.after_sunset ? ' <span class="muted">· After Sunset</span>' : ''}</span>
+    ${cel.shabbat_mode ? `<span class="cel-shabbat">🕯 SHABBAT SANCTUARY MODE</span>` : `<span class="cel-chip muted">${esc(w.en || '')}</span>`}
+  `;
+  right.innerHTML = `
+    <span class="cel-chip">☀ <strong>${sun.altitude_deg >= 0 ? '+' : ''}${sun.altitude_deg}° ${esc(sun.compass || '')}</strong></span>
+    <span class="cel-chip">${esc(moon.emoji || '🌙')} <strong>${moon.illumination_pct}% ${esc(moon.phase_en || '')}</strong> <span class="muted">(Alt ${moon.altitude_deg >= 0 ? '+' : ''}${moon.altitude_deg}° ${esc(moon.compass || '')} · Rise ${esc(moon.moonrise || '—')})</span></span>
+    ${nz ? `<span class="cel-chip" style="color:var(--gold);font-weight:700;">⏳ ${esc(nz.name)}: ${esc(nz.time)} (${esc(nz.countdown)})</span>` : ''}
+  `;
+}
+
+async function loadCelestial() {
+  try {
+    const r = await fetch('/api/celestial');
+    celestialData = await r.json();
+    if (celestialData.city_presets) cityPresetsCache = celestialData.city_presets;
+    renderCelestialRibbon(celestialData);
+    // Respect Shabbat Sanctuary Stillness automatically (no unsolicited auto-speak)
+    if (celestialData.shabbat_mode) {
+      autoSpeakReplies = false;
+    }
+    if (currentViewName === 'sky' || document.getElementById('skyDomeWrap')) {
+      renderSkyObservatory(celestialData);
+    }
+  } catch (e) {}
+}
+
+function renderSkyObservatory(cel) {
+  if (!cel) return;
+  const he = cel.hebrew_date || {};
+  const sun = cel.sun || {};
+  const moon = cel.moon || {};
+  const mizrach = cel.mizrach || {};
+  const yc = cel.year_context || {};
+  const w = cel.watch || {};
+  const nz = cel.next_zman || null;
+
+  document.getElementById('skyHero').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div class="muted" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;">100% Offline Astronomical Ephemeris · ${esc(cel.location.city)} (${cel.location.lat.toFixed(2)}°N, ${cel.location.lon.toFixed(2)}°E)</div>
+        <h2 style="margin:4px 0;font-size:1.75rem;">${esc(he.en_str)} &nbsp;·&nbsp; <span style="font-family:var(--hebrew);color:var(--gold);">${esc(he.he_str)}</span></h2>
+        <div style="color:var(--accent);font-weight:600;">${esc(w.en)} &nbsp;·&nbsp; ${esc((yc.tekufah && yc.tekufah.en) || '')}</div>
+      </div>
+      <div style="text-align:right;">
+        ${cel.shabbat_mode ? `<div class="cel-shabbat" style="font-size:0.9rem;padding:5px 14px;margin-bottom:6px;display:inline-block;">🕯 Shabbat / Yom Tov Sanctuary Stillness</div><br>` : ''}
+        ${nz ? `<div style="font-size:1.1rem;font-weight:700;color:var(--gold);">Next Zman: ${esc(nz.name)} at ${esc(nz.time)} <span style="color:var(--accent);">(in ${esc(nz.countdown)})</span></div>` : ''}
+        <div class="muted" style="font-size:0.82rem;">Local Time ${esc(cel.local_time)} · Sha'ah Zmanit (GRA): ${cel.shaah_zmanit_gra_min} min · Display Warmth: ${w.kelvin}K</div>
+      </div>
+    </div>`;
+
+  document.getElementById('skyDomeWrap').innerHTML = renderSkyDomeSvg(cel);
+
+  const kl = yc.kiddush_levana || {};
+  document.getElementById('skyMoonCard').innerHTML = `
+    <div style="display:flex;gap:16px;align-items:center;">
+      ${renderMoonPhaseSvg(moon.phase_angle_deg || 0, 96)}
+      <div>
+        <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;">Live Lunar &amp; Molad Observatory</div>
+        <h3 style="margin:3px 0;font-size:1.3rem;">${esc(moon.phase_en)} <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(moon.phase_he)}</span></h3>
+        <div style="color:var(--accent);font-weight:600;">${moon.illumination_pct}% Illuminated · ${moon.above_horizon ? 'Visible Above Horizon' : 'Below Horizon'}</div>
+      </div>
+    </div>
+    <div class="sky-stat-grid">
+      <div class="sky-stat"><div class="k">Current Elevation &amp; Bearing</div><div class="v">${moon.altitude_deg >= 0 ? '+' : ''}${moon.altitude_deg}° ${esc(moon.compass)} (${moon.azimuth_deg}°)</div></div>
+      <div class="sky-stat"><div class="k">Moonrise / Moonset Today</div><div class="v">↑ ${esc(moon.moonrise)} &nbsp;/&nbsp; ↓ ${esc(moon.moonset)}</div></div>
+      <div class="sky-stat"><div class="k">Lunar Cycle Age</div><div class="v">Day ${moon.lunar_age_days} / ${moon.synodic_cycle_days}d</div></div>
+      <div class="sky-stat"><div class="k">Earth–Moon Distance</div><div class="v">${(moon.distance_km || 0).toLocaleString()} km</div></div>
+    </div>
+    <div class="today-box" style="margin-top:12px;">
+      <h4>🌙 Kiddush Levana &amp; Rosh Chodesh</h4>
+      <div style="font-size:0.9rem;">${esc(kl.status || '')}</div>
+    </div>`;
+
+  document.getElementById('skySolarMizrachCard').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;">
+      <div>
+        <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;">Solar Position, Mizrach &amp; Holy OS</div>
+        <h3 style="margin:3px 0;font-size:1.3rem;">☀ Sun ${sun.altitude_deg >= 0 ? '+' : ''}${sun.altitude_deg}° ${esc(sun.compass)}</h3>
+        <div class="muted" style="font-size:0.86rem;">Azimuth ${sun.azimuth_deg}° · Declination ${sun.declination_deg}° · ${sun.above_horizon ? 'Above Horizon' : 'Below Horizon'}</div>
+      </div>
+      <svg width="88" height="88" viewBox="0 0 88 88" style="flex-shrink:0;" title="Direction of Jerusalem (Mizrach)">
+        <circle cx="44" cy="44" r="38" fill="none" stroke="rgba(228,188,105,0.45)" stroke-width="1.5"/>
+        <text x="44" y="14" text-anchor="middle" fill="#b7c2d6" font-size="9">N</text>
+        <text x="76" y="47" text-anchor="middle" fill="#b7c2d6" font-size="9">E</text>
+        <text x="44" y="81" text-anchor="middle" fill="#b7c2d6" font-size="9">S</text>
+        <text x="12" y="47" text-anchor="middle" fill="#b7c2d6" font-size="9">W</text>
+        <g transform="rotate(${mizrach.bearing_deg || 118} 44 44)">
+          <polygon points="44,14 50,46 44,41 38,46" fill="#e4bc69"/>
+          <circle cx="44" cy="44" r="4" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="sky-stat-grid">
+      <div class="sky-stat"><div class="k">Mizrach (Face Jerusalem)</div><div class="v">${mizrach.bearing_deg}° ${esc(mizrach.compass)} · ${(mizrach.distance_km || 0).toLocaleString()} km</div></div>
+      <div class="sky-stat"><div class="k">Living OS Display Warmth</div><div class="v">${w.kelvin}K (${cel.os_color_temp_sync ? 'hyprsunset Active' : 'Manual'})</div></div>
+    </div>
+    <div class="today-box" style="margin-top:12px;">
+      <h4>🖥 Ground-Up Holy OS Framework</h4>
+      <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">
+        <li>100% Offline Solar &amp; Lunar Ephemeris (runs with zero internet)</li>
+        <li>Live OS state published to <code>torah-sanctuary-state.json</code> + Sacred Terminal MOTD</li>
+        <li>Automatic <strong>Shabbat Sanctuary Mode</strong> from Candle Lighting to Havdalah</li>
+      </ul>
+    </div>`;
+
+  const actKey = cel.active_zman ? cel.active_zman.key : '';
+  const nxtKey = nz ? nz.key : '';
+  document.getElementById('skyZmanimCard').innerHTML = `
+    <h3 style="margin-top:0;">🕯 Complete Halachic Zmanim Today</h3>
+    <div>
+      ${(cel.zmanim || []).map(z => {
+        const cls = z.key === nxtKey ? 'next' : (z.key === actKey ? 'active' : (z.passed ? 'passed' : ''));
+        return `<div class="zman-row ${cls}">
+          <div><span>${esc(z.name)}</span> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:6px;">${esc(z.he)}</span></div>
+          <div style="font-variant-numeric:tabular-nums;">${esc(z.time)}${z.key === nxtKey ? ` <span style="font-size:0.78rem;color:var(--accent);">(${esc(nz.countdown)})</span>` : ''}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  const specials = (yc.special_days || []).map(sd => `<div class="source-chip"><strong>${esc(sd.name)}</strong> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:6px;">${esc(sd.he)}</span></div>`).join('');
+  const omerHtml = yc.omer ? `<div class="today-box" style="margin-bottom:10px;"><h4>🌾 Sefirat HaOmer — Day ${yc.omer.day}</h4><div>${esc(yc.omer.sefirah_en)} · <span style="font-family:var(--hebrew);color:var(--gold);">${esc(yc.omer.sefirah_he)}</span></div></div>` : '';
+  document.getElementById('skyYearCard').innerHTML = `
+    <h3 style="margin-top:0;">📅 Jewish Year, Tekufah &amp; Liturgical Compass</h3>
+    ${omerHtml}
+    ${specials || `<div class="source-chip"><strong>Regular Weekday / Shabbat Cycle</strong> · ${esc(he.en_str)}</div>`}
+    <div style="margin-top:12px;">
+      <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Season (Tekufah)</div>
+      <div style="font-weight:700;color:var(--gold);">${esc((yc.tekufah && yc.tekufah.en) || '')} <span style="font-family:var(--hebrew);margin-left:6px;">${esc((yc.tekufah && yc.tekufah.he) || '')}</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Active Tefillah (Prayer) Season Inserts</div>
+      <ul style="margin:0;padding-left:18px;font-size:0.9rem;line-height:1.55;">
+        ${(yc.prayers || []).map(p => `<li>${esc(p)}</li>`).join('')}
+      </ul>
+    </div>`;
+}
+
+function applyCityPreset(key) {
+  const p = cityPresetsCache[key];
+  if (!p) return;
+  document.getElementById('cfgLocCity').value = p.city || '';
+  document.getElementById('cfgLocLat').value = p.lat ?? '';
+  document.getElementById('cfgLocLon').value = p.lon ?? '';
+  document.getElementById('cfgLocTz').value = p.tz || '';
+}
+
+async function loadSettings() {
+  await loadHealth();
+  if (!Object.keys(cityPresetsCache).length) await loadCelestial();
+  const r = await fetch('/api/config');
+  const c = (await r.json()).config || {};
+  document.getElementById('cfgSynName').value = c.synagogue_name || 'The European Synagogue · Torah Sanctuary';
+  const loc = c.location || { city: 'Brussels, Belgium', lat: 50.8503, lon: 4.3517, tz: 'Europe/Brussels' };
+  document.getElementById('cfgLocCity').value = loc.city || 'Brussels, Belgium';
+  document.getElementById('cfgLocLat').value = loc.lat ?? 50.8503;
+  document.getElementById('cfgLocLon').value = loc.lon ?? 4.3517;
+  document.getElementById('cfgLocTz').value = loc.tz || 'Europe/Brussels';
+  document.getElementById('cfgOsColorSync').checked = c.os_color_temp_sync !== false;
+  document.getElementById('cfgOllamaModel').value = c.ollama_model || 'qwen2.5:1.5b';
+  document.getElementById('cfgCloudProv').value = c.cloud_provider || 'none';
+  document.getElementById('cfgCloudModel').value = c.cloud_model || '';
+  document.getElementById('cfgCloudKey').value = c.cloud_api_key || '';
+  document.getElementById('cfgVoiceProf').value = c.voice_profile || 'grand_narrator';
+  document.getElementById('cfgAutoSpeak').checked = c.auto_speak !== false;
+  currentVoiceProfile = c.voice_profile || 'grand_narrator';
+  autoSpeakReplies = c.auto_speak !== false;
+  document.getElementById('cfgIcsUrl').value = c.calendar_ics_url || '';
+  document.getElementById('cfgMailHook').value = c.mailing_webhook_url || '';
+}
+
+async function saveSettings() {
+  const presetKey = document.getElementById('cfgCityPreset').value;
+  const preset = cityPresetsCache[presetKey] || {};
+  const payload = {
+    synagogue_name: document.getElementById('cfgSynName').value.trim() || 'The European Synagogue · Torah Sanctuary',
+    location: {
+      city: document.getElementById('cfgLocCity').value.trim() || 'Brussels, Belgium',
+      lat: parseFloat(document.getElementById('cfgLocLat').value) || 50.8503,
+      lon: parseFloat(document.getElementById('cfgLocLon').value) || 4.3517,
+      tz: document.getElementById('cfgLocTz').value.trim() || 'Europe/Brussels',
+      candle_lighting_offset_min: preset.candle_lighting_offset_min || 18,
+      in_israel: !!preset.in_israel,
+    },
+    os_color_temp_sync: document.getElementById('cfgOsColorSync').checked,
+    ollama_model: document.getElementById('cfgOllamaModel').value.trim() || 'qwen2.5:1.5b',
+    cloud_provider: document.getElementById('cfgCloudProv').value,
+    cloud_model: document.getElementById('cfgCloudModel').value.trim(),
+    cloud_api_key: document.getElementById('cfgCloudKey').value.trim(),
+    voice_profile: document.getElementById('cfgVoiceProf').value,
+    auto_speak: document.getElementById('cfgAutoSpeak').checked,
+    calendar_ics_url: document.getElementById('cfgIcsUrl').value.trim(),
+    mailing_webhook_url: document.getElementById('cfgMailHook').value.trim(),
+  };
+  currentVoiceProfile = payload.voice_profile;
+  autoSpeakReplies = payload.auto_speak;
+  const r = await fetch('/api/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  if (r.ok) {
+    document.getElementById('cfgMsg').textContent = 'Settings saved! Celestial observatory, display rhythm & calendar updated.';
+    loadHealth();
+    loadCelestial();
+    loadToday(null);
+  }
+}
+
+loadHealth();
+loadCelestial();
+loadToday();
+setInterval(loadHealth, 30000);
+setInterval(loadCelestial, 60000);
+</script>
+</body>
+</html>

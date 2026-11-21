@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""
+torah-ctl — Command-Line Interface for Torah Sanctuary (100% Offline Tanakh, Commentaries & Hybrid AI).
+Usage:
+  torah-ctl status
+  torah-ctl lookup "Genesis 1:1-3"
+  torah-ctl commentary "Genesis 1:1"
+  torah-ctl search "burning bush"
+  torah-ctl parasha
+  torah-ctl stories
+  torah-ctl ask [--mode scholar|storyteller|history|all] "Your question..."
+"""
+
+import json
+import pathlib
+import sys
+
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+import ai_engine
+import torah_db
+
+
+def main():
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help", "help"):
+        print(__doc__.strip())
+        return
+    cmd = args[0].lower()
+
+    if cmd == "status":
+        print(json.dumps({
+            "stats": torah_db.get_stats(),
+            "ollama": ai_engine.check_ollama_status(),
+        }, indent=2, ensure_ascii=False))
+        return
+
+    if cmd == "lookup" and len(args) >= 2:
+        ref = " ".join(args[1:])
+        verses = torah_db.lookup_verses(ref, max_verses=20)
+        if not verses:
+            print(f"No verses matched: {ref}")
+            sys.exit(1)
+        for v in verses:
+            print(f"[{v['ref']}] {v['en_text']}")
+            print(f"  {v['he_text']}\n")
+        return
+
+    if cmd == "commentary" and len(args) >= 2:
+        ref = " ".join(args[1:])
+        parsed = torah_db.parse_refs(ref)
+        if not parsed:
+            print(f"Could not parse reference: {ref}")
+            sys.exit(1)
+        bk, ch, v1, _ = parsed[0]
+        comms = torah_db.get_verse_commentaries(bk, ch, v1 or 1)
+        if not comms:
+            print(f"No stored commentary for {bk} {ch}:{v1 or 1}")
+            return
+        for c in comms:
+            print(f"=== {c['commentator']} on {c['target_ref']} ===")
+            if c["en_text"]:
+                print(c["en_text"])
+            if c["he_text"]:
+                print(c["he_text"])
+            print()
+        return
+
+    if cmd == "search" and len(args) >= 2:
+        q = " ".join(args[1:])
+        res = torah_db.search_all(q, limit_verses=8, limit_comm=5, limit_docs=3)
+        for v in (res["exact_verses"] + res["verses"])[:8]:
+            print(f"[VERSE] {v['ref']}: {v['en_text']}")
+        for c in res["commentaries"][:5]:
+            print(f"[{c['commentator']}] {c['target_ref']}: {c['en_text'][:220]}")
+        for d in res["documents"][:3]:
+            print(f"[{d['category'].upper()}] {d['title']} ({d['refs']}): {d['subtitle']}")
+        return
+
+    if cmd == "parasha":
+        p = torah_db.get_weekly_parasha()
+        print(f"Parashat {p['en_name']} ({p['he_name']}) — {p['ref']}")
+        print(f"Haftarah: {p.get('live_haftarah') or p['haftarah_ref']}")
+        print(f"Summary:  {p['summary']}")
+        return
+
+    if cmd == "stories":
+        for d in torah_db.list_documents("story"):
+            print(f"- {d['slug']}: {d['title']} ({d['he_title']}) [{d['refs']}]")
+        return
+
+    if cmd == "ask" and len(args) >= 2:
+        mode = "all"
+        rest = args[1:]
+        if len(rest) >= 2 and rest[0] == "--mode":
+            mode = rest[1]
+            rest = rest[2:]
+        q = " ".join(rest).strip()
+        if not q:
+            print("Provide a question.")
+            sys.exit(1)
+        for ev in ai_engine.stream_answer(q, mode=mode):
+            if ev["type"] == "token":
+                sys.stdout.write(ev["text"])
+                sys.stdout.flush()
+            elif ev["type"] == "done":
+                print(f"\n\n[backend: {ev['backend']}]")
+        return
+
+    print(__doc__.strip())
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""
+torah-mcp — Standard JSON-RPC 2.0 stdio MCP Server for Torah Sanctuary.
+Exposes authoritative offline Tanakh, Classical Commentaries (Rashi, Ramban, Ibn Ezra, Sforno,
+Pirkei Avot, Midrash Rabbah), Weekly Parashah, and Story/History Dossiers to any MCP client.
+"""
+
+import json
+import pathlib
+import sys
+
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+import torah_db
+
+TOOLS = [
+    {
+        "name": "torah_lookup_verse",
+        "description": "Look up exact Hebrew + English verses from any of the 39 books of the Tanakh (e.g. 'Genesis 1:1-5', 'Exodus 20:1-14', 'Psalm 23', 'Deut 6:4').",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "reference": {"type": "string", "description": "Verse or chapter reference in English or Hebrew transliteration"}
+            },
+            "required": ["reference"],
+        },
+    },
+    {
+        "name": "torah_get_commentary",
+        "description": "Retrieve verbatim classical Jewish commentaries (Rashi, Ramban, Ibn Ezra, Sforno) for a specific Torah verse.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "book": {"type": "string", "description": "Torah book (Genesis, Exodus, Leviticus, Numbers, Deuteronomy)"},
+                "chapter": {"type": "integer"},
+                "verse": {"type": "integer"},
+            },
+            "required": ["book", "chapter", "verse"],
+        },
+    },
+    {
+        "name": "torah_search",
+        "description": "Full-text search across all 23,206 Tanakh verses, 21,000+ classical commentaries/Midrash/Pirkei Avot, 54 Parashiyot, and curated Torah Story & Historical dossiers.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "Keywords, theme, Hebrew term, or verse reference"}
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "torah_weekly_parasha",
+        "description": "Get this week's Parashat Hashavua (or a specific Parashah by slug/name) with Hebrew title, verse range, Haftarah, summary, and opening verses.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "slug": {"type": "string", "description": "Optional parashah name/slug; omit for this week's portion"}
+            },
+        },
+    },
+    {
+        "name": "torah_list_dossiers",
+        "description": "List curated Torah Stories (for kids & families), Historical/Archaeological Old Testament dossiers, and PaRDeS study guides.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "category": {"type": "string", "enum": ["story", "history", "guide", "all"]}
+            },
+        },
+    },
+    {
+        "name": "torah_read_dossier",
+        "description": "Read a full curated Torah Story, Historical/Archaeological dossier, or Study Guide by slug.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"slug": {"type": "string"}},
+            "required": ["slug"],
+        },
+    },
+]
+
+
+def call_tool(name: str, args: dict):
+    if name == "torah_lookup_verse":
+        return {"verses": torah_db.lookup_verses(args.get("reference", ""), max_verses=25)}
+    if name == "torah_get_commentary":
+        return {"commentaries": torah_db.get_verse_commentaries(args.get("book", "Genesis"), int(args.get("chapter", 1)), int(args.get("verse", 1)))}
+    if name == "torah_search":
+        return torah_db.search_all(args.get("query", ""), limit_verses=10, limit_comm=8, limit_docs=4)
+    if name == "torah_weekly_parasha":
+        slug = (args.get("slug") or "").strip()
+        if slug:
+            for p in torah_db.list_parashiyot():
+                if p["slug"] == slug or p["en_name"].lower() == slug.lower():
+                    p["verses_preview"] = torah_db.get_parasha_verses(p, max_verses=30)
+                    return p
+        return torah_db.get_weekly_parasha()
+    if name == "torah_list_dossiers":
+        cat = args.get("category")
+        if cat in (None, "", "all"):
+            cat = None
+        return {"dossiers": [{"slug": d["slug"], "category": d["category"], "title": d["title"], "he_title": d["he_title"], "refs": d["refs"], "subtitle": d["subtitle"]} for d in torah_db.list_documents(cat)]}
+    if name == "torah_read_dossier":
+        doc = torah_db.get_document(args.get("slug", ""))
+        return doc or {"error": "Dossier not found"}
+    return {"error": f"Unknown tool: {name}"}
+
+
+def write_msg(obj: dict):
+    sys.stdout.write(json.dumps(obj, ensure_ascii=False) + "\n")
+    sys.stdout.flush()
+
+
+def main():
+    for raw in sys.stdin:
+        line = raw.strip()
+        if not line:
+            continue
+        try:
+            req = json.loads(line)
+        except Exception:
+            continue
+        mid = req.get("id")
+        method = req.get("method")
+        params = req.get("params") or {}
+        if method == "initialize":
+            write_msg({
+                "jsonrpc": "2.0",
+                "id": mid,
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {"name": "torah-sanctuary-mcp", "version": "1.0.0"},
+                },
+            })
+        elif method == "notifications/initialized":
+            continue
+        elif method == "tools/list":
+            write_msg({"jsonrpc": "2.0", "id": mid, "result": {"tools": TOOLS}})
+        elif method == "tools/call":
+            try:
+                res = call_tool(params.get("name", ""), params.get("arguments") or {})
+                write_msg({
+                    "jsonrpc": "2.0",
+                    "id": mid,
+                    "result": {"content": [{"type": "text", "text": json.dumps(res, ensure_ascii=False)}]},
+                })
+            except Exception as e:
+                write_msg({
+                    "jsonrpc": "2.0",
+                    "id": mid,
+                    "result": {"isError": True, "content": [{"type": "text", "text": str(e)}]},
+                })
+        elif mid is not None:
+            write_msg({"jsonrpc": "2.0", "id": mid, "error": {"code": -32601, "message": f"Method not found: {method}"}})
+
+
+if __name__ == "__main__":
+    main()

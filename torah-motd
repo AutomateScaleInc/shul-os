@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Torah Sanctuary OS — Sacred Terminal MOTD
+MOTD="$HOME/.cache/torah-sanctuary/motd.txt"
+if [ -s "$MOTD" ]; then
+  cat "$MOTD"
+elif [ -x "$HOME/torah-sanctuary/sacred-os-daemon.py" ]; then
+  python3 "$HOME/torah-sanctuary/sacred-os-daemon.py" --quiet >/dev/null 2>&1 || true
+  [ -s "$MOTD" ] && cat "$MOTD"
+fi

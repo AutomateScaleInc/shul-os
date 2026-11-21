@@ -1,0 +1,15 @@
+[Unit]
+Description=Torah Sanctuary — Full-Screen Synagogue Kiosk Browser
+After=graphical-session.target torah-sanctuary.service
+Requires=torah-sanctuary.service
+
+[Service]
+Type=simple
+Environment="WAYLAND_DISPLAY=wayland-1"
+ExecStartPre=/bin/sleep 3
+ExecStart=/usr/bin/chromium --kiosk --noerrdialogs --disable-infobars --disable-session-crashed-bubble --ozone-platform=wayland --app=http://127.0.0.1:8080
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

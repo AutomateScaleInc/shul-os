@@ -1,0 +1,7 @@
+[Unit]
+Description=Torah Sanctuary OS — Celestial, Zmanim & Ambient Display Rhythm Sync
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/torah-sanctuary/sacred-os-daemon.py --quiet
