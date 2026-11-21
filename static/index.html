@@ -810,6 +810,97 @@
   .sb-act .sb-num { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; }
   .sb-act .sb-title { font-family: var(--serif); color: var(--gold); font-size: 0.98rem; font-weight: 700; margin: 2px 0 4px; }
   .sb-act .sb-txt { font-size: 0.82rem; color: var(--text); line-height: 1.42; }
+
+  /* ===== HANDS-FREE LIVING SHOW: CHARACTER INTERACTIONS, QUIZZES & TIMELY POPUPS ===== */
+  .char-stage-actors {
+    display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    position: absolute; inset: 0; z-index: 3; padding: 14px 20px;
+    background: linear-gradient(180deg, rgba(7,12,24,0.18), rgba(7,12,24,0.72));
+  }
+  .char-actor {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(11,18,34,0.84); border: 1.5px solid rgba(228,188,105,0.55);
+    border-radius: 999px; padding: 7px 14px 7px 9px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    animation: actorFloat 4.2s ease-in-out infinite;
+  }
+  .char-actor.right { flex-direction: row-reverse; padding: 7px 9px 7px 14px; text-align: right; animation-delay: 1.6s; }
+  .char-orb {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe9a8, #c4933b);
+    color: #0b1120; font-size: 1.35rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 0 18px rgba(228,188,105,0.5);
+  }
+  @keyframes actorFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  .dialogue-stack { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+  .char-bubble {
+    border-radius: 14px; padding: 10px 14px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elev);
+    opacity: 0; transform: translateY(12px) scale(0.97);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease;
+  }
+  .char-bubble.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .char-bubble.left { border-left: 4px solid var(--gold); margin-right: 24px; }
+  .char-bubble.right { border-right: 4px solid var(--accent); margin-left: 24px; text-align: left; }
+  .char-bubble.spark {
+    background: var(--gold-soft); border: 1px solid var(--gold);
+  }
+  .char-bubble .b-who { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 700; margin-bottom: 3px; }
+  .char-bubble.right .b-who { color: var(--accent); }
+  .char-bubble .b-txt { font-size: 0.96rem; line-height: 1.48; }
+
+  /* Guess-Before-Reveal Quiz Card */
+  .quiz-wrap { margin-top: 8px; }
+  .quiz-q { font-family: var(--serif); font-size: 1.28rem; color: #fff; font-weight: 700; line-height: 1.35; margin: 6px 0 10px; }
+  [data-theme="parchment"] .quiz-q { color: var(--text); }
+  .quiz-opts { display: grid; gap: 8px; }
+  .quiz-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 13px; border-radius: 11px;
+    background: var(--bg-elev); border: 1.5px solid var(--border);
+    font-size: 0.94rem; cursor: pointer;
+    transition: all 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .quiz-opt .q-let {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(228,188,105,0.18); color: var(--gold); font-weight: 800;
+    display: flex; align-items: center; justify-content: center; font-size: 0.84rem;
+  }
+  .quiz-opt.correct {
+    background: rgba(34, 197, 94, 0.2); border-color: #4ade80; color: #fff;
+    transform: scale(1.015); box-shadow: 0 0 22px rgba(74, 222, 128, 0.28);
+  }
+  [data-theme="parchment"] .quiz-opt.correct { color: #0f2e1a; }
+  .quiz-opt.correct .q-let { background: #22c55e; color: #061b0e; }
+  .quiz-opt.dimmed { opacity: 0.42; transform: scale(0.985); }
+  .quiz-cd-track { height: 6px; border-radius: 99px; background: rgba(255,255,255,0.1); overflow: hidden; margin: 10px 0 6px; }
+  .quiz-cd-bar { height: 100%; background: linear-gradient(90deg, var(--gold), #4ade80); width: 100%; transition: width 0.25s linear; }
+  .quiz-reveal-box {
+    margin-top: 8px; padding: 10px 14px; border-radius: 12px;
+    background: rgba(34,197,94,0.14); border: 1px solid rgba(74,222,128,0.55);
+    font-size: 0.9rem; line-height: 1.48;
+    animation: sanctuaryReveal 0.55s ease both;
+  }
+
+  /* Timely Animated Pop-Up Toast (Hands-Free Energy & Curiosity!) */
+  #sanctuaryToast {
+    position: fixed; right: 24px; bottom: 54px; z-index: 90;
+    max-width: 400px;
+    background: linear-gradient(135deg, rgba(16,28,54,0.96), rgba(26,40,72,0.96));
+    border: 1.5px solid var(--gold);
+    border-radius: 16px; padding: 12px 16px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.55), 0 0 24px rgba(228,188,105,0.22);
+    transform: translateY(28px) scale(0.94); opacity: 0; pointer-events: none;
+    transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+  }
+  #sanctuaryToast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+  #sanctuaryToast .t-tag { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold); font-weight: 800; margin-bottom: 4px; }
+  #sanctuaryToast .t-msg { font-size: 0.9rem; color: #f3ead8; line-height: 1.44; }
 </style>
 </head>
 <body>
@@ -1194,6 +1285,12 @@
   </footer>
 </div>
 
+<!-- TIMELY ANIMATED SANCTUARY POP-UP INSIGHT TOAST -->
+<div id="sanctuaryToast" onclick="this.classList.remove('show')">
+  <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
+  <div class="t-msg" id="toastMsg"></div>
+</div>
+
 <!-- FULL-SCREEN CINEMATIC SYNAGOGUE PRESENTATION OVERLAY -->
 <div id="presModal">
   <div class="pres-bg" id="presBg"></div>
@@ -1237,9 +1334,116 @@ let dailyData = null;
 let spotIdx = 0;
 let spotPaused = false;
 let spotTickMs = 0;
-const SPOT_DURATION_MS = 13000;
+let currentSpotDurationMs = 13000;
+let quizRevealed = false;
+let quizManualPick = null;
+let showBeatTimers = [];
+let toastIdx = 0;
+let toastHideTimer = null;
 let lastInteractionTs = Date.now();
 let currentViewName = 'today';
+
+function clearShowBeatTimers() {
+  showBeatTimers.forEach(t => clearTimeout(t));
+  showBeatTimers = [];
+}
+
+function weaveLivingShow(d) {
+  const base = listCopy(d.slides || []);
+  const ex = d.show_extras || {};
+  const scenes = ex.character_scenes || [];
+  const quizzes = ex.quizzes || [];
+  const syms = ex.featured_symbols || [];
+  const artCycle = [
+    (d.rich && d.rich.art) || '/art/jacobs-ladder.jpg',
+    '/art/abraham-stars.jpg',
+    '/art/burning-bush.jpg',
+    '/art/sinai-tablets.jpg',
+    '/art/noah-rainbow.jpg',
+    '/art/ruth-harvest.jpg',
+    '/art/david-harp.jpg',
+    '/art/sacred-symbols.jpg',
+  ];
+  const out = [];
+  let sIdx = 0, qIdx = 0, symIdx = 0, vSeen = 0;
+  base.forEach((sl, idx) => {
+    const copy = Object.assign({}, sl);
+    if (!copy.art) copy.art = (idx === 0) ? artCycle[0] : artCycle[idx % artCycle.length];
+    out.push(copy);
+    if (sl.kind === 'verse') {
+      vSeen++;
+      // After verse 1, 5, 9... weave an Animated Character Interaction Scene!
+      if (vSeen % 4 === 1 && sIdx < scenes.length) {
+        const sc = scenes[sIdx++];
+        out.push({
+          kind: 'character_scene',
+          title: `🎭 ${sc.title}`,
+          kicker: `LIVING CHARACTER DIALOGUE · ${sc.ref}`,
+          he_kicker: sc.he_title,
+          en_text: sc.beats.map(b => `${b.speaker}: ${b.line}`).join(' '),
+          commentator: 'Animated Story Scene',
+          scene: sc,
+          art: sc.art,
+        });
+      }
+      // After verse 2, 6, 10... weave a Guess-Before-The-Reveal Torah Challenge Quiz!
+      if (vSeen % 4 === 2 && qIdx < quizzes.length) {
+        const q = quizzes[qIdx++];
+        out.push({
+          kind: 'quiz',
+          title: `❓ ${q.badge}`,
+          kicker: 'CAN YOU GUESS BEFORE THE REVEAL?',
+          he_kicker: 'חִידַת תּוֹרָה',
+          en_text: q.question,
+          commentator: 'Auto-Reveal in 8s',
+          quiz: q,
+          art: q.art,
+        });
+      }
+      // After verse 4, 8, 12... weave a Living Sacred Symbol & Story Illustration Spotlight!
+      if (vSeen % 4 === 0 && symIdx < syms.length) {
+        const sym = syms[symIdx++];
+        out.push({
+          kind: 'symbol_feature',
+          title: `✡ ${sym.name}`,
+          kicker: `SACRED SYMBOL SPOTLIGHT · ${sym.source_ref}`,
+          he_kicker: sym.he_name,
+          en_text: sym.meaning,
+          commentator: 'In Today\'s Terms',
+          symbol: sym,
+          art: sym.art,
+        });
+      }
+    }
+  });
+  return out;
+}
+function listCopy(arr) { return Array.isArray(arr) ? arr.slice() : []; }
+
+function showTimelyPopup() {
+  if (currentViewName !== 'today' || document.getElementById('presModal').classList.contains('open')) return;
+  const popups = ((dailyData && dailyData.show_extras && dailyData.show_extras.popups) || []).slice();
+  if (celestialData && celestialData.moon) {
+    const m = celestialData.moon;
+    const nz = celestialData.next_zman;
+    popups.unshift({
+      tag: `${m.emoji || '🌙'} LIVE SKY RIGHT NOW`,
+      text: `Moon is ${m.illumination_pct}% ${m.phase_en} at ${m.altitude_deg >= 0 ? '+' : ''}${m.altitude_deg}° ${m.compass} (Rise ${m.moonrise}). ${nz ? `Next Zman: ${nz.name} at ${nz.time} (${nz.countdown}).` : ''}`,
+    });
+  }
+  if (!popups.length) return;
+  const item = popups[toastIdx % popups.length];
+  toastIdx++;
+  const el = document.getElementById('sanctuaryToast');
+  if (!el) return;
+  document.getElementById('toastTag').textContent = item.tag;
+  document.getElementById('toastMsg').textContent = item.text;
+  el.classList.add('show');
+  if (toastHideTimer) clearTimeout(toastHideTimer);
+  toastHideTimer = setTimeout(() => el.classList.remove('show'), 7500);
+}
+setInterval(showTimelyPopup, 19000);
+setTimeout(showTimelyPopup, 7000);
 
 ['mousemove', 'mousedown', 'keydown', 'touchstart', 'wheel'].forEach(ev => {
   window.addEventListener(ev, () => { lastInteractionTs = Date.now(); }, { passive: true });
@@ -1269,6 +1473,7 @@ async function loadToday(dayIdx = null) {
   const url = dayIdx === null ? '/api/today' : '/api/today?day=' + encodeURIComponent(dayIdx);
   const r = await fetch(url);
   dailyData = await r.json();
+  dailyData.slides = weaveLivingShow(dailyData);
   spotIdx = 0;
   spotTickMs = 0;
 
@@ -1284,16 +1489,19 @@ async function loadToday(dayIdx = null) {
     </button>`).join('');
 
   document.getElementById('streamTitle').textContent = `Parashat ${dailyData.parasha.en_name} · ${dailyData.aliyah_en}`;
-  document.getElementById('streamSub').textContent = `${dailyData.date_str} · ${dailyData.aliyah_ref} (${dailyData.verses_count} verses)`;
+  document.getElementById('streamSub').textContent = `${dailyData.date_str} · ${dailyData.aliyah_ref} (${dailyData.verses_count} verses + living show)`;
 
   // Render daily stream list
   const sList = document.getElementById('dailyStreamList');
-  sList.innerHTML = (dailyData.slides || []).map((s, i) => `
+  sList.innerHTML = (dailyData.slides || []).map((s, i) => {
+    const tag = s.kind === 'banner' ? '· Daily Overview' : (s.kind === 'character_scene' ? '· Animated Scene' : (s.kind === 'quiz' ? '· Guess Challenge' : (s.kind === 'symbol_feature' ? '· Symbol Spotlight' : (s.kind === 'story' ? '· Torah Story' : ''))));
+    return `
     <div class="stream-item ${i === 0 ? 'active' : ''}" id="stream-item-${i}" onclick="jumpSlide(${i})">
-      <div class="s-ref">${esc(s.title)} ${s.kind === 'banner' ? '· Daily Overview' : (s.kind === 'story' ? '· Torah Story' : '')}</div>
-      <div class="s-en">${esc((s.en_text || '').slice(0, 125))}${(s.en_text || '').length > 125 ? '...' : ''}</div>
+      <div class="s-ref">${esc(s.title)} ${tag}</div>
+      <div class="s-en">${esc((s.en_text || '').slice(0, 115))}${(s.en_text || '').length > 115 ? '...' : ''}</div>
       ${s.commentator ? `<div class="s-comm">✦ ${esc(s.commentator)}</div>` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   // Render persistent bottom scrolling marquee ticker strictly for TODAY's portion
   document.getElementById('tickerBadge').textContent = `${dailyData.day_en}: ${dailyData.parasha.en_name}`;
@@ -1440,47 +1648,193 @@ function buildStoryStoryboard(d, en) {
     </div>`).join('')}</div>`;
 }
 
+function revealCurrentQuiz(pickedIdx = null) {
+  if (!dailyData || !dailyData.slides) return;
+  const s = dailyData.slides[spotIdx];
+  if (!s || s.kind !== 'quiz' || quizRevealed) return;
+  quizRevealed = true;
+  quizManualPick = pickedIdx;
+  const q = s.quiz;
+  document.querySelectorAll('.quiz-opt').forEach((el, i) => {
+    if (i === q.correct_idx) {
+      el.classList.add('correct');
+      el.querySelector('.q-let').textContent = '✓';
+    } else {
+      el.classList.add('dimmed');
+    }
+  });
+  const cdLbl = document.getElementById('quizCdLabel');
+  if (cdLbl) cdLbl.textContent = '✨ ANSWER REVEALED!';
+  const cdBar = document.getElementById('quizCdBar');
+  if (cdBar) cdBar.style.width = '100%';
+  const rev = document.getElementById('quizRevealBox');
+  if (rev) rev.style.display = 'block';
+}
+
 function renderSpotlight() {
   if (!dailyData || !dailyData.slides || !dailyData.slides.length) return;
+  clearShowBeatTimers();
+  quizRevealed = false;
+  quizManualPick = null;
+
   const s = dailyData.slides[spotIdx] || dailyData.slides[0];
   const rich = dailyData.rich || {};
+  const slideArt = s.art || rich.art || '/art/jacobs-ladder.jpg';
+  currentSpotDurationMs = (s.kind === 'quiz' || s.kind === 'character_scene') ? 15500 : 12500;
   document.getElementById('spotCounter').textContent = `${spotIdx + 1} / ${dailyData.slides.length}`;
-  const richBar = (rich.characters && rich.characters.length) ? `
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center;">
-      ${rich.characters.map(c => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('characters'); openCharacter('${esc(c.slug)}')">👤 ${esc(c.name)}</button>`).join('')}
-      ${(rich.symbols || []).map(sym => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('symbols')">✡ ${esc(sym.name)}</button>`).join('')}
-    </div>` : '';
-  const todayHint = (rich.today_points && rich.today_points.length) ? `
-    <div class="today-box" style="margin-top:10px;padding:10px 14px;">
-      <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying Today's Portion in Today's Terms</h4>
-      <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">${rich.today_points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
-    </div>` : '';
-  const capHtml = `
-    <div>
-      <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:#f3d796;font-weight:700;">${esc(s.kicker)}</div>
-      <div style="font-family:var(--serif);font-size:1.55rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.title)}</div>
-    </div>
-    <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.3rem;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.he_kicker || '')}</div>`;
-  document.getElementById('spotlightContent').innerHTML = `
-    <div class="sanctuary-reveal">
-      ${rich.art ? renderLivingScene(rich.art, 'clamp(135px, 16vh, 210px)', capHtml, "openPresentation('parasha','')", 'margin-bottom:10px;cursor:pointer;') : `
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <span style="font-size:0.84rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;">${esc(s.kicker)}</span>
-        <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(s.he_kicker || '')}</span>
+
+  if (s.kind === 'character_scene' && s.scene) {
+    const sc = s.scene;
+    const stageHtml = `
+      <div class="living-stage" style="height:clamp(145px, 18vh, 215px);margin-bottom:10px;">
+        <img class="living-img" src="${esc(sc.art)}" alt="${esc(sc.title)}">
+        ${getLivingOverlaySvg(sc.art)}
+        <div class="char-stage-actors">
+          <div class="char-actor">
+            <div class="char-orb">${esc(sc.left.badge)}</div>
+            <div>
+              <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.02rem;line-height:1.1;">${esc(sc.left.he)}</div>
+              <div style="font-weight:700;color:#fff;font-size:0.95rem;">${esc(sc.left.name)}</div>
+              <div style="font-size:0.74rem;color:#c9d6ea;">${esc(sc.left.role)}</div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:0 6px;">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:#f3d796;font-weight:800;">${esc(sc.ref)}</div>
+            <div style="font-family:var(--serif);font-size:1.25rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sc.title)}</div>
+            <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.05rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">${esc(sc.he_title)}</div>
+          </div>
+          <div class="char-actor right">
+            <div class="char-orb">${esc(sc.right.badge)}</div>
+            <div>
+              <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.02rem;line-height:1.1;">${esc(sc.right.he)}</div>
+              <div style="font-weight:700;color:#fff;font-size:0.95rem;">${esc(sc.right.name)}</div>
+              <div style="font-size:0.74rem;color:#c9d6ea;">${esc(sc.right.role)}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    const beatsHtml = (sc.beats || []).map((b, idx) => `
+      <div class="char-bubble ${esc(b.side)}" id="char-beat-${idx}">
+        <div class="b-who">${esc(b.speaker)}</div>
+        <div class="b-txt">${esc(b.line)}</div>
+      </div>`).join('');
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${stageHtml}
+        <div class="dialogue-stack">${beatsHtml}</div>
+      </div>`;
+    // Animate dialogue beats in sequentially (hands-free story theater!)
+    (sc.beats || []).forEach((_, idx) => {
+      const delay = idx === 0 ? 350 : (idx === 1 ? 3900 : 7600);
+      showBeatTimers.push(setTimeout(() => {
+        const el = document.getElementById('char-beat-' + idx);
+        if (el) el.classList.add('shown');
+      }, delay));
+    });
+  } else if (s.kind === 'quiz' && s.quiz) {
+    const q = s.quiz;
+    const capHtml = `
+      <div>
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.12em;color:#4ade80;font-weight:800;">❓ ${esc(q.badge)} · GUESS OUT LOUD!</div>
+        <div style="font-family:var(--serif);font-size:1.4rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.75);">Can You Solve This Before the Reveal?</div>
       </div>
-      <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
-      ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
-      <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
-      ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${s.kind === 'story' ? renderMarkdown(s.commentary) : esc(s.commentary)}</div></div>` : ''}
-      ${todayHint}
-      ${richBar}
-    </div>`;
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.25rem;text-shadow:0 2px 10px rgba(0,0,0,0.75);">חִידַת תּוֹרָה</div>`;
+    const letters = ['A', 'B', 'C', 'D'];
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${renderLivingScene(q.art || slideArt, 'clamp(115px, 13.5vh, 175px)', capHtml, '', 'margin-bottom:8px;')}
+        <div class="quiz-wrap">
+          <div class="quiz-q">${esc(q.question)}</div>
+          <div class="quiz-opts">
+            ${(q.options || []).map((opt, i) => `
+              <div class="quiz-opt" onclick="revealCurrentQuiz(${i})">
+                <span class="q-let">${letters[i] || (i+1)}</span>
+                <span>${esc(opt)}</span>
+              </div>`).join('')}
+          </div>
+          <div class="quiz-cd-track"><div class="quiz-cd-bar" id="quizCdBar"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;">
+            <span id="quizCdLabel" style="color:var(--gold);font-weight:700;">⏳ Auto-revealing answer in 8s...</span>
+            <span class="muted">${esc(q.source_ref)}</span>
+          </div>
+          <div class="quiz-reveal-box" id="quizRevealBox" style="display:none;">
+            <strong style="color:#4ade80;">✨ Did You Know?</strong> ${esc(q.reveal_fact)}
+          </div>
+        </div>
+      </div>`;
+    // Smooth 8-second hands-free countdown -> automatic sparkling answer reveal!
+    for (let sec = 1; sec <= 8; sec++) {
+      showBeatTimers.push(setTimeout(() => {
+        if (quizRevealed) return;
+        const left = 8 - sec;
+        const bar = document.getElementById('quizCdBar');
+        const lbl = document.getElementById('quizCdLabel');
+        if (bar) bar.style.width = `${Math.max(0, (left / 8) * 100)}%`;
+        if (lbl && left > 0) lbl.textContent = `⏳ Auto-revealing answer in ${left}s...`;
+        if (left <= 0) revealCurrentQuiz(null);
+      }, sec * 1000));
+    }
+  } else if (s.kind === 'symbol_feature' && s.symbol) {
+    const sym = s.symbol;
+    const capHtml = `
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="sym-icon" style="width:62px;height:62px;background:rgba(11,17,32,0.86);">${sym.svg}</div>
+        <div>
+          <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.1em;color:#f3d796;font-weight:800;">✡ SACRED SYMBOL SPOTLIGHT · ${esc(sym.source_ref)}</div>
+          <div style="font-family:var(--serif);font-size:1.5rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sym.name)}</div>
+        </div>
+      </div>
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.35rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sym.he_name)}</div>`;
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${renderLivingScene(sym.art || slideArt, 'clamp(155px, 18.5vh, 225px)', capHtml, "switchView('symbols')", 'margin-bottom:12px;cursor:pointer;')}
+        <div class="spot-en" style="font-size:1.06rem;">${esc(sym.meaning)}</div>
+        <div class="spot-comm"><div class="c-label">What the Sages Teach</div><div>${esc(sym.classical)}</div></div>
+        <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+          <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying This Symbol in Today's Terms</h4>
+          <div style="font-size:0.9rem;">${esc(sym.today)}</div>
+        </div>
+      </div>`;
+  } else {
+    const richBar = (rich.characters && rich.characters.length) ? `
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center;">
+        ${rich.characters.map(c => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('characters'); openCharacter('${esc(c.slug)}')">👤 ${esc(c.name)}</button>`).join('')}
+        ${(rich.symbols || []).map(sym => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('symbols')">✡ ${esc(sym.name)}</button>`).join('')}
+      </div>` : '';
+    const todayHint = (rich.today_points && rich.today_points.length) ? `
+      <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+        <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying Today's Portion in Today's Terms</h4>
+        <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">${rich.today_points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
+      </div>` : '';
+    const capHtml = `
+      <div>
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:#f3d796;font-weight:700;">${esc(s.kicker)}</div>
+        <div style="font-family:var(--serif);font-size:1.55rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.title)}</div>
+      </div>
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.3rem;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.he_kicker || '')}</div>`;
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${slideArt ? renderLivingScene(slideArt, 'clamp(135px, 16vh, 210px)', capHtml, "openPresentation('parasha','')", 'margin-bottom:10px;cursor:pointer;') : `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:0.84rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;">${esc(s.kicker)}</span>
+          <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(s.he_kicker || '')}</span>
+        </div>
+        <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
+        ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
+        <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
+        ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${s.kind === 'story' ? renderMarkdown(s.commentary) : esc(s.commentary)}</div></div>` : ''}
+        ${todayHint}
+        ${richBar}
+      </div>`;
+  }
 
   const acts = document.getElementById('spotActions');
   const readTxt = `${s.title}. ${s.en_text}. ${s.commentator ? s.commentator + ' explains: ' + s.commentary : ''}`;
   let actHtml = `<button class="btn-secondary" onclick="openPresentation('parasha','')">🎬 Full Presentation</button>`;
   actHtml += `<button class="btn-secondary" onclick="speakText(this.dataset.txt)" data-txt="${esc(readTxt)}">🔊 Read Aloud</button>`;
-  if (s.kind === 'verse') {
+  if (s.kind === 'quiz' && !quizRevealed) {
+    actHtml += `<button class="btn-primary" onclick="revealCurrentQuiz(null)">✨ Reveal Answer Now</button>`;
+  } else if (s.kind === 'verse') {
     actHtml += `<button class="btn-primary" onclick="quickAsk('Explain ${esc(s.ref)} from today\\'s Aliyah of Parashat ${esc(dailyData.parasha.en_name)} with Rashi, Ramban, and how to apply it in today\\'s terms.', 'all')">📖 Interpret &amp; Apply Today</button>`;
   } else {
     actHtml += `<button class="btn-primary" onclick="quickAsk('Tell the story of today\\'s Torah reading (${esc(dailyData.parasha.en_name)}, ${esc(dailyData.aliyah_ref)}) warmly for families and apply it in today\\'s terms.', 'storyteller')">✨ Tell Today's Story</button>`;
@@ -1518,10 +1872,10 @@ function toggleTickerPause() {
 setInterval(() => {
   if (currentViewName === 'today' && !spotPaused && dailyData && dailyData.slides.length > 1) {
     spotTickMs += 250;
-    const pct = Math.min(100, (spotTickMs / SPOT_DURATION_MS) * 100);
+    const pct = Math.min(100, (spotTickMs / currentSpotDurationMs) * 100);
     const bar = document.getElementById('spotProgressBar');
     if (bar) bar.style.width = pct + '%';
-    if (spotTickMs >= SPOT_DURATION_MS) {
+    if (spotTickMs >= currentSpotDurationMs) {
       spotTickMs = 0;
       spotIdx = (spotIdx + 1) % dailyData.slides.length;
       renderSpotlight();

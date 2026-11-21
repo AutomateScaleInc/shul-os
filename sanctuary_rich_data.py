@@ -763,3 +763,319 @@ def build_presentation(kind: str = "story", slug: str = "") -> dict:
             },
         ],
     }
+
+
+# =============================================================================
+# HANDS-FREE LIVING SHOW ENGINE: GUESS-BEFORE-REVEAL QUIZZES, ANIMATED
+# CHARACTER INTERACTION SCENES & TIMELY POP-UP INSIGHTS (ZERO MOUSE REQUIRED!)
+# =============================================================================
+
+QUIZ_CARDS = [
+    {
+        "id": "vayetzei-galed",
+        "parashot": ["vayetzei"],
+        "badge": "Parashat Vayetzei Challenge",
+        "question": "When Jacob & Laban built a stone heap as a peace witness, Laban named it 'Yegar-Sahaduta' while Jacob named it 'Gal-ed'. Why the two names?",
+        "options": [
+            "Laban spoke Aramaic while Jacob preserved the Hebrew tongue",
+            "They were naming two different mountains on opposite borders",
+            "Jacob named it after his grandfather Abraham's birthplace",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "Both mean 'Heap of Witness' (Genesis 31:47)! Even after 20 years living in Laban's Aramaic-speaking household, Jacob kept Hebrew alive — showing how heritage endures in exile.",
+        "source_ref": "Genesis 31:47 · Rashi",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "vayetzei-ladder",
+        "parashot": ["vayetzei"],
+        "badge": "Parashat Vayetzei Riddle",
+        "question": "In Jacob's dream at Beit El, what surprising order did the angels move on the ladder?",
+        "options": [
+            "They flew down from heaven first, then walked up",
+            "They ascended UP from earth first, and only then descended",
+            "They stood completely still guarding the stone pillow",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Genesis 28:12 says 'ascending and descending' (עֹלִים וְיֹרְדִים)! Rashi explains: the angels who guarded Jacob inside the Land of Israel ascended home, while the angels of outside-Israel came down to escort him!",
+        "source_ref": "Genesis 28:12 · Rashi",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "vayetzei-years",
+        "parashot": ["vayetzei"],
+        "badge": "Torah Detail Check",
+        "question": "How many years in total did Jacob live and work in Laban's house before returning home?",
+        "options": [
+            "7 years — one for each day of Creation",
+            "14 years — seven for Rachel and seven for Leah",
+            "20 years — 14 for his wives and 6 for his flocks",
+        ],
+        "correct_idx": 2,
+        "reveal_fact": "20 years (Genesis 31:38–41)! Fourteen years for Rachel and Leah, plus six more years tending the flocks — and Jacob testifies he never once let a single animal go missing through negligence.",
+        "source_ref": "Genesis 31:38–41",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "mezuzah-slant",
+        "parashot": ["vaetchanan", "eikev", "vayetzei"],
+        "badge": "Sacred Symbol Mystery",
+        "question": "Why is a Jewish Mezuzah mounted diagonally (slanted) on the doorpost instead of straight up or flat?",
+        "options": [
+            "To fit narrow ancient stone doorways in Jerusalem",
+            "A loving compromise between Rashi (vertical) and his grandson Rabbeinu Tam (horizontal)",
+            "To point directly toward the sunrise every morning",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Rashi ruled a Mezuzah should stand vertical; his grandson Rabbeinu Tam ruled horizontal. Jewish tradition slanted it diagonally to honor both — teaching that peace inside a home outweighs winning an argument!",
+        "source_ref": "Shulchan Aruch YD 289 · Deuteronomy 6:9",
+        "art": "/art/jerusalem-scroll.jpg",
+    },
+    {
+        "id": "menorah-windows",
+        "parashot": ["terumah", "tetzaveh", "behaalotecha"],
+        "badge": "Temple Architecture Secret",
+        "question": "Why were the windows of King Solomon's Temple carved narrow on the INSIDE and wide on the OUTSIDE?",
+        "options": [
+            "To shine the Menorah's light OUTWARD into the world",
+            "To keep Jerusalem winter rain from entering the Sanctuary",
+            "So trumpets could echo louder during festivals",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "Ordinary houses make windows wide inside to let light IN. The Talmud (Menachot 86b) explains the Temple did the reverse: God needs no light — the Menorah exists to radiate warmth and wisdom OUT into the world!",
+        "source_ref": "Talmud Menachot 86b · I Kings 6:4",
+        "art": "/art/sacred-symbols.jpg",
+    },
+    {
+        "id": "burning-bush-humble",
+        "parashot": ["shemot"],
+        "badge": "Midrash Riddle",
+        "question": "Why did God reveal Himself to Moses inside a humble thorny bush (Sneh) rather than a tall cedar tree?",
+        "options": [
+            "There were no cedar trees growing in Egypt",
+            "To show God shares in humanity's pain and chooses humble leadership",
+            "Because thorn bushes burn brighter in desert wind",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Midrash Shemot Rabbah (2:5) teaches: 'I am with them in distress' (Psalm 91:15). God chose the lowliest bush to teach Moses that true greatness stands shoulder-to-shoulder with the suffering.",
+        "source_ref": "Exodus 3:2 · Shemot Rabbah 2:5",
+        "art": "/art/burning-bush.jpg",
+    },
+    {
+        "id": "israel-meaning",
+        "parashot": ["vayishlach", "vayetzei"],
+        "badge": "Hebrew Name Secret",
+        "question": "What does the Hebrew name 'Yisrael' (Israel), given to Jacob after his night-long struggle, literally mean?",
+        "options": [
+            "One who never experiences doubt or hardship",
+            "One who wrestles with God and people, and prevails",
+            "Dweller of the sunlit mountains",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Genesis 32:29 — 'Yisrael' celebrates honest, courageous struggle! Judaism never asks you to pretend life is easy; wrestling with hard questions and holding on until dawn is how strength is forged.",
+        "source_ref": "Genesis 32:29",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "noah-rainbow",
+        "parashot": ["noach"],
+        "badge": "Ramban Insight",
+        "question": "In Hebrew, 'Keshet' means both 'rainbow' and 'archer's bow'. Why does the rainbow curve UPWARD away from earth?",
+        "options": [
+            "Like a warrior hanging up a weapon pointing away in lasting peace",
+            "Because clouds only form in half-circles over mountains",
+            "To match the rounded roof of Noah's Ark",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "Ramban on Genesis 9:12 notes a hunter points a bow downward to shoot, but God turned the bow upward — laying down judgment forever as a covenant of mercy with all living creatures.",
+        "source_ref": "Genesis 9:12–16 · Ramban",
+        "art": "/art/noah-rainbow.jpg",
+    },
+    {
+        "id": "ruth-shavuot",
+        "parashot": ["bamidbar"],
+        "badge": "Festival Connection",
+        "question": "Why do Jewish communities read the Book of Ruth specifically on Shavuot — the holiday of Receiving the Torah?",
+        "options": [
+            "Ruth's story happens during the barley harvest and shows Torah's heart is Chesed (loving-kindness)",
+            "Ruth was Moses's younger sister who carried the tablets",
+            "Ruth wrote the Book of Psalms in Jerusalem",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "The Sages note the Book of Ruth contains no laws of ritual purity — it was written solely to teach the immense reward of kindness (Chesed), and Ruth became the great-grandmother of King David!",
+        "source_ref": "Ruth 1:16 · Ruth Rabbah 2:14",
+        "art": "/art/ruth-harvest.jpg",
+    },
+    {
+        "id": "tzitzit-613",
+        "parashot": ["shelach"],
+        "badge": "Hebrew Gematria Surprise",
+        "question": "How do the fringes of a Tallit (Tzitzit) numerically encode all 613 Mitzvot of the Torah?",
+        "options": [
+            "There are 613 tiny threads woven into every corner",
+            "The Hebrew word Tzitzit (600) + 8 strings + 5 knots = 613!",
+            "The Tallit is exactly 613 centimeters wide",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Rashi on Numbers 15:39 shows: Tzitzit (צִיצִת) has gematria 600, plus 8 hanging strings and 5 double knots on each corner = 613 — a visual compass for your values right in front of your eyes!",
+        "source_ref": "Numbers 15:39 · Rashi",
+        "art": "/art/sinai-tablets.jpg",
+    },
+    {
+        "id": "abraham-tent",
+        "parashot": ["vayera", "lech-lecha"],
+        "badge": "Hospitality Wisdom",
+        "question": "According to the Midrash, what made Abraham & Sarah's desert tent architecture completely unique?",
+        "options": [
+            "It had four open doorways facing North, South, East & West",
+            "It was woven entirely out of silver thread",
+            "It floated on a raft along the Euphrates river",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "Four wide-open entrances — so no weary traveler arriving from any direction ever had to walk around looking for a door! Hospitality (Hachnasat Orchim) welcomes people before they even ask.",
+        "source_ref": "Genesis 18:1 · Bereishit Rabbah 48:9",
+        "art": "/art/abraham-stars.jpg",
+    },
+    {
+        "id": "sefer-torah-letter",
+        "parashot": ["vayeilech", "bereishit"],
+        "badge": "Community Secret",
+        "question": "If just ONE single Hebrew letter out of 304,805 in a Sefer Torah is cracked or missing, what happens to the scroll?",
+        "options": [
+            "Only that one chapter is skipped on Shabbat",
+            "The entire scroll cannot be used for public reading until that one letter is lovingly repaired",
+            "Nothing — one letter out of 304,805 doesn't matter",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "The Talmud (Menachot 30a) teaches every single letter is indispensable — just like every single person in a synagogue community. Take one person away, and the whole scroll is incomplete!",
+        "source_ref": "Talmud Menachot 30a",
+        "art": "/art/sacred-symbols.jpg",
+    },
+]
+
+CHARACTER_SCENES = [
+    {
+        "id": "scene-jacob-beitel",
+        "parashot": ["vayetzei"],
+        "title": "Awakening at the Gate of Heaven",
+        "he_title": "אָכֵן יֵשׁ ה׳ בַּמָּקוֹם הַזֶּה",
+        "ref": "Genesis 28:12–17",
+        "art": "/art/jacobs-ladder.jpg",
+        "left": {"name": "Jacob (Ya'akov)", "he": "יַעֲקֹב", "role": "Traveler in Exile", "badge": "🏕"},
+        "right": {"name": "Heavenly Messengers", "he": "מַלְאֲכֵי אֱלֹהִים", "role": "Ascending & Descending", "badge": "✨"},
+        "beats": [
+            {"side": "left", "speaker": "Jacob wakes from his dream", "line": "\"Surely God is present in this very place — and I, I did not even know it!\""},
+            {"side": "right", "speaker": "The Ladder Vision", "line": "Rooted on cold desert stone, its summit touches Heaven — bridging ordinary human effort with Divine purpose."},
+            {"side": "spark", "speaker": "Rashi & Today's Takeaway", "line": "You don't need a marble palace to feel sacredness. Even a lonely stone on the road can become Beit El — a House of God."},
+        ],
+    },
+    {
+        "id": "scene-jacob-laban",
+        "parashot": ["vayetzei"],
+        "title": "The Peace Pillar at Gal-ed",
+        "he_title": "וְעַתָּה לְכָה נִכְרְתָה בְרִית",
+        "ref": "Genesis 31:44–52",
+        "art": "/art/jacobs-ladder.jpg",
+        "left": {"name": "Jacob", "he": "יַעֲקֹב", "role": "Calls it 'Gal-ed' (Hebrew)", "badge": "✡"},
+        "right": {"name": "Laban", "he": "לָבָן", "role": "Calls it 'Yegar-Sahaduta' (Aramaic)", "badge": "🪨"},
+        "beats": [
+            {"side": "right", "speaker": "Laban", "line": "\"Come now, let us make a covenant, you and I — let this mound of stones stand as witness between us.\""},
+            {"side": "left", "speaker": "Jacob", "line": "\"Neither of us will cross this mound with harm. We set clear, honest boundaries — and share a meal in peace.\""},
+            {"side": "spark", "speaker": "In Today's Terms", "line": "Healthy peace doesn't erase differences or ignore past hurt — it sets clear boundaries in writing and chooses dignity over endless conflict."},
+        ],
+    },
+    {
+        "id": "scene-moses-bush",
+        "parashot": ["shemot", "vayetzei"],
+        "title": "Here I Am — At the Burning Bush",
+        "he_title": "הִנֵּנִי · וְהַסְּנֶה אֵינֶנּוּ אֻכָּל",
+        "ref": "Exodus 3:2–12",
+        "art": "/art/burning-bush.jpg",
+        "left": {"name": "Moses (Moshe)", "he": "מֹשֶׁה", "role": "Humble Shepherd", "badge": "🌿"},
+        "right": {"name": "The Unconsumed Flame", "he": "הַסְּנֶה הַבּוֹעֵר", "role": "Voice from the Bush", "badge": "🔥"},
+        "beats": [
+            {"side": "left", "speaker": "Moses stops & turns aside", "line": "\"Let me pause and look closely at this wonder — why is the thorny bush burning yet never consumed?\""},
+            {"side": "right", "speaker": "The Call to Lead", "line": "\"Who am I to go to Pharaoh?\" — \"I will be with you.\" Moses notices one lost lamb and earns the mission of a nation."},
+            {"side": "spark", "speaker": "Rashi & Today's Takeaway", "line": "Great moments begin when you slow down enough to notice what everyone else walks past — and answer 'Hineni' (Here I am)."},
+        ],
+    },
+    {
+        "id": "scene-abraham-stars",
+        "parashot": ["lech-lecha", "vayera", "vayetzei"],
+        "title": "Step Outside & Count the Stars",
+        "he_title": "הַבֶּט־נָא הַשָּׁמַיְמָה וּסְפֹר הַכּוֹכָבִים",
+        "ref": "Genesis 15:5",
+        "art": "/art/abraham-stars.jpg",
+        "left": {"name": "Abraham & Sarah", "he": "אַבְרָהָם וְשָׂרָה", "role": "Pioneers of Faith", "badge": "⛺"},
+        "right": {"name": "The Infinite Sky", "he": "כּוֹכְבֵי הַשָּׁמַיִם", "role": "Covenant Promise", "badge": "⭐"},
+        "beats": [
+            {"side": "left", "speaker": "Abraham's Honest Doubt", "line": "\"I am growing old and still have no child — how can my legacy possibly endure?\""},
+            {"side": "right", "speaker": "Lift Your Eyes Upward", "line": "\"Step outside your narrow calculations! Look up at the heavens and count the stars — so shall your descendants be.\""},
+            {"side": "spark", "speaker": "In Today's Terms", "line": "When you feel trapped by your current limits, step outside the spreadsheet, lift your gaze, and remember your impact travels further than you can see."},
+        ],
+    },
+    {
+        "id": "scene-ruth-naomi",
+        "parashot": ["bamidbar", "vayetzei"],
+        "title": "Wherever You Go, I Will Go",
+        "he_title": "כִּי אֶל־אֲשֶׁר תֵּלְכִי אֵלֵךְ",
+        "ref": "Ruth 1:16–17",
+        "art": "/art/ruth-harvest.jpg",
+        "left": {"name": "Ruth", "he": "רוּת", "role": "Embodiment of Chesed", "badge": "🌾"},
+        "right": {"name": "Naomi", "he": "נָעֳמִי", "role": "Returning to Bethlehem", "badge": "🕊"},
+        "beats": [
+            {"side": "right", "speaker": "Naomi", "line": "\"Turn back, my daughter — I have nothing left to offer you. Go home to comfort and security.\""},
+            {"side": "left", "speaker": "Ruth", "line": "\"Do not urge me to leave you! Wherever you go, I will go; your people shall be my people, and your God my God.\""},
+            {"side": "spark", "speaker": "In Today's Terms", "line": "Quiet, unselfish loyalty when nobody is applauding literally changed history — from Ruth's kindness came King David."},
+        ],
+    },
+    {
+        "id": "scene-david-harp",
+        "parashot": ["korach", "vayetzei"],
+        "title": "Courage & Song Before Dawn",
+        "he_title": "עוּרָה כְבוֹדִי · אָעִירָה שָּׁחַר",
+        "ref": "Psalm 57:9 · I Samuel 17",
+        "art": "/art/david-harp.jpg",
+        "left": {"name": "King David", "he": "דָּוִד הַמֶּלֶךְ", "role": "Sweet Singer of Israel", "badge": "🎵"},
+        "right": {"name": "The Midnight Harp", "he": "כִּנּוֹר דָּוִד", "role": "Awakening the Dawn", "badge": "👑"},
+        "beats": [
+            {"side": "left", "speaker": "David's Secret (Talmud Berakhot 3b)", "line": "\"I do not wait for the dawn to wake me — I wake the dawn with music, gratitude, and Torah study!\""},
+            {"side": "right", "speaker": "The North Wind", "line": "At midnight a breeze brushed the harp strings over David's bed, turning quiet night hours into the Psalms sung worldwide today."},
+            {"side": "spark", "speaker": "In Today's Terms", "line": "Don't let the day's noise dictate your mood — set your own inner rhythm first thing in the morning."},
+        ],
+    },
+]
+
+POPUP_INSIGHTS = [
+    {"tag": "💡 RASHI WHISPER", "text": "Jacob's ladder stood on earth with its top in heaven — Rashi notes the angels of Israel ascended first, and the angels of the Diaspora descended to guard him."},
+    {"tag": "🔤 HEBREW SECRET", "text": "'Gal-ed' (Hebrew) and 'Yegar-Sahaduta' (Aramaic) both mean 'Heap of Witness' — even in exile, Jacob kept Hebrew alive."},
+    {"tag": "✡ SYMBOL FACT", "text": "A Mezuzah is mounted diagonally as a loving compromise between Rashi (vertical) and his grandson Rabbeinu Tam (horizontal) — peace beats winning!"},
+    {"tag": "✨ APPLY IT TODAY", "text": "You don't need perfect surroundings to find holiness — Jacob discovered 'the Gate of Heaven' sleeping on a cold stone."},
+    {"tag": "🕯 SHABBAT WISDOM", "text": "In the Temple, the windows were narrow inside and wide outside — designed so the Menorah's light would shine OUT into the world."},
+    {"tag": "📖 DID YOU KNOW?", "text": "A Sefer Torah has 304,805 handwritten Hebrew letters — if even ONE letter is missing, the scroll is incomplete, just like every member of a community."},
+    {"tag": "🌿 MIDRASH SPARK", "text": "God spoke to Moses from a humble thorny bush to teach: true leadership never looks down from a tower — it stands beside people in pain."},
+    {"tag": "🌈 RAMBAN INSIGHT", "text": "The Hebrew word 'Keshet' means both rainbow and archer's bow — God turned the bow upward away from earth as an eternal sign of peace."},
+    {"tag": "🌾 RUTH'S LESSON", "text": "The Book of Ruth has no miracles of thunder — only quiet human kindness (Chesed), which gave birth to the royal line of King David."},
+    {"tag": "🧭 MIZRACH", "text": "From Brussels, facing Jerusalem (Mizrach) is 118° East-Southeast — 3,298 km straight toward Har HaBayit."},
+    {"tag": "⭐ PIRKEI AVOT", "text": "\"Who is wise? One who learns from every person. Who is rich? One who rejoices in their portion.\" (Pirkei Avot 4:1)"},
+    {"tag": "🔥 TRY THIS", "text": "In the 'Ask & Interpret' tab, you can ask any question aloud — or tap '🎬 Present' for a 7-slide Shabbat table deck!"},
+]
+
+
+def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
+    slug = (parasha_slug or "").lower()
+    # Prioritize quizzes & animated character scenes matching THIS week's Parashah first!
+    p_quizzes = [q for q in QUIZ_CARDS if slug and slug in q.get("parashot", [])]
+    other_quizzes = [q for q in QUIZ_CARDS if q not in p_quizzes]
+    quizzes = (p_quizzes + other_quizzes)[:6]
+
+    p_scenes = [s for s in CHARACTER_SCENES if slug and slug in s.get("parashot", [])]
+    other_scenes = [s for s in CHARACTER_SCENES if s not in p_scenes]
+    scenes = (p_scenes + other_scenes)[:4]
+
+    return {
+        "quizzes": quizzes,
+        "character_scenes": scenes,
+        "popups": POPUP_INSIGHTS,
+        "featured_symbols": SYMBOLS[:6],
+    }
