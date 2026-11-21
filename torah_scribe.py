@@ -46,6 +46,17 @@ COMMENTARY_EXPANSION_QUEUE = [
     ("Or HaChaim", "Or HaChaim on Leviticus", "Leviticus"),
     ("Or HaChaim", "Or HaChaim on Numbers", "Numbers"),
     ("Or HaChaim", "Or HaChaim on Deuteronomy", "Deuteronomy"),
+    ("Rashi", "Rashi on Psalms", "Psalms"),
+    ("Rashi", "Rashi on Proverbs", "Proverbs"),
+    ("Rashi", "Rashi on Ruth", "Ruth"),
+    ("Rashi", "Rashi on Esther", "Esther"),
+    ("Rashi", "Rashi on Isaiah", "Isaiah"),
+    ("Rashi", "Rashi on Hosea", "Hosea"),
+    ("Rashi", "Rashi on Jonah", "Jonah"),
+    ("Rashi", "Rashi on Joshua", "Joshua"),
+    ("Rashi", "Rashi on Judges", "Judges"),
+    ("Rashi", "Rashi on I Samuel", "I Samuel"),
+    ("Rashi", "Rashi on II Samuel", "II Samuel"),
     ("Kli Yakar", "Kli Yakar on Genesis", "Genesis"),
     ("Kli Yakar", "Kli Yakar on Exodus", "Exodus"),
     ("Kli Yakar", "Kli Yakar on Leviticus", "Leviticus"),
@@ -97,6 +108,16 @@ def ensure_scribe_tables():
                 summary TEXT NOT NULL,
                 items_added INTEGER NOT NULL DEFAULT 0,
                 duration_s REAL NOT NULL DEFAULT 0.0
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scribe_checked_chapters (
+                commentator TEXT NOT NULL,
+                target_book TEXT NOT NULL,
+                chapter INTEGER NOT NULL,
+                PRIMARY KEY (commentator, target_book, chapter)
             )
             """
         )
@@ -209,6 +230,12 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
                     "SELECT DISTINCT chapter FROM commentaries WHERE commentator = ? AND target_book = ?",
                     (commentator, book_title),
                 )
+            } | {
+                int(r[0])
+                for r in conn.execute(
+                    "SELECT chapter FROM scribe_checked_chapters WHERE commentator = ? AND target_book = ?",
+                    (commentator, book_title),
+                )
             }
             missing = [ch for ch in range(1, total_ch + 1) if ch not in done_chs]
             if not missing:
@@ -227,6 +254,10 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
                         return False, f"Offline or Sefaria unreachable while checking {commentator} on {book_title}", 0
                     break
                 fetched_any = True
+                conn.execute(
+                    "INSERT OR IGNORE INTO scribe_checked_chapters (commentator, target_book, chapter) VALUES (?, ?, ?)",
+                    (commentator, book_title, ch),
+                )
                 en_verses, he_verses = res
                 max_v = max(len(en_verses), len(he_verses))
                 for v_idx in range(max_v):
@@ -263,6 +294,7 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
                 conn.execute("INSERT INTO commentaries_fts(commentaries_fts) VALUES('rebuild')")
                 conn.commit()
                 return True, f"Added {added} verbatim {commentator} commentaries on {book_title} (ch. {batch[0]}–{batch[-1]})", added
+            conn.commit()
             return True, f"Checked {commentator} on {book_title} (ch. {batch[0]}–{batch[-1]}, 0 new English entries)", 0
 
     return False, "All queued classical commentators fully ingested!", 0

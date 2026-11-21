@@ -1062,6 +1062,90 @@ POPUP_INSIGHTS = [
 ]
 
 
+HEBREW_WORDS = [
+    {
+        "word_he": "חֶסֶד", "translit": "Chesed", "pronounce": "KHEH-sed",
+        "root": ["ח", "ס", "ד"], "meaning": "Loving-kindness · Unconditional generosity",
+        "ref": "Psalm 89:3 · Ruth 1:16",
+        "verse": "\"The world is built on Chesed (loving-kindness).\" (Psalm 89:3)",
+        "today": "Not just polite charity — Chesed is noticing what someone needs before they ask and showing up with warmth.",
+        "art": "/art/ruth-harvest.jpg",
+    },
+    {
+        "word_he": "הִנֵּנִי", "translit": "Hineni", "pronounce": "hee-neh-NEE",
+        "root": ["ה", "נ", "ה"], "meaning": "Here I am — fully present, ready to serve",
+        "ref": "Genesis 22:1 · Exodus 3:4",
+        "verse": "Abraham, Jacob, and Moses all answered God's call with one word: \"Hineni — Here I am!\"",
+        "today": "In an age of constant distraction, Hineni means putting down the phone, looking someone in the eye, and being 100% present.",
+        "art": "/art/burning-bush.jpg",
+    },
+    {
+        "word_he": "סֻלָּם", "translit": "Sulam", "pronounce": "soo-LAHM",
+        "root": ["ס", "ל", "ל"], "meaning": "Ladder · A rising pathway connecting earth and heaven",
+        "ref": "Genesis 28:12",
+        "verse": "\"A ladder was set on the earth, and its top reached to the heavens.\" (Genesis 28:12)",
+        "today": "Growth is a ladder, not an elevator — one honest step upward at a time connects ordinary daily life to higher purpose.",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "word_he": "שָׁלוֹם", "translit": "Shalom", "pronounce": "shah-LOHM",
+        "root": ["ש", "ל", "ם"], "meaning": "Wholeness · Harmony · Peace",
+        "ref": "Numbers 6:26 · Proverbs 3:17",
+        "verse": "\"May God lift His countenance upon you and grant you Shalom.\" (Priestly Blessing)",
+        "today": "Comes from the root 'Shalem' (complete/whole) — real peace isn't merely the absence of argument, it's making people feel whole.",
+        "art": "/art/creation-shabbat.jpg",
+    },
+    {
+        "word_he": "צְדָקָה", "translit": "Tzedakah", "pronounce": "tzeh-dah-KAH",
+        "root": ["צ", "ד", "ק"], "meaning": "Righteousness · Justice through giving",
+        "ref": "Deuteronomy 16:20 · Proverbs 10:2",
+        "verse": "\"Justice, justice shall you pursue.\" (Deuteronomy 16:20)",
+        "today": "Unlike English 'charity' (from emotion), Tzedakah comes from 'Tzedek' (justice) — lifting up others is simply setting the world right.",
+        "art": "/art/sacred-symbols.jpg",
+    },
+    {
+        "word_he": "שְׁמַע", "translit": "Shema", "pronounce": "sh-MAH",
+        "root": ["ש", "מ", "ע"], "meaning": "Listen deeply · Understand · Internalize",
+        "ref": "Deuteronomy 6:4",
+        "verse": "\"Shema Yisrael — Hear, O Israel: the Lord our God, the Lord is One.\"",
+        "today": "In Hebrew, 'hearing' and 'understanding' share the exact same word — true listening changes how we act, not just what hits our ears.",
+        "art": "/art/sinai-tablets.jpg",
+    },
+    {
+        "word_he": "תְּשׁוּבָה", "translit": "Teshuvah", "pronounce": "teh-shoo-VAH",
+        "root": ["ש", "ו", "ב"], "meaning": "Return · Coming home to your truest self",
+        "ref": "Deuteronomy 30:2 · Hosea 14:2",
+        "verse": "\"Return, O Israel, to the Lord your God.\" (Haftarah of Parashat Vayetzei, Hosea 14:2)",
+        "today": "Not guilt or self-punishment — Teshuvah literally means 'returning home', proving no mistake is ever the end of your story.",
+        "art": "/art/jerusalem-scroll.jpg",
+    },
+    {
+        "word_he": "אֱמוּנָה", "translit": "Emunah", "pronounce": "eh-moo-NAH",
+        "root": ["א", "מ", "ן"], "meaning": "Faithfulness · Steadfast trust · Reliability",
+        "ref": "Exodus 17:12 · Habakkuk 2:4",
+        "verse": "Moses's hands remained 'Emunah' (steady) — the same root as 'Amen' and 'craftsman' (Oman).",
+        "today": "Faith in Judaism is not blind belief — it's steadfast loyalty and craftsmanship you practice every day, even when skies are cloudy.",
+        "art": "/art/abraham-stars.jpg",
+    },
+    {
+        "word_he": "שִׂמְחָה", "translit": "Simchah", "pronounce": "sim-KHAH",
+        "root": ["ש", "מ", "ח"], "meaning": "Radiant joy · Gladness of heart",
+        "ref": "Psalm 100:2 · Deuteronomy 16:14",
+        "verse": "\"Serve God with Simchah (joy); come before Him with song!\" (Psalm 100:2)",
+        "today": "Chassidic wisdom teaches that joy isn't a luxury after success — joy is the spiritual fuel that breaks through every barrier.",
+        "art": "/art/david-harp.jpg",
+    },
+    {
+        "word_he": "תִּקּוּן", "translit": "Tikkun", "pronounce": "tee-KOON",
+        "root": ["ת", "ק", "ן"], "meaning": "Repair · Elevation · Making the world whole",
+        "ref": "Aleinu · Genesis 2:15",
+        "verse": "\"To work the garden and to guard it.\" (Genesis 2:15)",
+        "today": "Every honest act of kindness, craftsmanship, and healing repairs a piece of the world — we are partners in Creation.",
+        "art": "/art/noah-rainbow.jpg",
+    },
+]
+
+
 def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
     slug = (parasha_slug or "").lower()
     # Prioritize quizzes & animated character scenes matching THIS week's Parashah first!
@@ -1078,4 +1162,5 @@ def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
         "character_scenes": scenes,
         "popups": POPUP_INSIGHTS,
         "featured_symbols": SYMBOLS[:6],
+        "hebrew_words": HEBREW_WORDS[:6],
     }

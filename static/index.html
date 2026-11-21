@@ -901,6 +901,18 @@
   #sanctuaryToast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
   #sanctuaryToast .t-tag { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold); font-weight: 800; margin-bottom: 4px; }
   #sanctuaryToast .t-msg { font-size: 0.9rem; color: #f3ead8; line-height: 1.44; }
+
+  /* Animated Hebrew Root (Shoresh) Tiles */
+  .shoresh-row { display: flex; align-items: center; gap: 10px; direction: rtl; margin: 10px 0; flex-wrap: wrap; }
+  .shoresh-tile {
+    width: 54px; height: 54px; border-radius: 14px;
+    background: linear-gradient(145deg, rgba(228,188,105,0.22), rgba(24,39,68,0.92));
+    border: 1.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--hebrew); font-size: 1.9rem; font-weight: 700; color: #fff4cc;
+    box-shadow: 0 6px 20px rgba(228,188,105,0.22);
+    animation: sanctuaryReveal 0.55s cubic-bezier(0.22,1,0.36,1) both;
+  }
 </style>
 </head>
 <body>
@@ -1354,6 +1366,7 @@ function weaveLivingShow(d) {
   const scenes = ex.character_scenes || [];
   const quizzes = ex.quizzes || [];
   const syms = ex.featured_symbols || [];
+  const hwords = ex.hebrew_words || [];
   const artCycle = [
     (d.rich && d.rich.art) || '/art/jacobs-ladder.jpg',
     '/art/abraham-stars.jpg',
@@ -1365,7 +1378,7 @@ function weaveLivingShow(d) {
     '/art/sacred-symbols.jpg',
   ];
   const out = [];
-  let sIdx = 0, qIdx = 0, symIdx = 0, vSeen = 0;
+  let sIdx = 0, qIdx = 0, symIdx = 0, hwIdx = 0, vSeen = 0;
   base.forEach((sl, idx) => {
     const copy = Object.assign({}, sl);
     if (!copy.art) copy.art = (idx === 0) ? artCycle[0] : artCycle[idx % artCycle.length];
@@ -1398,6 +1411,20 @@ function weaveLivingShow(d) {
           commentator: 'Auto-Reveal in 8s',
           quiz: q,
           art: q.art,
+        });
+      }
+      // After verse 3, 7, 11... weave an Animated Hebrew Word & 3-Letter Root Explorer!
+      if (vSeen % 4 === 3 && hwIdx < hwords.length) {
+        const hw = hwords[hwIdx++];
+        out.push({
+          kind: 'hebrew_word',
+          title: `🔤 Hebrew Root: ${hw.translit}`,
+          kicker: `LEARN A LIVING HEBREW ROOT · ${hw.ref}`,
+          he_kicker: hw.word_he,
+          en_text: `${hw.translit} (${hw.pronounce}) — ${hw.meaning}`,
+          commentator: '3-Letter Shoresh',
+          hword: hw,
+          art: hw.art,
         });
       }
       // After verse 4, 8, 12... weave a Living Sacred Symbol & Story Illustration Spotlight!
@@ -1774,6 +1801,35 @@ function renderSpotlight() {
         if (left <= 0) revealCurrentQuiz(null);
       }, sec * 1000));
     }
+  } else if (s.kind === 'hebrew_word' && s.hword) {
+    const hw = s.hword;
+    const capHtml = `
+      <div>
+        <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:#f3d796;font-weight:800;">🔤 LIVING HEBREW ROOT · ${esc(hw.ref)}</div>
+        <div style="font-family:var(--serif);font-size:1.65rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(hw.translit)} <span style="font-size:1rem;color:#5cb6e5;font-weight:600;">(${esc(hw.pronounce)})</span></div>
+      </div>
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:2.1rem;text-shadow:0 2px 12px rgba(0,0,0,0.85);">${esc(hw.word_he)}</div>`;
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${renderLivingScene(hw.art || slideArt, 'clamp(140px, 16vh, 200px)', capHtml, '', 'margin-bottom:10px;')}
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="muted" style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.08em;">Meaning</div>
+            <div style="font-family:var(--serif);font-size:1.25rem;color:var(--gold);font-weight:700;">${esc(hw.meaning)}</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;text-align:right;">3-Letter Shoresh (Root)</div>
+            <div class="shoresh-row" style="margin:4px 0 0;">
+              ${(hw.root || []).map((ch, idx) => `<div class="shoresh-tile" style="animation-delay:${(idx*0.18).toFixed(2)}s;">${esc(ch)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="spot-comm" style="margin-top:10px;"><div class="c-label">In the Torah &amp; Tanakh</div><div>${esc(hw.verse)}</div></div>
+        <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+          <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Living This Word Today</h4>
+          <div style="font-size:0.9rem;">${esc(hw.today)}</div>
+        </div>
+      </div>`;
   } else if (s.kind === 'symbol_feature' && s.symbol) {
     const sym = s.symbol;
     const capHtml = `
