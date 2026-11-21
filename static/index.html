@@ -1200,8 +1200,8 @@ function renderSpotlight() {
       </div>
       <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
       ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
-      <div class="spot-en">${esc(s.en_text)}</div>
-      ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${esc(s.commentary)}</div></div>` : ''}
+      <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
+      ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${s.kind === 'story' ? renderMarkdown(s.commentary) : esc(s.commentary)}</div></div>` : ''}
       ${todayHint}
       ${richBar}
     </div>`;
