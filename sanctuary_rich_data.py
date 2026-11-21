@@ -951,6 +951,156 @@ QUIZ_CARDS = [
         "source_ref": "Talmud Menachot 30a",
         "art": "/art/sacred-symbols.jpg",
     },
+    {
+        "id": "guess-char-rachel",
+        "parashot": ["vayetzei"],
+        "badge": "🕵️ Guess the Character!",
+        "question": "I was a shepherdess at a well in Haran, shared my secret wedding signs with my sister so she wouldn't be embarrassed, and my tears move Heaven. Who am I?",
+        "options": [
+            "Miriam the Prophetess",
+            "Rachel Imeinu (Matriarch Rachel)",
+            "Queen Esther of Shushan",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Rachel Imeinu (Genesis 29)! The Midrash (Eichah Rabbah) teaches that Rachel's quiet act of self-sacrifice for Leah is why God promised: 'Restrain your voice from weeping — your children shall return to their borders!' (Jeremiah 31:16).",
+        "source_ref": "Genesis 29:9–25 · Jeremiah 31:15–16",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "true-myth-shabbat",
+        "parashot": ["bereishit", "yitro", "vayetzei"],
+        "badge": "⚡ True or Myth?",
+        "question": "TRUE OR MYTH: In the Torah, the very FIRST thing God calls 'Holy' (Kadosh) is not a mountain or a temple — it is a day in time (Shabbat)!",
+        "options": [
+            "TRUE — Genesis 2:3 sanctifies the Seventh Day before any place on earth!",
+            "MYTH — Mount Sinai was called holy first",
+            "MYTH — Jerusalem was named holy in Genesis 1",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "100% TRUE! Rabbi Abraham Joshua Heschel famously called Shabbat 'a Cathedral in Time.' Anyone can carry holiness into their week — wherever they live on earth!",
+        "source_ref": "Genesis 2:3",
+        "art": "/art/creation-shabbat.jpg",
+    },
+    {
+        "id": "torah-numbers-tribes",
+        "parashot": ["vayetzei", "vayishlach"],
+        "badge": "🔢 Torah by the Numbers",
+        "question": "Jacob had 12 sons who became the 12 Tribes of Israel. How many of them were born in THIS week's Parashah (Vayetzei) alone?",
+        "options": [
+            "Only 3 sons (Reuben, Shimon, and Levi)",
+            "11 of the 12 sons! Only Benjamin was born later in the Land of Israel",
+            "All 12 sons were born in Egypt",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Eleven of the twelve tribes — from Reuben all the way to Joseph — are born right inside Parashat Vayetzei (Genesis 29–30)! Only Benjamin is born later on the road to Bethlehem.",
+        "source_ref": "Genesis 29:31–30:24",
+        "art": "/art/jacobs-ladder.jpg",
+    },
+    {
+        "id": "guess-char-joseph",
+        "parashot": ["vayeshev", "miketz", "vayetzei"],
+        "badge": "🕵️ Guess the Character!",
+        "question": "Sold into slavery at 17, falsely imprisoned in Egypt, yet I interpreted Pharaoh's dreams and saved the entire region from famine without taking revenge. Who am I?",
+        "options": [
+            "Joseph (Yosef HaTzaddik)",
+            "Joshua son of Nun",
+            "King Solomon",
+        ],
+        "correct_idx": 0,
+        "reveal_fact": "Joseph (Genesis 37–50)! When his brothers feared revenge, Joseph told them: 'You meant it for harm, yet God wove it for good — to keep many people alive.' True strength forgives.",
+        "source_ref": "Genesis 50:20",
+        "art": "/art/joseph-egypt.jpg",
+    },
+    {
+        "id": "shul-secret-shofar",
+        "parashot": ["vayera", "emor"],
+        "badge": "🕍 Synagogue Sound Mystery",
+        "question": "Why must a Rosh Hashanah Shofar be naturally curved (like a ram's horn) rather than straightened out?",
+        "options": [
+            "Curved horns are louder in large courtyards",
+            "It symbolizes bending our hearts in humility and sincere reflection before God",
+            "Straight horns only existed in Babylon",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "The Talmud (Rosh Hashanah 26b) explains: the more a person bends their ego in honesty and humility, the higher their prayer rises!",
+        "source_ref": "Talmud Rosh Hashanah 26b",
+        "art": "/art/sacred-symbols.jpg",
+    },
+    {
+        "id": "true-myth-elijah",
+        "parashot": ["pinchas", "vayetzei"],
+        "badge": "⚡ True or Myth?",
+        "question": "When Prophet Elijah waited on Mount Horeb for God's voice, where did God speak — in the wind, the earthquake, the fire, or a 'still, small voice'?",
+        "options": [
+            "Inside the roaring fire that split the rocks",
+            "In the 'Kol Demamah Dakah' — a still, gentle whisper after the storm",
+            "Through a great thunderbolt from the sea",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "I Kings 19:11–12: God was NOT in the wind, earthquake, or fire — God was in the 'still, small voice' (קוֹל דְּמָמָה דַקָּה). The loudest noise in life is rarely the wisest.",
+        "source_ref": "I Kings 19:11–12",
+        "art": "/art/jerusalem-scroll.jpg",
+    },
+    {
+        "id": "guess-char-esther",
+        "parashot": ["tetzaveh", "vayetzei"],
+        "badge": "🕵️ Guess the Character!",
+        "question": "My Hebrew name 'Hadassah' means myrtle tree, my Persian name means 'hidden star', and my uncle asked: 'Who knows if you reached this moment for such a time as this?'",
+        "options": [
+            "Deborah the Judge",
+            "Queen Esther",
+            "Hannah mother of Samuel",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Queen Esther (Esther 4:14)! Even though God's Name is never written explicitly once in the Megillah, Divine providence is hidden inside every single courageous human choice.",
+        "source_ref": "Esther 2:7 · 4:14",
+        "art": "/art/jerusalem-scroll.jpg",
+    },
+    {
+        "id": "torah-numbers-parashot",
+        "parashot": ["bereishit", "vayetzei"],
+        "badge": "🔢 Torah by the Numbers",
+        "question": "How many weekly Torah portions (Parashiyot) divide the Five Books of Moses across the Jewish year?",
+        "options": [
+            "24 portions — two every month",
+            "54 portions — read in sync by every synagogue across the entire world!",
+            "100 portions — read over two years",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "54 Parashiyot! Whether you walk into a synagogue in Brussels, Jerusalem, New York, or Tokyo this Shabbat, every single congregation opens the Torah to the exact same portion!",
+        "source_ref": "Annual Torah Reading Cycle",
+        "art": "/art/sacred-symbols.jpg",
+    },
+    {
+        "id": "sea-nachshon",
+        "parashot": ["beshalach", "vayetzei"],
+        "badge": "🌊 Midrash Action Moment",
+        "question": "According to the Talmud, what happened right BEFORE the Red Sea actually split into two walls of water?",
+        "options": [
+            "The sea parted while Israel was still miles away",
+            "Nachshon ben Aminadav bravely walked into the water up to his chin — and THEN it split!",
+            "Moses built a wooden bridge across the shore",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "Talmud Sotah 37a! Miracles rarely open while you stand safely on dry land waiting for guarantees — take the first courageous step forward, and the path opens!",
+        "source_ref": "Exodus 14:15 · Talmud Sotah 37a",
+        "art": "/art/exodus-sea.jpg",
+    },
+    {
+        "id": "david-stones",
+        "parashot": ["vayetzei", "korach"],
+        "badge": "🎵 Unexpected Torah Detail",
+        "question": "When young shepherd David walked down to face Goliath, why did he refuse King Saul's heavy royal armor?",
+        "options": [
+            "It was too small for David",
+            "David knew you win your biggest battles by being authentically yourself, not wearing someone else's armor",
+            "Saul forgot to bring a helmet",
+        ],
+        "correct_idx": 1,
+        "reveal_fact": "I Samuel 17:39! David took off the king's bronze armor and used the five smooth stones and sling he had practiced with every day. Don't imitate someone else's tools — master your own gift!",
+        "source_ref": "I Samuel 17:38–40",
+        "art": "/art/david-harp.jpg",
+    },
 ]
 
 CHARACTER_SCENES = [
@@ -1151,16 +1301,16 @@ def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
     # Prioritize quizzes & animated character scenes matching THIS week's Parashah first!
     p_quizzes = [q for q in QUIZ_CARDS if slug and slug in q.get("parashot", [])]
     other_quizzes = [q for q in QUIZ_CARDS if q not in p_quizzes]
-    quizzes = (p_quizzes + other_quizzes)[:6]
+    quizzes = (p_quizzes + other_quizzes)[:12]
 
     p_scenes = [s for s in CHARACTER_SCENES if slug and slug in s.get("parashot", [])]
     other_scenes = [s for s in CHARACTER_SCENES if s not in p_scenes]
-    scenes = (p_scenes + other_scenes)[:4]
+    scenes = (p_scenes + other_scenes)[:6]
 
     return {
         "quizzes": quizzes,
         "character_scenes": scenes,
         "popups": POPUP_INSIGHTS,
         "featured_symbols": SYMBOLS[:6],
-        "hebrew_words": HEBREW_WORDS[:6],
+        "hebrew_words": HEBREW_WORDS[:8],
     }
