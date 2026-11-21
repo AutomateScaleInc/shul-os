@@ -30,6 +30,8 @@ DEFAULT_CONFIG = {
     "presence_sleep_minutes": 5,
     "default_theme": "sanctuary",  # sanctuary | parchment
     "os_color_temp_sync": True,
+    "scribe_enabled": True,
+    "scribe_online_ingest": True,
     "location": {
         "city": "Brussels, Belgium",
         "lat": 50.8503,

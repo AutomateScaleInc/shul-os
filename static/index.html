@@ -984,6 +984,18 @@
         <div class="card">
           <h2>Local Offline Library Status</h2>
           <div id="healthDetails" class="muted">Loading...</div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+            <h2 style="margin:0;">🧠 Mini-Orca · Living Torah Scribe</h2>
+            <span class="comm-badge" id="scribeBadge">Loading...</span>
+          </div>
+          <p class="muted" style="font-size:0.85rem;margin-top:0;">Autonomously strengthens this node every 30 minutes (pauses automatically for Shabbat Stillness): expands classical commentaries (<em>Or HaChaim, Kli Yakar, Chizkuni, Rashbam, Metzudat David</em>) and authors grounded Parashah &amp; Tanakh study sheets indexed directly into the local AI brain.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">
+            <button class="btn-primary" onclick="triggerScribe('')">⚡ Run Mini-Orca Cycle Now</button>
+            <button class="btn-secondary" onclick="triggerScribe('ingest_commentary')">📚 Expand Commentaries</button>
+            <button class="btn-secondary" onclick="triggerScribe('enrich_parasha')">✍️ Author Parashah Guide</button>
+          </div>
+          <div id="scribeDetails" class="muted" style="font-size:0.85rem;">Loading Mini-Orca activity journal...</div>
         </div>
         <div class="card">
           <h2>Synagogue &amp; Hybrid AI Settings</h2>
@@ -1011,6 +1023,8 @@
               <input class="form-input" id="cfgLocTz" placeholder="Timezone">
             </div>
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam When Online</label>
             <label>Local Ollama Model<br><input class="form-input" style="width:100%" id="cfgOllamaModel" value="qwen2.5:3b"></label>
             <label>Optional Cloud AI Provider<br>
               <select id="cfgCloudProv" style="width:100%">
@@ -2462,8 +2476,50 @@ function applyCityPreset(key) {
   document.getElementById('cfgLocTz').value = p.tz || '';
 }
 
+async function loadScribeStatus() {
+  try {
+    const r = await fetch('/api/scribe/status');
+    const s = await r.json();
+    const badge = document.getElementById('scribeBadge');
+    if (badge) {
+      badge.textContent = s.is_running ? '⚡ Working Now...' : (s.shabbat_paused ? '🕯 Resting (Shabbat)' : (s.enabled ? '✓ Active (30m Loop)' : 'Paused'));
+    }
+    const el = document.getElementById('scribeDetails');
+    if (!el) return;
+    const commTags = (s.commentators || []).map(c => `<span class="trait-pill">${esc(c.name)}: ${c.count.toLocaleString()}</span>`).join(' ');
+    const docsHtml = (s.scribe_docs || []).slice(0, 6).map(d =>
+      `<div style="padding:5px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px;align-items:center;">
+        <div><strong>${esc(d.title)}</strong> <span class="muted">(${esc(d.refs)})</span></div>
+        <button class="tool-btn" onclick="switchView('history'); openDoc('${esc(d.slug)}', 'historyDetail')">Read</button>
+      </div>`
+    ).join('') || '<div class="muted">No autonomous study sheets yet — click "Run Mini-Orca Cycle Now" to author the first one!</div>';
+    const runsHtml = (s.recent_runs || []).slice(0, 6).map(run =>
+      `<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+        <span style="color:var(--gold);">${esc((run.ts || '').slice(5, 16).replace('T', ' '))}</span> · <strong>${esc(run.mission)}</strong> (${esc(run.status)}) — ${esc(run.summary)}
+      </div>`
+    ).join('') || '<div class="muted">Awaiting first autonomous cycle.</div>';
+    el.innerHTML = `
+      <div style="margin-bottom:8px;"><strong>Status:</strong> ${esc(s.current_task)} · <strong>Completed Cycles:</strong> ${s.total_completed_cycles} · <strong>Total Commentaries:</strong> ${(s.total_commentaries || 0).toLocaleString()} · <strong>Scribe Study Sheets:</strong> ${s.total_scribe_docs}</div>
+      <div style="margin-bottom:10px;">${commTags}</div>
+      <div style="font-weight:700;color:var(--gold);margin:8px 0 4px;">Newly Authored Study Sheets (Indexed into Local AI)</div>
+      <div style="margin-bottom:10px;">${docsHtml}</div>
+      <div style="font-weight:700;color:var(--gold);margin:8px 0 4px;">Recent Mini-Orca Activity Log</div>
+      <div>${runsHtml}</div>`;
+  } catch (e) {}
+}
+
+async function triggerScribe(mission) {
+  const badge = document.getElementById('scribeBadge');
+  if (badge) badge.textContent = '⚡ Starting Cycle...';
+  await fetch('/api/scribe/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({mission}) });
+  setTimeout(loadScribeStatus, 1500);
+  setTimeout(loadScribeStatus, 8000);
+  setTimeout(() => { loadScribeStatus(); loadHealth(); }, 20000);
+}
+
 async function loadSettings() {
   await loadHealth();
+  loadScribeStatus();
   if (!Object.keys(cityPresetsCache).length) await loadCelestial();
   const r = await fetch('/api/config');
   const c = (await r.json()).config || {};
@@ -2474,6 +2530,8 @@ async function loadSettings() {
   document.getElementById('cfgLocLon').value = loc.lon ?? 4.3517;
   document.getElementById('cfgLocTz').value = loc.tz || 'Europe/Brussels';
   document.getElementById('cfgOsColorSync').checked = c.os_color_temp_sync !== false;
+  document.getElementById('cfgScribeEnabled').checked = c.scribe_enabled !== false;
+  document.getElementById('cfgScribeOnline').checked = c.scribe_online_ingest !== false;
   document.getElementById('cfgOllamaModel').value = c.ollama_model || 'qwen2.5:1.5b';
   document.getElementById('cfgCloudProv').value = c.cloud_provider || 'none';
   document.getElementById('cfgCloudModel').value = c.cloud_model || '';
@@ -2500,6 +2558,8 @@ async function saveSettings() {
       in_israel: !!preset.in_israel,
     },
     os_color_temp_sync: document.getElementById('cfgOsColorSync').checked,
+    scribe_enabled: document.getElementById('cfgScribeEnabled').checked,
+    scribe_online_ingest: document.getElementById('cfgScribeOnline').checked,
     ollama_model: document.getElementById('cfgOllamaModel').value.trim() || 'qwen2.5:1.5b',
     cloud_provider: document.getElementById('cfgCloudProv').value,
     cloud_model: document.getElementById('cfgCloudModel').value.trim(),

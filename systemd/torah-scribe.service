@@ -1,0 +1,9 @@
+[Unit]
+Description=Torah Sanctuary OS — Mini-Orca Autonomous Living Torah Scribe Cycle
+After=torah-sanctuary.service
+
+[Service]
+Type=oneshot
+Nice=15
+IOSchedulingClass=idle
+ExecStart=/usr/bin/python3 %h/torah-sanctuary/torah_scribe.py

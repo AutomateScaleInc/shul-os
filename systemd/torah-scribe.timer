@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Torah Sanctuary Mini-Orca Living Scribe every 30 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=30min
+Unit=torah-scribe.service
+
+[Install]
+WantedBy=timers.target

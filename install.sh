@@ -133,6 +133,8 @@ fi
 cp "$INSTALL_DIR/systemd/torah-sanctuary.service" "$HOME/.config/systemd/user/"
 cp "$INSTALL_DIR/systemd/torah-celestial.service" "$HOME/.config/systemd/user/"
 cp "$INSTALL_DIR/systemd/torah-celestial.timer" "$HOME/.config/systemd/user/"
+cp "$INSTALL_DIR/systemd/torah-scribe.service" "$HOME/.config/systemd/user/"
+cp "$INSTALL_DIR/systemd/torah-scribe.timer" "$HOME/.config/systemd/user/"
 if (( ENABLE_KIOSK == 1 )); then
   cp "$INSTALL_DIR/systemd/torah-kiosk.service" "$HOME/.config/systemd/user/"
 fi
@@ -140,6 +142,7 @@ systemctl --user daemon-reload
 systemctl --user enable torah-sanctuary.service
 systemctl --user restart torah-sanctuary.service
 systemctl --user enable --now torah-celestial.timer
+systemctl --user enable --now torah-scribe.timer
 python3 "$INSTALL_DIR/sacred-os-daemon.py" --quiet || true
 
 # Gentle comfortable speaker volume (42%)

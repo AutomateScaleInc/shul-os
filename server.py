@@ -19,6 +19,7 @@ import sacred_astronomy
 import sanctuary_rich_data
 import shul_events
 import torah_db
+import torah_scribe
 import voice_engine
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
@@ -244,6 +245,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(snap)
             return
 
+        if path == "/api/scribe/status":
+            self._send_json(torah_scribe.get_scribe_status())
+            return
+
         if path == "/api/shul/events":
             force_ics = qs.get("refresh", ["0"])[0] == "1"
             self._send_json(shul_events.list_events(force_ics=force_ics))
@@ -353,6 +358,16 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json({"ok": True, "webhook_status": status_code, "subject": mailing["subject"]})
             except Exception as e:
                 self._send_json({"error": f"Webhook push failed: {e}"}, status=502)
+            return
+
+        if path == "/api/scribe/run":
+            body = self._read_json_body()
+            mission = (body.get("mission") or "").strip()
+            cmd = ["python3", str(BASE_DIR / "torah_scribe.py"), "--force"]
+            if mission and mission in ("ingest_commentary", "enrich_parasha", "enrich_tanakh_book"):
+                cmd.append(f"--mission={mission}")
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self._send_json({"ok": True, "started": True, "mission": mission or "auto"})
             return
 
         if path == "/api/config":
