@@ -268,14 +268,14 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
     return False, "All queued classical commentators fully ingested!", 0
 
 
-def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 620) -> str:
+def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 420) -> str:
     cfg = ai_engine.load_config()
     url = cfg.get("ollama_url", "http://127.0.0.1:11434").rstrip("/") + "/api/chat"
     model = cfg.get("ollama_model", "qwen2.5:1.5b")
     payload = {
         "model": model,
-        "stream": False,
-        "options": {"temperature": 0.35, "num_predict": max_tokens, "num_ctx": 3072},
+        "stream": True,
+        "options": {"temperature": 0.35, "num_predict": max_tokens, "num_ctx": 2048},
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -286,9 +286,22 @@ def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 6
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=180) as r:
-        data = json.loads(r.read().decode("utf-8", "ignore"))
-    return (data.get("message") or {}).get("content", "").strip()
+    chunks = []
+    with urllib.request.urlopen(req, timeout=120) as r:
+        for raw_line in r:
+            line = raw_line.decode("utf-8", "ignore").strip()
+            if not line:
+                continue
+            try:
+                ev = json.loads(line)
+            except Exception:
+                continue
+            tok = (ev.get("message") or {}).get("content", "")
+            if tok:
+                chunks.append(tok)
+            if ev.get("done"):
+                break
+    return "".join(chunks).strip()
 
 
 def mission_enrich_next_parasha() -> tuple[bool, str, int]:
@@ -317,14 +330,14 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
 
     # Pull real classical commentaries for the first few verses
     comm_lines = []
-    for v in verses[:8]:
+    for v in verses[:6]:
         bk_title = v["ref"].rsplit(" ", 1)[0]
         cs = torah_db.get_verse_commentaries(bk_title, int(v["chapter"]), int(v["verse"]))[:2]
         for c in cs:
-            if len(comm_lines) < 6:
-                comm_lines.append(f"- {c['commentator']} on {v['ref']}: {c['en_text'][:220]}")
+            if len(comm_lines) < 4:
+                comm_lines.append(f"- {c['commentator']} on {v['ref']}: {c['en_text'][:180]}")
 
-    verse_block = "\n".join(f"- {v['ref']}: {v['en_text'][:200]}" for v in verses[:10])
+    verse_block = "\n".join(f"- {v['ref']}: {v['en_text'][:170]}" for v in verses[:6])
     comm_block = "\n".join(comm_lines) if comm_lines else "- Draw faithfully on classical Jewish tradition (Rashi, Ramban, Sforno)."
 
     sys_prompt = (
@@ -345,7 +358,7 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
         "## Shabbat Table Questions\n(3 thoughtful questions for children and adults around the Shabbat table)"
     )
 
-    body = _call_local_ollama(sys_prompt, user_prompt, max_tokens=680)
+    body = _call_local_ollama(sys_prompt, user_prompt, max_tokens=440)
     if len(body) < 180:
         return False, f"Model output too short for {target['en_name']}", 0
 
