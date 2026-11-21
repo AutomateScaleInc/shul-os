@@ -332,8 +332,10 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
         "Anchor every insight strictly in the provided verbatim Torah verses and classical Jewish commentators. "
         "Never invent verse quotes. Write clearly, warmly, and meaningfully for both families and adults."
     )
+    t_ref = target.get("ref") or target.get("torah_ref") or ""
+    h_ref = target.get("haftarah_ref") or target.get("haftarah") or ""
     user_prompt = (
-        f"Create a concise, deeply meaningful study guide for Parashat {target['en_name']} ({target['he_name']}, {target['torah_ref']}, Haftarah: {target.get('haftarah', '')}).\n\n"
+        f"Create a concise, deeply meaningful study guide for Parashat {target['en_name']} ({target['he_name']}, {t_ref}, Haftarah: {h_ref}).\n\n"
         f"VERBATIM VERSES:\n{verse_block}\n\n"
         f"CLASSICAL COMMENTATORS:\n{comm_block}\n\n"
         "Respond using EXACTLY these 4 markdown headings:\n"
@@ -368,8 +370,8 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
                 slug,
                 f"Parashat {target['en_name']} — Living Scribe Study Sheet",
                 target.get("he_name", ""),
-                f"Autonomous Grounded Study Guide · {target['torah_ref']} · Haftarah: {target.get('haftarah', '')}",
-                target["torah_ref"],
+                f"Autonomous Grounded Study Guide · {t_ref} · Haftarah: {h_ref}",
+                t_ref,
                 kid,
                 today_sec,
                 comm,
