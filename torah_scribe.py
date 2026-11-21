@@ -182,24 +182,16 @@ def get_scribe_status() -> dict:
 
 
 def _fetch_sefaria_chapter(sefaria_ref: str, timeout: float = 12.0) -> tuple[list, list] | None:
-    enc = urllib.parse.quote(sefaria_ref, safe="")
-    url = f"https://www.sefaria.org/api/v3/texts/{enc}?return_format=strip_only_footnotes"
+    enc = urllib.parse.quote(sefaria_ref.replace(" ", "_"), safe="_,.")
+    url = f"https://www.sefaria.org/api/texts/{enc}?context=0&commentary=0"
     req = urllib.request.Request(url, headers={"User-Agent": "TorahSanctuaryOS/1.0 (+open-source-synagogue)"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             data = json.loads(r.read().decode("utf-8", "ignore"))
     except Exception:
         return None
-    en_list, he_list = [], []
-    for ver in data.get("versions") or []:
-        lang = (ver.get("actualLanguage") or ver.get("language") or "").lower()
-        txt = ver.get("text")
-        if not isinstance(txt, list):
-            continue
-        if lang.startswith("en") and not en_list:
-            en_list = txt
-        elif lang.startswith("he") and not he_list:
-            he_list = txt
+    en_list = data.get("text") if isinstance(data.get("text"), list) else []
+    he_list = data.get("he") if isinstance(data.get("he"), list) else []
     return (en_list, he_list) if (en_list or he_list) else None
 
 
@@ -326,7 +318,8 @@ def mission_enrich_next_parasha() -> tuple[bool, str, int]:
     # Pull real classical commentaries for the first few verses
     comm_lines = []
     for v in verses[:8]:
-        cs = torah_db.get_verse_commentaries(v["book_title"], int(v["chapter"]), int(v["verse"]))[:2]
+        bk_title = v["ref"].rsplit(" ", 1)[0]
+        cs = torah_db.get_verse_commentaries(bk_title, int(v["chapter"]), int(v["verse"]))[:2]
         for c in cs:
             if len(comm_lines) < 6:
                 comm_lines.append(f"- {c['commentator']} on {v['ref']}: {c['en_text'][:220]}")
