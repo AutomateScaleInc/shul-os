@@ -42,7 +42,7 @@ chmod +x "$INSTALL_DIR"/server.py "$INSTALL_DIR"/sacred_astronomy.py "$INSTALL_D
 # 2. Install base OS dependencies (Arch / Omarchy or Debian / Ubuntu)
 if command -v pacman >/dev/null 2>&1; then
   MISSING=()
-  for pkg in python sqlite ffmpeg chromium ollama; do
+  for pkg in python sqlite ffmpeg chromium ollama qrencode cloudflared; do
     pacman -Qi "$pkg" >/dev/null 2>&1 || MISSING+=("$pkg")
   done
   if (( ${#MISSING[@]} > 0 )) && sudo -n true 2>/dev/null; then
