@@ -15,6 +15,7 @@ import urllib.parse
 import urllib.request
 
 import ai_engine
+import broadcast_hub
 import sacred_astronomy
 import sanctuary_rich_data
 import shul_events
@@ -95,6 +96,58 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+            return
+
+        if path in ("/watch", "/watch/"):
+            wp = STATIC_DIR / "watch.html"
+            if not wp.exists():
+                self.send_error(404, "Watch view not found")
+                return
+            body = wp.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if path == "/api/broadcast/state":
+            self._send_json(broadcast_hub.get_state(include_deck=True))
+            return
+
+        if path == "/api/broadcast/qr.svg":
+            svg_bytes = broadcast_hub.generate_qr_svg(qs.get("url", [""])[0])
+            self.send_response(200)
+            self.send_header("Content-Type", "image/svg+xml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(svg_bytes)))
+            self.end_headers()
+            self.wfile.write(svg_bytes)
+            return
+
+        if path == "/api/broadcast/stream":
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Connection", "keep-alive")
+            self.end_headers()
+            q = broadcast_hub.subscribe()
+            try:
+                while True:
+                    try:
+                        msg = q.get(timeout=15.0)
+                        self.wfile.write(f"data: {msg}\n\n".encode("utf-8"))
+                        self.wfile.flush()
+                    except Exception:
+                        self.wfile.write(b": keepalive\n\n")
+                        self.wfile.flush()
+            except Exception:
+                pass
+            finally:
+                broadcast_hub.unsubscribe(q)
             return
 
         if path.startswith("/art/"):
@@ -359,6 +412,33 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json({"ok": True, "webhook_status": status_code, "subject": mailing["subject"]})
             except Exception as e:
                 self._send_json({"error": f"Webhook push failed: {e}"}, status=502)
+            return
+
+        if path == "/api/broadcast/start":
+            body = self._read_json_body()
+            st = broadcast_hub.start_broadcast(
+                deck_kind=(body.get("kind") or "parasha").strip(),
+                deck_slug=(body.get("slug") or "").strip(),
+                slide_idx=int(body.get("slide_idx") or 0),
+                public_tunnel=bool(body.get("public_tunnel", True)),
+                port=PORT,
+            )
+            self._send_json({"ok": True, "broadcast": st})
+            return
+
+        if path == "/api/broadcast/sync":
+            body = self._read_json_body()
+            st = broadcast_hub.sync_broadcast(
+                deck_kind=body.get("kind"),
+                deck_slug=body.get("slug"),
+                slide_idx=body.get("slide_idx"),
+            )
+            self._send_json({"ok": True, "broadcast": st})
+            return
+
+        if path == "/api/broadcast/stop":
+            st = broadcast_hub.stop_broadcast()
+            self._send_json({"ok": True, "broadcast": st})
             return
 
         if path == "/api/scribe/run":

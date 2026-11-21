@@ -202,18 +202,25 @@ def get_scribe_status() -> dict:
     }
 
 
-def _fetch_sefaria_chapter(sefaria_ref: str, timeout: float = 12.0) -> tuple[list, list] | None:
+def _fetch_sefaria_chapter(sefaria_ref: str, timeout: float = 12.0) -> tuple[str, list, list]:
+    """Returns ('ok', en_list, he_list), ('not_found', [], []), or ('offline', [], [])."""
     enc = urllib.parse.quote(sefaria_ref.replace(" ", "_"), safe="_,.")
     url = f"https://www.sefaria.org/api/texts/{enc}?context=0&commentary=0"
     req = urllib.request.Request(url, headers={"User-Agent": "TorahSanctuaryOS/1.0 (+open-source-synagogue)"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             data = json.loads(r.read().decode("utf-8", "ignore"))
+    except urllib.error.HTTPError as e:
+        if e.code in (400, 404):
+            return ("not_found", [], [])
+        return ("offline", [], [])
     except Exception:
-        return None
+        return ("offline", [], [])
+    if data.get("error"):
+        return ("not_found", [], [])
     en_list = data.get("text") if isinstance(data.get("text"), list) else []
     he_list = data.get("he") if isinstance(data.get("he"), list) else []
-    return (en_list, he_list) if (en_list or he_list) else None
+    return ("ok", en_list, he_list)
 
 
 def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, int]:
@@ -247,9 +254,8 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
             fetched_any = False
             for ch in batch:
                 write_live_state({"current_task": f"Ingesting {commentator} on {book_title} ch.{ch}..."})
-                res = _fetch_sefaria_chapter(f"{sef_prefix} {ch}")
-                if res is None:
-                    # Offline or API temporarily unreachable -> bail gracefully
+                st, en_verses, he_verses = _fetch_sefaria_chapter(f"{sef_prefix} {ch}")
+                if st == "offline":
                     if not fetched_any:
                         return False, f"Offline or Sefaria unreachable while checking {commentator} on {book_title}", 0
                     break
@@ -258,7 +264,8 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
                     "INSERT OR IGNORE INTO scribe_checked_chapters (commentator, target_book, chapter) VALUES (?, ?, ?)",
                     (commentator, book_title, ch),
                 )
-                en_verses, he_verses = res
+                if st != "ok":
+                    continue
                 max_v = max(len(en_verses), len(he_verses))
                 for v_idx in range(max_v):
                     v_num = v_idx + 1

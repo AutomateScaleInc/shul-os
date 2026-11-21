@@ -1349,6 +1349,8 @@
             </div>
             <label>Shul Calendar ICS Feed URL (Google Calendar / Chabad iCal .ics)<br><input class="form-input" style="width:100%" id="cfgIcsUrl" placeholder="https://.../calendar.ics (syncs Rabbi Michoel's events automatically)"></label>
             <label>Mailing / Newsletter Webhook URL (Mailchimp / Brevo / Zapier / CRM)<br><input class="form-input" style="width:100%" id="cfgMailHook" placeholder="https://... (receives signups & weekly newsletter pushes)"></label>
+            <label>Custom Public Broadcast Domain (optional, e.g. https://live.theshul.eu)<br><input class="form-input" style="width:100%" id="cfgBroadcastBase" placeholder="Leave blank for automatic Cloudflare quick tunnel or LAN /watch"></label>
+            <label>Companion House-Node: Follow Master Synagogue Broadcast URL (optional)<br><input class="form-input" style="width:100%" id="cfgBroadcastFollow" placeholder="e.g. https://live.theshul.eu or http://100.94.73.72:8080"></label>
             <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
             <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
           </div>
@@ -1382,9 +1384,26 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <select id="presPicker" class="form-input" style="padding:6px 10px;font-size:0.85rem;" onchange="switchPresentationFromPicker(this.value)"></select>
+      <button class="btn-secondary" id="presBroadcastBtn" onclick="toggleBroadcastLive()" title="Broadcast these slides live to phones, tablets & linked house nodes">📡 Broadcast Live</button>
+      <button class="btn-secondary" id="presQrBtn" onclick="toggleBroadcastPopover()" style="display:none;border-color:#f87171;color:#fecaca;">🔴 QR &amp; Link</button>
       <button class="btn-secondary" id="presNarrateBtn" onclick="narrateCurrentSlide()">🔊 Narrate Slide</button>
       <button class="btn-secondary" id="presAutoBtn" onclick="togglePresAuto()">▶ Auto-Play</button>
       <button class="btn-primary" onclick="closePresentation()">✕ Exit</button>
+    </div>
+  </div>
+  <div id="broadcastPopover" style="display:none;position:fixed;top:76px;right:28px;z-index:160;width:320px;background:rgba(12,20,38,0.97);border:1.5px solid var(--gold);border-radius:16px;padding:16px;box-shadow:0 20px 54px rgba(0,0,0,0.7);text-align:center;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <strong style="color:#f87171;font-size:0.9rem;">🔴 LIVE BROADCAST ACTIVE</strong>
+      <button class="tool-btn" onclick="document.getElementById('broadcastPopover').style.display='none'">✕</button>
+    </div>
+    <div id="broadcastViewerBadge" style="font-size:0.82rem;color:var(--accent);margin-bottom:8px;">👁 0 watching · Slides sync in real time</div>
+    <div style="background:#fffdf7;border-radius:12px;padding:8px;display:inline-block;margin-bottom:10px;">
+      <img id="broadcastQrImg" src="/api/broadcast/qr.svg" alt="Scan to Watch Live" style="width:176px;height:176px;display:block;">
+    </div>
+    <div id="broadcastUrlText" style="font-family:monospace;font-size:0.78rem;color:#f3d796;word-break:break-all;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" style="padding:6px 12px;font-size:0.8rem;" onclick="copyBroadcastUrl()">📋 Copy Watch Link</button>
+      <button class="btn-secondary" style="padding:6px 12px;font-size:0.8rem;" onclick="toggleBroadcastLive()">⏹ Stop Broadcast</button>
     </div>
   </div>
   <div class="pres-stage">
@@ -2749,9 +2768,124 @@ function switchPresentationFromPicker(val) {
   openPresentation(kind, slug || '');
 }
 
+let presCurrentKind = 'parasha';
+let presCurrentSlug = '';
+let broadcastLive = false;
+let broadcastPollTimer = null;
+let broadcastWatchUrl = '';
+let companionSource = null;
+
+async function toggleBroadcastLive() {
+  const btn = document.getElementById('presBroadcastBtn');
+  const qrBtn = document.getElementById('presQrBtn');
+  const pop = document.getElementById('broadcastPopover');
+  if (broadcastLive) {
+    broadcastLive = false;
+    if (broadcastPollTimer) { clearInterval(broadcastPollTimer); broadcastPollTimer = null; }
+    await fetch('/api/broadcast/stop', { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' }).catch(() => {});
+    if (btn) btn.textContent = '📡 Broadcast Live';
+    if (qrBtn) qrBtn.style.display = 'none';
+    if (pop) pop.style.display = 'none';
+    return;
+  }
+  if (btn) btn.textContent = '⏳ Starting Live...';
+  const r = await fetch('/api/broadcast/start', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ kind: presCurrentKind, slug: presCurrentSlug, slide_idx: presIdx, public_tunnel: true }),
+  });
+  const d = await r.json();
+  const st = d.broadcast || {};
+  broadcastLive = !!st.active;
+  updateBroadcastUi(st);
+  if (pop) pop.style.display = 'block';
+  if (broadcastPollTimer) clearInterval(broadcastPollTimer);
+  broadcastPollTimer = setInterval(async () => {
+    if (!broadcastLive) return;
+    try {
+      const sr = await fetch('/api/broadcast/state');
+      const sd = await sr.json();
+      updateBroadcastUi(sd);
+    } catch (e) {}
+  }, 3000);
+}
+
+function updateBroadcastUi(st) {
+  const btn = document.getElementById('presBroadcastBtn');
+  const qrBtn = document.getElementById('presQrBtn');
+  if (!st || !st.active) return;
+  broadcastWatchUrl = st.watch_url || st.lan_url || (location.origin + '/watch');
+  if (btn) btn.textContent = '⏹ End Broadcast';
+  if (qrBtn) {
+    qrBtn.style.display = 'inline-block';
+    qrBtn.textContent = `🔴 LIVE · 👁 ${st.viewer_count || 0}`;
+  }
+  const vb = document.getElementById('broadcastViewerBadge');
+  if (vb) {
+    const tState = st.tunnel_status === 'starting' ? ' · Opening public HTTPS tunnel...' : (st.public_url ? ' · Public HTTPS Ready' : ' · Local Network Ready');
+    vb.textContent = `👁 ${st.viewer_count || 0} watching${tState}`;
+  }
+  const ut = document.getElementById('broadcastUrlText');
+  if (ut) ut.textContent = broadcastWatchUrl;
+  const qi = document.getElementById('broadcastQrImg');
+  if (qi && qi.dataset.url !== broadcastWatchUrl) {
+    qi.dataset.url = broadcastWatchUrl;
+    qi.src = '/api/broadcast/qr.svg?url=' + encodeURIComponent(broadcastWatchUrl) + '&t=' + Date.now();
+  }
+}
+
+function toggleBroadcastPopover() {
+  const pop = document.getElementById('broadcastPopover');
+  if (pop) pop.style.display = pop.style.display === 'none' ? 'block' : 'none';
+}
+
+async function copyBroadcastUrl() {
+  if (!broadcastWatchUrl) return;
+  try {
+    await navigator.clipboard.writeText(broadcastWatchUrl);
+    const vb = document.getElementById('broadcastViewerBadge');
+    if (vb) vb.textContent = '✓ Watch link copied to clipboard!';
+  } catch (e) {}
+}
+
+function syncBroadcastIfLive() {
+  if (!broadcastLive) return;
+  fetch('/api/broadcast/sync', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ kind: presCurrentKind, slug: presCurrentSlug, slide_idx: presIdx }),
+  }).catch(() => {});
+}
+
+function initCompanionFollow(followUrl) {
+  if (companionSource) { companionSource.close(); companionSource = null; }
+  const base = String(followUrl || '').trim().replace(/\/+$/, '');
+  if (!base) return;
+  try {
+    companionSource = new EventSource(base + '/api/broadcast/stream');
+    companionSource.onmessage = (ev) => {
+      try {
+        const st = JSON.parse(ev.data);
+        if (st.active && st.deck && (st.deck.slides || []).length) {
+          presDeck = st.deck;
+          presIdx = st.slide_idx || 0;
+          document.getElementById('presModal').classList.add('open');
+          document.getElementById('presDeckTitle').textContent = '🔴 SYNCED LIVE · ' + (presDeck.deck_title || 'Torah Broadcast');
+          document.getElementById('presDeckSub').textContent = st.host_name || '';
+          renderPresSlide();
+        } else if (document.getElementById('presModal').classList.contains('open') && (document.getElementById('presDeckTitle').textContent || '').startsWith('🔴 SYNCED LIVE')) {
+          closePresentation();
+        }
+      } catch (e) {}
+    };
+  } catch (e) {}
+}
+
 async function openPresentation(kind = 'parasha', slug = '') {
   stopSpeaking();
   clearPresAuto();
+  presCurrentKind = kind;
+  presCurrentSlug = slug;
   const r = await fetch(`/api/presentation?kind=${encodeURIComponent(kind)}&slug=${encodeURIComponent(slug)}`);
   presDeck = await r.json();
   presIdx = 0;
@@ -2760,11 +2894,13 @@ async function openPresentation(kind = 'parasha', slug = '') {
   document.getElementById('presDeckSub').textContent = presDeck.subtitle || '';
   await populatePresPicker(`${kind}:${slug}`);
   renderPresSlide();
+  syncBroadcastIfLive();
 }
 
 function closePresentation() {
   stopSpeaking();
   clearPresAuto();
+  if (broadcastLive) toggleBroadcastLive();
   document.getElementById('presModal').classList.remove('open');
 }
 
@@ -2785,6 +2921,7 @@ function stepPres(delta) {
   stopSpeaking();
   presIdx = (presIdx + delta + presDeck.slides.length) % presDeck.slides.length;
   renderPresSlide();
+  syncBroadcastIfLive();
 }
 
 function narrateCurrentSlide() {
@@ -3428,6 +3565,9 @@ async function loadSettings() {
   autoSpeakReplies = c.auto_speak !== false;
   document.getElementById('cfgIcsUrl').value = c.calendar_ics_url || '';
   document.getElementById('cfgMailHook').value = c.mailing_webhook_url || '';
+  document.getElementById('cfgBroadcastBase').value = c.broadcast_public_base_url || '';
+  document.getElementById('cfgBroadcastFollow').value = c.broadcast_follow_url || '';
+  if (c.broadcast_follow_url) initCompanionFollow(c.broadcast_follow_url);
 }
 
 async function saveSettings() {
@@ -3454,7 +3594,10 @@ async function saveSettings() {
     auto_speak: document.getElementById('cfgAutoSpeak').checked,
     calendar_ics_url: document.getElementById('cfgIcsUrl').value.trim(),
     mailing_webhook_url: document.getElementById('cfgMailHook').value.trim(),
+    broadcast_public_base_url: document.getElementById('cfgBroadcastBase').value.trim(),
+    broadcast_follow_url: document.getElementById('cfgBroadcastFollow').value.trim(),
   };
+  initCompanionFollow(payload.broadcast_follow_url);
   currentVoiceProfile = payload.voice_profile;
   autoSpeakReplies = payload.auto_speak;
   const r = await fetch('/api/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
@@ -3469,6 +3612,9 @@ async function saveSettings() {
 loadHealth();
 loadCelestial();
 loadToday();
+fetch('/api/config').then(r => r.json()).then(d => {
+  if (d && d.config && d.config.broadcast_follow_url) initCompanionFollow(d.config.broadcast_follow_url);
+}).catch(() => {});
 setInterval(loadHealth, 30000);
 setInterval(loadCelestial, 60000);
 </script>

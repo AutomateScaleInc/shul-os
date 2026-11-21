@@ -32,6 +32,8 @@ DEFAULT_CONFIG = {
     "os_color_temp_sync": True,
     "scribe_enabled": True,
     "scribe_online_ingest": True,
+    "broadcast_public_base_url": "",
+    "broadcast_follow_url": "",
     "location": {
         "city": "Brussels, Belgium",
         "lat": 50.8503,

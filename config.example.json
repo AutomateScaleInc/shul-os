@@ -14,6 +14,8 @@
   "os_color_temp_sync": true,
   "scribe_enabled": true,
   "scribe_online_ingest": true,
+  "broadcast_public_base_url": "",
+  "broadcast_follow_url": "",
   "location": {
     "city": "Brussels, Belgium",
     "lat": 50.8503,

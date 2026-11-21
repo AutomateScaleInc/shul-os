@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Torah Sanctuary Broadcast</title>
+<style>
+  :root {
+    --bg: #070d1b; --card: rgba(16, 26, 48, 0.92); --gold: #e4bc69; --accent: #5cb6e5;
+    --text: #f3ead8; --muted: #b7c2d6; --serif: Georgia, 'Times New Roman', serif;
+    --hebrew: 'Noto Serif Hebrew', 'SBL Hebrew', 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    display: flex; flex-direction: column; overflow-x: hidden;
+  }
+  #bgLayer {
+    position: fixed; inset: 0; background-size: cover; background-position: center;
+    filter: blur(22px) brightness(0.28) saturate(1.15); transform: scale(1.08);
+    transition: background-image 0.8s ease; z-index: 0;
+  }
+  header {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 22px; background: rgba(7, 12, 24, 0.86);
+    border-bottom: 1px solid rgba(228,188,105,0.28);
+  }
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px;
+    border-radius: 999px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em;
+    background: rgba(239,68,68,0.2); border: 1px solid #f87171; color: #fecaca;
+  }
+  .live-pill.idle { background: rgba(228,188,105,0.16); border-color: var(--gold); color: var(--gold); }
+  .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #ef4444; animation: pulse 1.6s infinite; }
+  .live-pill.idle .live-dot { background: var(--gold); animation: none; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+  main {
+    position: relative; z-index: 2; flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .stage {
+    width: 100%; max-width: 1120px;
+    background: var(--card); border: 1px solid rgba(228,188,105,0.36);
+    border-radius: 22px; padding: 28px 34px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.62);
+    animation: reveal 0.55s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: center; }
+  @media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; } .stage { padding: 20px; } }
+  .art-box {
+    border-radius: 18px; overflow: hidden; border: 2px solid rgba(228,188,105,0.5);
+    aspect-ratio: 16 / 10; background: #080f20;
+  }
+  .art-box img { width: 100%; height: 100%; object-fit: cover; display: block; animation: kb 24s ease-in-out infinite alternate; }
+  @keyframes kb { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+  .kicker { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 800; }
+  h1 { font-family: var(--serif); font-size: clamp(1.7rem, 3.2vw, 2.7rem); color: var(--gold); margin: 8px 0; line-height: 1.15; }
+  .he { font-family: var(--hebrew); direction: rtl; color: #f6dc9b; font-size: clamp(1.3rem, 2.4vw, 2rem); margin: 6px 0 12px; }
+  .body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.62; color: var(--text); }
+  .point {
+    background: rgba(24,37,64,0.88); border-left: 4px solid var(--gold);
+    border-radius: 12px; padding: 13px 16px; margin-bottom: 10px; font-size: 1.06rem; line-height: 1.5;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+  .subcard {
+    background: rgba(24,37,64,0.9); border: 1px solid rgba(228,188,105,0.35);
+    border-radius: 14px; padding: 16px;
+  }
+  .btn {
+    background: rgba(228,188,105,0.16); border: 1px solid var(--gold); color: var(--gold);
+    border-radius: 10px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-size: 0.85rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(228,188,105,0.28); }
+  footer {
+    position: relative; z-index: 2; padding: 10px 22px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    background: rgba(7, 12, 24, 0.84); border-top: 1px solid rgba(228,188,105,0.22);
+    font-size: 0.82rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div id="bgLayer"></div>
+<header>
+  <div>
+    <div style="font-family:var(--serif);color:var(--gold);font-size:1.15rem;font-weight:700;" id="hostTitle">✡ Torah Sanctuary · Live Broadcast</div>
+    <div style="font-size:0.8rem;color:var(--muted);" id="deckSub">Connecting to live synagogue stream...</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span class="live-pill idle" id="liveBadge"><span class="live-dot"></span><span id="liveText">STANDBY</span></span>
+    <button class="btn" onclick="speakCurrentSlide()">🔊 Hear Slide</button>
+    <a class="btn" href="/">📖 Open Full Sanctuary</a>
+  </div>
+</header>
+<main>
+  <div class="stage" id="stageBox">
+    <div class="kicker">The European Synagogue · Torah Sanctuary OS</div>
+    <h1>Connecting to Live Session...</h1>
+    <p class="body" style="color:var(--muted);">Slides will appear and advance automatically in real time as the presenter leads the class.</p>
+  </div>
+</main>
+<footer>
+  <div id="slideCounter">Awaiting live session</div>
+  <div id="celInfo">100% Live Synchronized Torah Study</div>
+</footer>
+<script>
+let currentState = null;
+let ttsAudio = null;
+function esc(s) { return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function renderState(st) {
+  currentState = st;
+  document.getElementById('hostTitle').textContent = '✡ ' + (st.host_name || 'Torah Sanctuary');
+  const badge = document.getElementById('liveBadge');
+  const ltxt = document.getElementById('liveText');
+  const box = document.getElementById('stageBox');
+
+  if (!st.active || !st.deck || !(st.deck.slides || []).length) {
+    badge.className = 'live-pill idle';
+    ltxt.textContent = 'STANDBY';
+    document.getElementById('deckSub').textContent = 'Ready — slides will sync automatically the instant a session begins';
+    document.getElementById('slideCounter').textContent = 'Standing by for presenter';
+    document.getElementById('bgLayer').style.backgroundImage = "url('/art/jacobs-ladder.jpg')";
+    box.innerHTML = `
+      <div class="hero-grid">
+        <div>
+          <div class="kicker">Live Synagogue Broadcast Room</div>
+          <h1>Waiting for Live Presentation</h1>
+          <div class="he">בְּרוּכִים הַבָּאִים לְבֵית הַמִּדְרָשׁ</div>
+          <p class="body" style="color:var(--muted);">Stay right on this page. As soon as Rabbi Michoel or the presenter hits <strong>Broadcast Live</strong>, every illuminated painting, Hebrew &amp; English verse, Character, Symbol, and <em>"In Today's Terms"</em> slide will sync here in real time.</p>
+          <div style="margin-top:16px;"><a class="btn" href="/">📖 Explore Today's Torah Reading While You Wait</a></div>
+        </div>
+        <div class="art-box"><img src="/art/jacobs-ladder.jpg" alt="Torah Sanctuary"></div>
+      </div>`;
+    return;
+  }
+
+  badge.className = 'live-pill';
+  ltxt.textContent = `LIVE · 👁 ${st.viewer_count || 1}`;
+  const deck = st.deck;
+  const idx = Math.max(0, Math.min(st.slide_idx || 0, deck.slides.length - 1));
+  const s = deck.slides[idx];
+  const art = s.art || deck.art || '/art/sacred-symbols.jpg';
+  document.getElementById('bgLayer').style.backgroundImage = `url('${art}')`;
+  document.getElementById('deckSub').textContent = `${deck.deck_title} · ${deck.subtitle || ''}`;
+  document.getElementById('slideCounter').textContent = `Slide ${idx + 1} of ${deck.slides.length} · Synced Live`;
+
+  if (s.type === 'title') {
+    box.innerHTML = `<div class="hero-grid">
+      <div><div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>${s.he_title ? `<div class="he">${esc(s.he_title)}</div>` : ''}<p class="body">${esc(s.subtitle)}</p></div>
+      <div class="art-box"><img src="${esc(art)}" alt="${esc(s.title)}"></div>
+    </div>`;
+  } else if (s.type === 'story') {
+    box.innerHTML = `<div class="hero-grid">
+      <div><div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>${s.he_text ? `<div class="he">${esc(s.he_text)}</div>` : ''}<p class="body">${esc(s.body)}</p></div>
+      <div class="art-box"><img src="${esc(art)}" alt="${esc(s.title)}"></div>
+    </div>`;
+  } else if (s.type === 'characters') {
+    box.innerHTML = `<div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>
+      <div class="cards">${(s.characters || []).map(c => `<div class="subcard"><div class="he" style="font-size:1.25rem;margin:0;">${esc(c.he_name)}</div><h3 style="margin:4px 0;color:#fff;font-family:var(--serif);">${esc(c.name)}</h3><div style="color:var(--accent);font-weight:600;margin-bottom:6px;">${esc(c.archetype)}</div><div style="font-size:0.94rem;">${esc(c.today || '')}</div></div>`).join('')}</div>`;
+  } else if (s.type === 'symbols') {
+    box.innerHTML = `<div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>
+      <div class="cards">${(s.symbols || []).map(sym => `<div class="subcard"><div style="display:flex;gap:12px;align-items:center;"><div style="width:48px;height:48px;color:var(--gold);flex-shrink:0;">${sym.svg || ''}</div><div><div class="he" style="font-size:1.15rem;margin:0;">${esc(sym.he_name)}</div><h3 style="margin:2px 0;color:#fff;">${esc(sym.name)}</h3></div></div><p style="font-size:0.94rem;margin:10px 0 6px;">${esc(sym.meaning)}</p><div style="color:#f3d796;font-size:0.88rem;"><strong>Today:</strong> ${esc(sym.today)}</div></div>`).join('')}</div>`;
+  } else if (s.type === 'commentators') {
+    box.innerHTML = `<div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>
+      <div style="margin-top:12px;">${(s.items || []).map(it => `<div class="point"><div style="color:var(--accent);font-weight:700;font-size:0.9rem;margin-bottom:3px;">${esc(it.author)} ${it.ref ? '· ' + esc(it.ref) : ''}</div><div>${esc(it.text)}</div></div>`).join('')}</div>`;
+  } else if (s.type === 'today') {
+    box.innerHTML = `<div class="hero-grid">
+      <div><div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1><div style="margin-top:10px;">${(s.points || []).map(pt => `<div class="point">✦ ${esc(pt)}</div>`).join('')}</div></div>
+      <div class="art-box"><img src="${esc(art)}" alt="${esc(s.title)}"></div>
+    </div>`;
+  } else {
+    box.innerHTML = `<div class="kicker">${esc(s.kicker)}</div><h1>${esc(s.title)}</h1>
+      <div style="margin-top:14px;">${(s.questions || []).map((q, i) => `<div class="point"><strong>${i+1}.</strong> ${esc(q)}</div>`).join('')}</div>`;
+  }
+}
+
+async function speakCurrentSlide() {
+  if (!currentState || !currentState.active || !currentState.deck) return;
+  const s = currentState.deck.slides[currentState.slide_idx || 0];
+  if (!s) return;
+  const txt = s.narration || `${s.title}. ${s.body || s.subtitle || ''}`;
+  if (ttsAudio) { ttsAudio.pause(); ttsAudio = null; }
+  try {
+    const r = await fetch('/api/tts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({text: txt}) });
+    if (r.ok) {
+      const url = URL.createObjectURL(await r.blob());
+      ttsAudio = new Audio(url);
+      ttsAudio.play().catch(() => {});
+      return;
+    }
+  } catch (e) {}
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(txt));
+  }
+}
+
+function connectStream() {
+  const es = new EventSource('/api/broadcast/stream');
+  es.onmessage = (ev) => {
+    try { renderState(JSON.parse(ev.data)); } catch (e) {}
+  };
+  es.onerror = () => {
+    es.close();
+    setTimeout(connectStream, 3000);
+  };
+}
+
+fetch('/api/celestial').then(r => r.json()).then(c => {
+  const he = c.hebrew_date || {};
+  const m = c.moon || {};
+  document.getElementById('celInfo').textContent = `✡ ${he.en_str || ''} · ${m.emoji || '🌙'} ${m.illumination_pct || ''}% ${m.phase_en || ''} · ${c.location ? c.location.city : ''}`;
+}).catch(() => {});
+
+connectStream();
+</script>
+</body>
+</html>
