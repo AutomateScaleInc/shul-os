@@ -1893,6 +1893,7 @@
       <button data-view="mesh">🌐 Shul Mesh</button>
       <button data-view="history">History</button>
       <button data-view="settings">Settings</button>
+      <button type="button" onclick="window.open('/under-the-hood','_blank')" title="Open the Under the Hood Presentation &amp; Self-Replication Guide">✨ Under the Hood</button>
     </nav>
     <div class="hdr-tools">
       <button class="btn-primary" style="padding:6px 12px;font-size:0.84rem;" onclick="openPresentation('parasha','')" title="Launch Full-Screen Presentation for Rabbi & Community">🎬 Present</button>
@@ -2445,10 +2446,18 @@
                 <div id="meshJoinHubUrl" style="font-family:monospace;font-size:0.82rem;color:var(--gold);word-break:break-all;margin:3px 0 8px;">Loading...</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="copyMeshJoinCmd()">📋 Copy Omarchy Join Cmd</button>
+                  <a class="btn-primary" style="padding:5px 10px;font-size:0.78rem;text-decoration:none;" href="/under-the-hood" target="_blank">✨ Share Under the Hood Deck</a>
                   <a class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;text-decoration:none;" href="/api/admin/export-bundle" download="shulos-synagogue-bundle.json">📦 Export Shul Bundle</a>
                   <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="switchView('settings')">⚙ Mesh Settings</button>
                 </div>
-                <div class="muted" style="font-size:0.74rem;margin-top:6px;">Open Source (MIT License) · Turnkey <code>./install-omarchy-shul.sh</code> for any Chabad House, Synagogue, or Family Residence.</div>
+                <div class="muted" style="font-size:0.74rem;margin-top:6px;">🌱 Self-Replicating Open Source (MIT) · Share <code>/under-the-hood</code> or run <code>./install-omarchy-shul.sh</code> to deploy &amp; link any Chabad House, Synagogue, or Family Residence.</div>
+              </div>
+            </div>
+            <div style="margin-top:10px;padding:9px 12px;border-radius:11px;background:rgba(228,188,105,0.08);border:1px solid rgba(228,188,105,0.34);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <img src="/api/mesh/deck-qr.svg" alt="Scan Under the Hood Presentation QR" style="width:68px;height:68px;background:#fff;padding:4px;border-radius:8px;border:1px solid var(--gold);flex-shrink:0;">
+              <div style="min-width:0;flex:1;">
+                <div style="font-size:0.74rem;font-weight:800;color:var(--gold);letter-spacing:0.06em;">🚀 SHARE &amp; REPLICATE THIS OS (PRESENTATION QR)</div>
+                <div class="muted" style="font-size:0.78rem;">Let any visiting Rabbi, Chabad Director, or guest scan this QR to open the <strong>Under the Hood Presentation</strong> &amp; join the Shul Mesh!</div>
               </div>
             </div>
             <pre id="meshJoinCmdPre" style="margin:10px 0 0;padding:10px;border-radius:10px;background:rgba(6,11,24,0.75);border:1px solid var(--border);color:#cbd5e1;font-size:0.74rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;"></pre>
@@ -2677,6 +2686,7 @@
         <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
           <a class="btn-primary" style="padding:5px 12px;font-size:0.8rem;text-decoration:none;" href="/give" target="_blank">Open Mobile Splash →</a>
           <a class="btn-secondary" style="padding:5px 10px;font-size:0.8rem;text-decoration:none;" href="/watch" target="_blank">📺 Live Screen</a>
+          <a class="btn-secondary" style="padding:5px 10px;font-size:0.8rem;text-decoration:none;" href="/under-the-hood" target="_blank">🚀 Get This OS</a>
         </div>
       </div>
       <div>
@@ -3264,7 +3274,7 @@ function celebrateQuizReveal() {
 
 // Navigation
 document.querySelectorAll('#mainNav button').forEach(btn => {
-  btn.addEventListener('click', () => switchView(btn.dataset.view));
+  if (btn.dataset.view) btn.addEventListener('click', () => switchView(btn.dataset.view));
 });
 function switchView(name) {
   currentViewName = name;

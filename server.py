@@ -261,6 +261,18 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(svg_bytes)
             return
 
+        if path == "/api/mesh/deck-qr.svg":
+            base_u = community_hub.get_public_base_url(self.headers.get("Host", ""))
+            svg_bytes = broadcast_hub.generate_qr_svg(base_u + "/under-the-hood")
+            self.send_response(200)
+            self.send_header("Content-Type", "image/svg+xml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(svg_bytes)))
+            self.end_headers()
+            self.wfile.write(svg_bytes)
+            return
+
         if path == "/api/broadcast/qr.svg":
             svg_bytes = broadcast_hub.generate_qr_svg(qs.get("url", [""])[0])
             self.send_response(200)

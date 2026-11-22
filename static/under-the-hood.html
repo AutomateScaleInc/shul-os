@@ -127,7 +127,9 @@
       </div>
     </div>
     <div class="tools">
-      <a class="btn" href="https://shul.automatescale.com" target="_blank">🌐 Live Sanctuary</a>
+      <a class="btn" href="/" target="_blank">🌐 Live Sanctuary</a>
+      <a class="btn" href="/?view=mesh" target="_blank">🔗 Shul Mesh</a>
+      <a class="btn" href="/give" target="_blank">💛 Sponsor / Connect</a>
       <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
       <button class="btn primary" onclick="step(1)">Next Slide ▶</button>
     </div>
@@ -292,6 +294,15 @@
         <div><span class="ts">[0:50–1:00]</span> <em>(Wide shot)</em> “100% MIT open source. One command turns any spare computer into a living sanctuary. Drop a comment if your community wants to link into the mesh!”</div>
       </div>
       <div class="broll">🔥 <strong>Top Titles:</strong> (1) <em>“I Turned a 2013 iMac Into an Open-Source Operating System for Synagogues (100% Offline AI + Mesh)”</em> · (2) <em>“No Cloud, No Mouse, No Hallucinations: Building ShulOS on Arch Linux &amp; Tailscale”</em></div>
+      <div style="margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;border-radius:14px;background:rgba(228,188,105,0.09);border:1px solid rgba(228,188,105,0.42);">
+        <img src="/api/mesh/deck-qr.svg" alt="Scan to Share Presentation" style="width:76px;height:76px;background:#fff;padding:4px;border-radius:10px;border:1.5px solid var(--gold);flex-shrink:0;" onerror="this.style.display='none'">
+        <div style="flex:1;min-width:220px;">
+          <div style="font-size:0.76rem;font-weight:800;color:var(--gold);letter-spacing:0.08em;">🌱 SELF-REPLICATE THIS OS FOR YOUR SHUL OR CHABAD HOUSE</div>
+          <div style="font-size:0.84rem;color:var(--muted);margin:3px 0 6px;">Scan to share this deck, or deploy a linked node in 2 minutes:</div>
+          <code style="font-size:0.78rem;color:#93c5fd;">./install-omarchy-shul.sh --name "Your Shul" --type chabad --follow "https://shul.automatescale.com"</code>
+        </div>
+        <a class="btn primary" href="/api/admin/export-bundle" download="shulos-synagogue-bundle.json">📦 Export Shul Bundle</a>
+      </div>
     </section>
   </main>
 
