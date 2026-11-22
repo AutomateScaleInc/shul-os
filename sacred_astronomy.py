@@ -476,6 +476,93 @@ def bearing_to_jerusalem(lat: float, lon: float) -> dict:
 # =============================================================================
 # 3. JEWISH YEAR CYCLE, HOLIDAYS, TEKUFOT, OMER & LITURGICAL COMPASS
 # =============================================================================
+def get_upcoming_milestones(he_date: dict, gdate: datetime.date, in_israel: bool = False) -> dict:
+    """100% offline calculator for exact Next Rosh Chodesh, Shabbat Mevarchim, and Next 4 Jewish Holidays."""
+    hy, hm, hd = he_date["year"], he_date["month"], he_date["day"]
+    leap = he_date["is_leap_year"]
+    today_rd = gdate.toordinal()
+
+    # 1. Exact Next Rosh Chodesh
+    months_in_y = hebrew_year_months(hy)
+    if hm == months_in_y:
+        rc_hy, rc_hm = hy + 1, 7 if months_in_y == 12 else 1
+    else:
+        rc_hy, rc_hm = (hy + 1, 7) if hm == 6 else (hy, hm + 1)
+    # Wait: Hebrew year increments at Tishrei (month 7)! Months in order of year are 7,8,9,10,11,12,(13),1,2,3,4,5,6.
+    yr_order = [7, 8, 9, 10, 11, 12] + ([13] if leap else []) + [1, 2, 3, 4, 5, 6]
+    idx_m = yr_order.index(hm)
+    if idx_m + 1 < len(yr_order):
+        rc_hy, rc_hm = hy, yr_order[idx_m + 1]
+    else:
+        rc_hy, rc_hm = hy + 1, 7
+    rc_rd = hebrew_to_rd(rc_hy, rc_hm, 1)
+    rc_gdate = datetime.date.fromordinal(rc_rd)
+    rc_days = max(0, rc_rd - today_rd)
+    rc_name_en = "Adar I" if (rc_hm == 12 and is_hebrew_leap_year(rc_hy)) else HEBREW_MONTHS_EN[rc_hm]
+    rc_name_he = "אֲדָר א׳" if (rc_hm == 12 and is_hebrew_leap_year(rc_hy)) else HEBREW_MONTHS_HE[rc_hm]
+    shabbat_mevarchim_soon = (1 <= rc_days <= 8) and (rc_hm != 7)
+
+    # 2. Next 4 Upcoming Major Jewish Festivals / Milestones (scanning hy and hy+1)
+    milestones = []
+    for cand_y in (hy, hy + 1):
+        adar_p = 13 if is_hebrew_leap_year(cand_y) else 12
+        defs = [
+            (7, 1, "Rosh Hashanah", "רֹאשׁ הַשָּׁנָה", "🍎"),
+            (7, 10, "Yom Kippur", "יוֹם כִּפּוּר", "🕊"),
+            (7, 15, "Sukkot", "סֻכּוֹת", "🌿"),
+            (7, 22, "Shemini Atzeret / Simchat Torah", "שִׂמְחַת תּוֹרָה", "📜"),
+            (9, 25, "Chanukah (1st Day · Eve prior night)", "חֲנֻכָּה", "🕎"),
+            (10, 10, "Asara B'Tevet", "עֲשָׂרָה בְּטֵבֵת", "🕯"),
+            (11, 15, "Tu B'Shvat (New Year of Trees)", "ט״ו בִּשְׁבָט", "🌳"),
+            (adar_p, 14, "Purim", "פּוּרִים", "👑"),
+            (1, 15, "Pesach (Passover)", "פֶּסַח", "🍷"),
+            (2, 18, "Lag BaOmer", "ל״ג בָּעֹמֶר", "🔥"),
+            (3, 6, "Shavuot (Giving of the Torah)", "שָׁבוּעוֹת", "⛰"),
+            (5, 9, "Tisha B'Av", "תִּשְׁעָה בְּאָב", "🕯"),
+            (5, 15, "Tu B'Av", "ט״ו בְּאָב", "💛"),
+        ]
+        for mm, dd, en_n, he_n, em in defs:
+            m_rd = hebrew_to_rd(cand_y, mm, dd)
+            if m_rd >= today_rd:
+                gd = datetime.date.fromordinal(m_rd)
+                milestones.append({
+                    "days_away": m_rd - today_rd,
+                    "name": en_n,
+                    "he": he_n,
+                    "emoji": em,
+                    "hebrew_date": f"{dd} {HEBREW_MONTHS_EN[mm]} {cand_y}",
+                    "gregorian_date": gd.strftime("%b %d, %Y"),
+                })
+    milestones.sort(key=lambda x: x["days_away"])
+
+    # 3. Ordered Months for the 12/13-Month Jewish Year Wheel SVG
+    wheel_months = []
+    fest_short = {7: "Tishrei · High Holidays", 8: "Cheshvan", 9: "Kislev · Chanukah", 10: "Tevet", 11: "Shevat · Tu B'Shvat", 12: "Adar · Purim", 13: "Adar II · Purim", 1: "Nisan · Pesach", 2: "Iyyar · Omer", 3: "Sivan · Shavuot", 4: "Tammuz", 5: "Av", 6: "Elul · Shofar"}
+    for m_num in yr_order:
+        m_en = "Adar I" if (m_num == 12 and leap) else HEBREW_MONTHS_EN[m_num]
+        m_he = "אֲדָר א׳" if (m_num == 12 and leap) else HEBREW_MONTHS_HE[m_num]
+        wheel_months.append({
+            "num": m_num,
+            "en": m_en,
+            "he": m_he,
+            "note": fest_short.get(m_num, m_en),
+            "is_current": (m_num == hm),
+            "day_frac": round(hd / max(29, he_date["month_length"]), 3) if m_num == hm else 0.0,
+        })
+
+    return {
+        "next_rosh_chodesh": {
+            "month_en": rc_name_en,
+            "month_he": rc_name_he,
+            "gregorian_date": rc_gdate.strftime("%a, %b %d, %Y"),
+            "days_away": rc_days,
+            "shabbat_mevarchim_soon": shabbat_mevarchim_soon,
+        },
+        "upcoming_holidays": milestones[:5],
+        "wheel_months": wheel_months,
+    }
+
+
 def get_jewish_year_context(he_date: dict, gdate: datetime.date, in_israel: bool = False) -> dict:
     hy, hm, hd = he_date["year"], he_date["month"], he_date["day"]
     leap = he_date["is_leap_year"]
@@ -642,6 +729,7 @@ def get_jewish_year_context(he_date: dict, gdate: datetime.date, in_israel: bool
         "prayers": prayers,
         "tekufah": tekufah,
         "kiddush_levana": kiddush_levana,
+        "milestones": get_upcoming_milestones(he_date, gdate, in_israel=in_israel),
     }
 
 

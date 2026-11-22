@@ -301,6 +301,16 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             snap = sacred_astronomy.get_sacred_moment()
             snap["city_presets"] = sacred_astronomy.CITY_PRESETS
             snap["os_color_temp_sync"] = cfg.get("os_color_temp_sync", True)
+            # Attach real verbatim Daily Pirkei Avot Wisdom from local SQLite corpus!
+            try:
+                with torah_db.get_conn() as conn:
+                    avot = conn.execute("SELECT ref, en_text, he_text FROM commentaries WHERE commentator = 'Pirkei Avot' ORDER BY id").fetchall()
+                if avot:
+                    doy = int(snap["timestamp_iso"][8:10]) + int(snap["timestamp_iso"][5:7]) * 31
+                    pick = dict(avot[doy % len(avot)])
+                    snap["daily_pirkei_avot"] = pick
+            except Exception:
+                pass
             self._send_json(snap)
             return
 

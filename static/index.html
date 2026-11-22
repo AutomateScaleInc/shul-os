@@ -1706,6 +1706,13 @@ function showTimelyPopup() {
       text: `Moon is ${m.illumination_pct}% ${m.phase_en} at ${m.altitude_deg >= 0 ? '+' : ''}${m.altitude_deg}° ${m.compass} (Rise ${m.moonrise}). ${nz ? `Next Zman: ${nz.name} at ${nz.time} (${nz.countdown}).` : ''}`,
     });
   }
+  if (celestialData && celestialData.daily_pirkei_avot && celestialData.daily_pirkei_avot.en_text) {
+    const av = celestialData.daily_pirkei_avot;
+    popups.splice(2, 0, {
+      tag: `📜 DAILY PIRKEI AVOT · ${av.ref}`,
+      text: av.en_text.slice(0, 175) + (av.en_text.length > 175 ? '...' : ''),
+    });
+  }
   if (!popups.length) return;
   const item = popups[toastIdx % popups.length];
   toastIdx++;
@@ -3866,22 +3873,76 @@ function renderSkyObservatory(cel) {
       }).join('')}
     </div>`;
 
+  const ms = yc.milestones || {};
+  const rc = ms.next_rosh_chodesh || null;
+  const wheelMonths = ms.wheel_months || [];
+  let wheelSvg = '';
+  if (wheelMonths.length) {
+    const n = wheelMonths.length, cx = 150, cy = 150, rOut = 128, rIn = 64, rLbl = 98;
+    const slices = wheelMonths.map((m, idx) => {
+      const a0 = ((idx / n) * 2 * Math.PI) - Math.PI / 2;
+      const a1 = (((idx + 1) / n) * 2 * Math.PI) - Math.PI / 2;
+      const am = (a0 + a1) / 2;
+      const x0 = cx + rOut * Math.cos(a0), y0 = cy + rOut * Math.sin(a0);
+      const x1 = cx + rOut * Math.cos(a1), y1 = cy + rOut * Math.sin(a1);
+      const xi1 = cx + rIn * Math.cos(a1), yi1 = cy + rIn * Math.sin(a1);
+      const xi0 = cx + rIn * Math.cos(a0), yi0 = cy + rIn * Math.sin(a0);
+      const lx = cx + rLbl * Math.cos(am), ly = cy + rLbl * Math.sin(am);
+      const fill = m.is_current ? 'rgba(228,188,105,0.34)' : 'rgba(20,34,62,0.72)';
+      const stroke = m.is_current ? '#e4bc69' : 'rgba(228,188,105,0.28)';
+      let ptr = '';
+      if (m.is_current) {
+        const ap = a0 + (a1 - a0) * (m.day_frac || 0.5);
+        const px = cx + (rOut + 8) * Math.cos(ap), py = cy + (rOut + 8) * Math.sin(ap);
+        ptr = `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="5" fill="#ffe588" stroke="#fff" stroke-width="1.4"/>`;
+      }
+      return `<path d="M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${rOut} ${rOut} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)} L ${xi1.toFixed(1)} ${yi1.toFixed(1)} A ${rIn} ${rIn} 0 0 0 ${xi0.toFixed(1)} ${yi0.toFixed(1)} Z" fill="${fill}" stroke="${stroke}" stroke-width="${m.is_current ? '2' : '1'}"/>
+        <text x="${lx.toFixed(1)}" y="${(ly - 2).toFixed(1)}" text-anchor="middle" fill="${m.is_current ? '#fff6d6' : '#c9d6ea'}" font-size="9.5" font-weight="${m.is_current ? '800' : '600'}">${esc(m.en.slice(0, 8))}</text>
+        <text x="${lx.toFixed(1)}" y="${(ly + 10).toFixed(1)}" text-anchor="middle" fill="#e4bc69" font-size="9" font-family="var(--hebrew)">${esc(m.he)}</text>${ptr}`;
+    }).join('');
+    wheelSvg = `<svg viewBox="0 0 300 300" style="width:235px;height:235px;flex-shrink:0;display:block;margin:0 auto;">
+      ${slices}
+      <circle cx="${cx}" cy="${cy}" r="${rIn - 2}" fill="#0c1528" stroke="rgba(228,188,105,0.5)" stroke-width="1.5"/>
+      <text x="${cx}" y="${cy - 10}" text-anchor="middle" fill="#e4bc69" font-size="13" font-weight="800" font-family="var(--hebrew)">${esc(he.he_str || '')}</text>
+      <text x="${cx}" y="${cy + 9}" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">${esc(he.en_str || '')}</text>
+      <text x="${cx}" y="${cy + 25}" text-anchor="middle" fill="#5cb6e5" font-size="9.5">${he.is_leap_year ? '13-Month Leap Year' : '12-Month Sacred Year'}</text>
+    </svg>`;
+  }
+
+  const holHtml = (ms.upcoming_holidays || []).slice(0, 4).map(h =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.86rem;">
+      <div>${esc(h.emoji)} <strong>${esc(h.name)}</strong> <span class="muted">(${esc(h.gregorian_date)})</span></div>
+      <span style="color:var(--gold);font-weight:700;">${h.days_away === 0 ? 'TODAY' : `in ${h.days_away}d`}</span>
+    </div>`
+  ).join('');
+
+  const avot = cel.daily_pirkei_avot || null;
+  const avotHtml = avot ? `<div class="today-box" style="margin-top:12px;"><h4>📜 Daily Pirkei Avot · ${esc(avot.ref)}</h4><div style="font-size:0.88rem;line-height:1.48;">${esc((avot.en_text || '').slice(0, 280))}${(avot.en_text || '').length > 280 ? '...' : ''}</div></div>` : '';
+
   const specials = (yc.special_days || []).map(sd => `<div class="source-chip"><strong>${esc(sd.name)}</strong> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:6px;">${esc(sd.he)}</span></div>`).join('');
   const omerHtml = yc.omer ? `<div class="today-box" style="margin-bottom:10px;"><h4>🌾 Sefirat HaOmer — Day ${yc.omer.day}</h4><div>${esc(yc.omer.sefirah_en)} · <span style="font-family:var(--hebrew);color:var(--gold);">${esc(yc.omer.sefirah_he)}</span></div></div>` : '';
   document.getElementById('skyYearCard').innerHTML = `
-    <h3 style="margin-top:0;">📅 Jewish Year, Tekufah &amp; Liturgical Compass</h3>
+    <h3 style="margin-top:0;">📅 Sacred Jewish Year Wheel, Holidays &amp; Tekufah</h3>
     ${omerHtml}
-    ${specials || `<div class="source-chip"><strong>Regular Weekday / Shabbat Cycle</strong> · ${esc(he.en_str)}</div>`}
-    <div style="margin-top:12px;">
-      <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Season (Tekufah)</div>
-      <div style="font-weight:700;color:var(--gold);">${esc((yc.tekufah && yc.tekufah.en) || '')} <span style="font-family:var(--hebrew);margin-left:6px;">${esc((yc.tekufah && yc.tekufah.he) || '')}</span></div>
+    <div style="display:grid;grid-template-columns:235px 1fr;gap:14px;align-items:center;">
+      <div>${wheelSvg}</div>
+      <div>
+        ${rc ? `<div class="source-chip" style="margin-bottom:8px;"><strong>🌙 Next Rosh Chodesh: ${esc(rc.month_en)} (${esc(rc.month_he)})</strong><div class="muted" style="font-size:0.82rem;">${esc(rc.gregorian_date)} · in <strong>${rc.days_away} days</strong>${rc.shabbat_mevarchim_soon ? ' · <strong>Shabbat Mevarchim this week!</strong>' : ''}</div></div>` : ''}
+        <div class="muted" style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Upcoming Sacred Milestones (100% Offline)</div>
+        ${holHtml}
+      </div>
     </div>
-    <div style="margin-top:12px;">
-      <div class="muted" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Active Tefillah (Prayer) Season Inserts</div>
-      <ul style="margin:0;padding-left:18px;font-size:0.9rem;line-height:1.55;">
+    <div style="margin-top:10px;">
+      <span class="muted" style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;">Season (Tekufah):</span>
+      <strong style="color:var(--gold);margin-left:6px;">${esc((yc.tekufah && yc.tekufah.en) || '')}</strong> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:4px;">${esc((yc.tekufah && yc.tekufah.he) || '')}</span>
+    </div>
+    <div style="margin-top:8px;">
+      <div class="muted" style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Active Tefillah (Prayer) Season Inserts</div>
+      <ul style="margin:0;padding-left:18px;font-size:0.86rem;line-height:1.48;">
         ${(yc.prayers || []).map(p => `<li>${esc(p)}</li>`).join('')}
       </ul>
-    </div>`;
+    </div>
+    ${avotHtml}`;
 }
 
 function applyCityPreset(key) {
