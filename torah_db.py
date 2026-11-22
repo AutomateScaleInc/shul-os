@@ -332,7 +332,8 @@ def search_all(query: str, limit_verses: int = 8, limit_comm: int = 6, limit_doc
         for p in all_paras:
             p_slug = (p.get("slug") or "").lower()
             p_name = (p.get("en_name") or "").lower()
-            if (p_name and p_name in q_low) or (p_slug and p_slug in q_tokens) or (p.get("he_name") and p["he_name"] in q):
+            name_hit = bool(p_name and re.search(rf"\b{re.escape(p_name)}\b", q_low))
+            if name_hit or (p_slug and p_slug in q_tokens) or (p.get("he_name") and p["he_name"] in q):
                 paras.append(p)
         if not paras:
             like_q = f"%{q}%"
