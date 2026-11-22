@@ -1920,6 +1920,19 @@
   <main>
     <!-- 0. TODAY'S DAILY TORAH READING (LIVING SANCTUARY SHOWCASE) -->
     <section id="view-today" class="view active">
+      <div id="dateTravelBar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:7px 12px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('prev_week')" title="Jump back 1 full week (previous Parashah)">⏮ -1 Wk</button>
+          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('prev')" title="Previous day">◀ Prev Day</button>
+          <input type="date" id="dateTravelInput" class="form-input" style="padding:3px 8px;font-size:0.8rem;width:auto;" onchange="if(this.value) loadToday(null, this.value)" title="Pick any past or future date">
+          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('next')" title="Next day">Next Day ▶</button>
+          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('next_week')" title="Jump forward 1 full week (next Parashah)">+1 Wk ⏭</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span id="dateTravelHeb" style="font-size:0.8rem;color:var(--gold);font-weight:700;"></span>
+          <button class="btn-primary" id="dateTravelTodayBtn" style="display:none;padding:4px 10px;font-size:0.76rem;" onclick="loadToday(null, null)">↩ Back to Today</button>
+        </div>
+      </div>
       <div class="day-strip" id="dayStrip"></div>
       <div class="today-grid">
         <div class="spotlight-card" id="spotlightCard">
@@ -3145,18 +3158,44 @@ function switchView(name) {
   if (name === 'settings') loadSettings();
 }
 
-async function loadToday(dayIdx = null) {
-  const url = dayIdx === null ? '/api/today' : '/api/today?day=' + encodeURIComponent(dayIdx);
+function travelDate(dir) {
+  if (!dailyData) return;
+  const map = {
+    prev: dailyData.prev_date,
+    next: dailyData.next_date,
+    prev_week: dailyData.prev_week_date,
+    next_week: dailyData.next_week_date,
+  };
+  if (map[dir]) loadToday(null, map[dir]);
+}
+
+async function loadToday(dayIdx = null, targetDate = null) {
+  const params = new URLSearchParams();
+  if (targetDate) params.set('date', targetDate);
+  if (dayIdx !== null && dayIdx !== undefined) params.set('day', String(dayIdx));
+  const qs = params.toString();
+  const url = qs ? '/api/today?' + qs : '/api/today';
   const r = await fetch(url);
   dailyData = await r.json();
   dailyData.slides = weaveLivingShow(dailyData);
   spotIdx = 0;
   spotTickMs = 0;
 
-  // Render 7-day Aliyah strip
+  // Update Time-Travel Date Bar (past/future days & weeks!)
+  const dtIn = document.getElementById('dateTravelInput');
+  if (dtIn && dailyData.selected_date) dtIn.value = dailyData.selected_date;
+  const dtHeb = document.getElementById('dateTravelHeb');
+  if (dtHeb) {
+    const badge = dailyData.is_today_date ? '✦ Today' : '🕰 Viewing Past/Future Day';
+    dtHeb.innerHTML = `${badge} · ${esc(dailyData.hebrew_date_en || '')} <span style="font-family:var(--hebrew);">${esc(dailyData.hebrew_date_he || '')}</span> · Parashat ${esc(dailyData.parasha.en_name)}`;
+  }
+  const dtTodayBtn = document.getElementById('dateTravelTodayBtn');
+  if (dtTodayBtn) dtTodayBtn.style.display = dailyData.is_today_date ? 'none' : 'inline-flex';
+
+  // Render 7-day Aliyah strip (every pill carries its exact ISO date!)
   const strip = document.getElementById('dayStrip');
   strip.innerHTML = (dailyData.daily_schedule || []).map(d => `
-    <button class="day-pill ${d.day_index === dailyData.selected_day_index ? 'active' : ''}" onclick="loadToday(${d.day_index})">
+    <button class="day-pill ${d.day_index === dailyData.selected_day_index ? 'active' : ''}" onclick="loadToday(null, '${esc(d.date_iso || '')}')">
       <div class="d-top">
         <span>${esc(d.day_en.slice(0, 3))}${d.is_today ? ' · TODAY' : ''}</span>
         <span style="font-family:var(--hebrew);">${esc(d.aliyah_he)}</span>

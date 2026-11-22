@@ -389,13 +389,14 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
         if path == "/api/today":
             day_param = qs.get("day", [None])[0]
+            date_param = qs.get("date", [None])[0]
             day_idx = None
             if day_param is not None and str(day_param).strip() != "":
                 try:
                     day_idx = int(day_param)
                 except ValueError:
                     day_idx = None
-            daily = torah_db.get_daily_portion(day_idx)
+            daily = torah_db.get_daily_portion(day_idx, target_date=date_param)
             # Weave Brussels Shabbat times & The Shul (theshul.eu) / Rabbi Michoel events into the scrolling ticker
             try:
                 shul_ann = shul_events.get_ticker_announcements()
@@ -412,7 +413,9 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 pass
             try:
-                p_pres = sanctuary_rich_data.build_presentation("parasha", "")
+                p_obj = daily.get("parasha") or {}
+                p_key = (p_obj.get("slug") or p_obj.get("en_name") or "").lower().replace(" ", "-")
+                p_pres = sanctuary_rich_data.build_presentation("parasha", p_key)
                 p_slides = p_pres.get("slides") or []
                 chars_s = next((sl.get("characters", []) for sl in p_slides if sl.get("type") == "characters"), [])
                 syms_s = next((sl.get("symbols", []) for sl in p_slides if sl.get("type") == "symbols"), [])
@@ -423,8 +426,6 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                     "symbols": [{"slug": s.get("slug", ""), "name": s.get("name", ""), "he_name": s.get("he_name", "")} for s in syms_s[:3]],
                     "today_points": today_s[:2],
                 }
-                p_obj = daily.get("parasha") or {}
-                p_key = (p_obj.get("slug") or p_obj.get("en_name") or "").lower().replace(" ", "-")
                 daily["show_extras"] = sanctuary_rich_data.get_handsfree_show_extras(p_key)
                 # Weave Today's Temple Psalm (Shir Shel Yom) + Month Chronicle right into show_extras!
                 try:

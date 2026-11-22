@@ -617,18 +617,52 @@ def get_verses_for_span(book_slug: str, span_ref: str) -> list:
         return [dict(r) for r in rows]
 
 
-def get_daily_portion(day_index: int = None) -> dict:
+def get_daily_portion(day_index: int = None, target_date: str = None) -> dict:
     """
-    Returns today's exact Aliyah (Sunday=0 .. Saturday=6) of the Weekly Parashah,
-    with Hebrew + English verses, linked Rashi/Ramban/Ibn Ezra/Sforno commentary,
-    curated story tie-in, spotlight slides, and scrolling sanctuary ticker messages.
+    Returns any day's exact Aliyah (Sunday=0 .. Saturday=6) of its Weekly Parashah —
+    supporting full multi-day / multi-week / any-date time-travel offline!
     """
-    # Python tm_wday: Mon=0..Sun=6 -> Jewish week index: Sun=0, Mon=1..Sat=6
-    lt = time.localtime()
-    today_idx = (lt.tm_wday + 1) % 7
-    idx = today_idx if day_index is None else max(0, min(6, int(day_index)))
+    import datetime as _dt
+    import sacred_astronomy as _sa
+
+    today_date = _dt.date.today()
+    ref_date = today_date
+    if target_date and str(target_date).strip():
+        try:
+            ref_date = _dt.date.fromisoformat(str(target_date).strip()[:10])
+        except ValueError:
+            ref_date = today_date
+
+    # Jewish week index: Sun=0, Mon=1..Sat=6
+    today_idx = (today_date.weekday() + 1) % 7
+    ref_idx = (ref_date.weekday() + 1) % 7
+    if day_index is not None and not target_date:
+        idx = max(0, min(6, int(day_index)))
+        ref_date = today_date + _dt.timedelta(days=(idx - today_idx))
+    elif day_index is not None:
+        idx = max(0, min(6, int(day_index)))
+        sunday_ref = ref_date - _dt.timedelta(days=ref_idx)
+        ref_date = sunday_ref + _dt.timedelta(days=idx)
+    else:
+        idx = ref_idx
+
+    sunday_today = today_date - _dt.timedelta(days=today_idx)
+    sunday_ref = ref_date - _dt.timedelta(days=idx)
+    week_offset = (sunday_ref - sunday_today).days // 7
 
     parasha = get_weekly_parasha()
+    if week_offset != 0:
+        with get_conn() as conn:
+            all_p = [dict(r) for r in conn.execute("SELECT * FROM parashiyot ORDER BY id ASC").fetchall()]
+        if all_p:
+            cur_i = next((i for i, p in enumerate(all_p) if p["en_name"].lower() == parasha["en_name"].lower()), 0)
+            parasha = dict(all_p[(cur_i + week_offset) % len(all_p)])
+            parasha["aliyot"] = []
+            parasha["live_haftarah"] = parasha.get("haftarah_ref", "")
+            parasha["daf_yomi"] = ""
+            parasha["tanakh_929"] = ""
+
+    he_for_date = _sa.gregorian_to_hebrew(ref_date)
     book_slug = parasha["book_slug"]
     aliyot_raw = list(parasha.get("aliyot") or [])
 
@@ -778,7 +812,16 @@ def get_daily_portion(day_index: int = None) -> dict:
         ticker_items.append(f"✨ Story Spotlight ({matching_story['title']}): {matching_story['subtitle']}")
 
     return {
-        "date_str": time.strftime("%A, %B %d, %Y", lt),
+        "date_str": ref_date.strftime("%A, %B %d, %Y"),
+        "selected_date": ref_date.isoformat(),
+        "is_today_date": ref_date == today_date,
+        "week_offset": week_offset,
+        "hebrew_date_en": he_for_date.get("en_str", ""),
+        "hebrew_date_he": he_for_date.get("he_str", ""),
+        "prev_date": (ref_date - _dt.timedelta(days=1)).isoformat(),
+        "next_date": (ref_date + _dt.timedelta(days=1)).isoformat(),
+        "prev_week_date": (ref_date - _dt.timedelta(days=7)).isoformat(),
+        "next_week_date": (ref_date + _dt.timedelta(days=7)).isoformat(),
         "today_index": today_idx,
         "selected_day_index": idx,
         "day_en": day_en,
@@ -790,12 +833,13 @@ def get_daily_portion(day_index: int = None) -> dict:
         "daily_schedule": [
             {
                 "day_index": i,
+                "date_iso": (sunday_ref + _dt.timedelta(days=i)).isoformat(),
                 "day_en": DAILY_LABELS[i][0],
                 "day_he": DAILY_LABELS[i][1],
                 "aliyah_en": DAILY_LABELS[i][2],
                 "aliyah_he": DAILY_LABELS[i][3],
                 "ref": daily_refs[i] if i < len(daily_refs) else parasha["ref"],
-                "is_today": i == today_idx,
+                "is_today": (sunday_ref + _dt.timedelta(days=i)) == today_date,
             }
             for i in range(7)
         ],

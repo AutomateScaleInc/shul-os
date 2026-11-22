@@ -269,6 +269,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/connect/messages",
             "/api/syndication/pack",
             "/api/today",
+            "/api/today?date=2026-11-15",
             "/api/celestial",
             "/api/characters",
             "/api/symbols",
