@@ -1049,3 +1049,185 @@ def get_holidays_encyclopedia() -> dict:
         "next_rosh_chodesh": ms.get("next_rosh_chodesh"),
         "holidays": enriched,
     }
+
+
+# =============================================================================
+# 6. COMMUNITY HERITAGE CHRONICLE: FAMOUS JEWISH BIRTHDAYS, IN MEMORIAM
+#    (YAHRZEITS OF GREAT HISTORICAL FIGURES), BRUSSELS/GLOBAL FACTS & WIT
+# =============================================================================
+
+COMMUNITY_HERITAGE_ITEMS = [
+    # --- FAMOUS JEWISH BIRTHDAYS ---
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 11, "g_day": 22,
+        "title": "Rodney Dangerfield & November Legends", "date_label": "Nov 22 · 1921",
+        "subtitle": "Comedy, Science & Cultural Impact",
+        "text": "Born Jacob Rodney Cohen on Nov 22 — part of an extraordinary tradition of Jewish humorists who turned self-deprecation and sharp wit into universal joy.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 11, "g_day": 27,
+        "title": "Chaim Weizmann", "date_label": "Nov 27 · 1874",
+        "subtitle": "Biochemist & First President of Israel",
+        "text": "Pioneered industrial fermentation chemistry in Britain and later helped found the Hebrew University of Jerusalem and the Weizmann Institute of Science.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 12, "g_day": 18,
+        "title": "Steven Spielberg", "date_label": "Dec 18 · 1946",
+        "subtitle": "Filmmaker & Shoah Foundation Founder",
+        "text": "Beyond shaping modern cinema, he founded the USC Shoah Foundation — preserving over 55,000 video testimonies of Holocaust survivors for future generations.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 12, "g_day": 21,
+        "title": "Henrietta Szold", "date_label": "Dec 21 · 1860",
+        "subtitle": "Founder of Hadassah & Youth Aliyah",
+        "text": "Built modern healthcare across Jerusalem regardless of religion or background, and personally led Youth Aliyah — rescuing over 11,000 Jewish children from Nazi Europe.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 3, "g_day": 8,
+        "title": "Rabbi Lord Jonathan Sacks", "date_label": "Mar 8 · 1948",
+        "subtitle": "Philosopher, Author & Chief Rabbi",
+        "text": "Templeton Prize laureate who bridged Torah wisdom and modern civic ethics for millions worldwide: 'To heal a fractured world, start with the dignity of difference.'",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 3, "g_day": 14,
+        "title": "Albert Einstein", "date_label": "Mar 14 · 1879",
+        "subtitle": "Nobel Laureate in Physics",
+        "text": "Revolutionized our understanding of space, time, and light — and championed human rights, education, and the Hebrew University of Jerusalem.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 10, "g_day": 28,
+        "title": "Dr. Jonas Salk", "date_label": "Oct 28 · 1914",
+        "subtitle": "Creator of the Polio Vaccine",
+        "text": "When asked who owned the patent to his life-saving polio vaccine, he famously replied: 'There is no patent. Could you patent the sun?'",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 7, "g_day": 25,
+        "title": "Rosalind Franklin", "date_label": "Jul 25 · 1920",
+        "subtitle": "DNA Pioneer · Photo 51",
+        "text": "Her X-ray crystallography unlocked the double-helix structure of DNA and RNA viruses — one of the most consequential breakthroughs in modern biology.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 5, "g_day": 3,
+        "title": "Golda Meir", "date_label": "May 3 · 1898",
+        "subtitle": "Stateswoman & 4th Prime Minister of Israel",
+        "text": "From a schoolteacher in Milwaukee to one of the first female heads of government in the modern world — remembered for plainspoken courage and warmth.",
+    },
+    {
+        "kind": "birthday", "badge": "🎂 NOTABLE JEWISH BIRTHDAY", "g_month": 8, "g_day": 25,
+        "title": "Leonard Bernstein", "date_label": "Aug 25 · 1918",
+        "subtitle": "Composer, Conductor & Educator",
+        "text": "Wove Jewish liturgical motifs into symphonies and Broadway masterpieces alike, inspiring generations of young musicians through his televised concerts.",
+    },
+    # --- IN MEMORIAM / YAHRZEITS OF SIGNIFICANT JEWISH FIGURES ---
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONO L'VRACHAH", "h_month": 9, "h_day": 9,
+        "title": "Rabbi DovBer of Lubavitch (Mitteler Rebbe)", "date_label": "9 Kislev · 1827",
+        "subtitle": "Born & Passed on the Exact Same Hebrew Date",
+        "text": "Authored profound works of contemplative philosophy and established the Chabad community in Hebron; remembered in Kislev for rivers of kindness and teaching.",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONO L'VRACHAH", "h_month": 8, "h_day": 20,
+        "title": "Rabbi Lord Jonathan Sacks (ז״ל)", "date_label": "20 Cheshvan · 2020",
+        "subtitle": "Voice of Moral Clarity Across Nations",
+        "text": "Remembered every autumn for teaching that optimism is passive, while hope is active: 'Optimism is the belief that things will get better; hope is the belief that together we can make them better.'",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONAH L'VRACHAH", "h_month": 8, "h_day": 21,
+        "title": "Hannah Senesh (ז״ל)", "date_label": "21 Cheshvan · 1944",
+        "subtitle": "Poet & Heroic Parachutist",
+        "text": "Parachuted into Nazi-occupied Europe at age 22 to rescue Jews; her poem 'Eli, Eli' ('A Walk to Caesarea') remains one of the most sung prayers for light and peace.",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONO L'VRACHAH", "h_month": 10, "h_day": 20,
+        "title": "Maimonides — The Rambam (ז״ל)", "date_label": "20 Tevet · 1204",
+        "subtitle": "Physician, Philosopher & Codifier",
+        "text": "Royal physician in Cairo who authored the Mishneh Torah and Guide for the Perplexed — uniting rigorous medicine, rational philosophy, and timeless Torah scholarship.",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONO L'VRACHAH", "h_month": 4, "h_day": 29,
+        "title": "Rashi — Rabbi Shlomo Yitzchaki (ז״ל)", "date_label": "29 Tammuz · 1105",
+        "subtitle": "Master Commentator of Troyes, France",
+        "text": "Vintner and scholar whose crystal-clear commentary on the entire Torah and Talmud has guided learners of every age for over 900 years.",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONO L'VRACHAH", "h_month": 4, "h_day": 3,
+        "title": "The Lubavitcher Rebbe (זצ״ל)", "date_label": "3 Tammuz · 1994",
+        "subtitle": "Architect of Global Jewish Outreach",
+        "text": "Built a worldwide network of over 5,000 Chabad Houses — turning every corner of the globe into a warm, open-door home for Shabbat, education, and kindness.",
+    },
+    {
+        "kind": "memoriam", "badge": "🕯 IN MEMORIAM · ZICHRONAH L'VRACHAH", "h_month": 12, "h_day": 15,
+        "title": "Dona Gracia Mendes Nasi (ז״ל)", "date_label": "1569 · Antwerp & Tiberias",
+        "subtitle": "Renaissance Philanthropist & Rescuer",
+        "text": "Led a daring underground rescue network right from Antwerp, Belgium — saving thousands of Conversos from the Inquisition and rebuilding Jewish life in Tiberias.",
+    },
+    # --- COMMUNITY, BRUSSELS & JEWISH INNOVATION FACTS ---
+    {
+        "kind": "community", "badge": "🌍 BRUSSELS & BELGIUM HERITAGE", "g_month": 0, "g_day": 0,
+        "title": "The Great Synagogue of Europe", "date_label": "Brussels · Est. 1878",
+        "subtitle": "Heart of Belgian Jewish History",
+        "text": "Built in 1878 on Rue de la Régence in Romanesque-Byzantine style, it survived WWII and was officially designated the Great Synagogue of Europe in 2008.",
+    },
+    {
+        "kind": "community", "badge": "🌍 BELGIAN HEROISM · RIGHTEOUS", "g_month": 0, "g_day": 0,
+        "title": "Over 1,790 Belgian Righteous Among Nations", "date_label": "Yad Vashem Honor",
+        "subtitle": "Courage & Solidarity in Belgium",
+        "text": "Through the Belgian Committee for the Defense of Jews and brave ordinary families, more than 25,000 Jews — including over 3,000 hidden children — were sheltered in Belgium during WWII.",
+    },
+    {
+        "kind": "community", "badge": "💡 JEWISH INNOVATION & SCIENCE", "g_month": 0, "g_day": 0,
+        "title": "22% of All Nobel Prize Laureates", "date_label": "Global Impact",
+        "subtitle": "Culture of Questions & Lifelong Study",
+        "text": "Though representing under 0.2% of the world's population, Jewish scholars and scientists have received over 210 Nobel Prizes across Physics, Medicine, Chemistry, Literature & Peace.",
+    },
+    {
+        "kind": "community", "badge": "🌍 LIVING LANGUAGE MIRACLE", "g_month": 0, "g_day": 0,
+        "title": "Hebrew — The Only Revived Ancient Tongue", "date_label": "3,300+ Years Alive",
+        "subtitle": "From Dead Sea Scrolls to Everyday Street",
+        "text": "A child in Jerusalem or Brussels today can pick up a 2,100-year-old Dead Sea Scroll of Isaiah and read the exact same words aloud — the only ancient language ever revived as a modern mother tongue.",
+    },
+    {
+        "kind": "community", "badge": "💡 EVERYDAY INVENTIONS", "g_month": 0, "g_day": 0,
+        "title": "Drip Irrigation, USB Drives & PillCam", "date_label": "Tikkun Olam in Tech",
+        "subtitle": "Innovation That Feeds & Heals Millions",
+        "text": "Modern drip irrigation (saving billions of gallons of water worldwide), the USB flash drive, Waze navigation, and the swallowable PillCam diagnostic camera all grew out of Israeli labs.",
+    },
+    {
+        "kind": "wit", "badge": "✨ TIMELESS JEWISH WISDOM", "g_month": 0, "g_day": 0,
+        "title": "Classic Community Proverb", "date_label": "Heritage & Character",
+        "subtitle": "From Generation to Generation (L'Dor VaDor)",
+        "text": "“A single candle can light a thousand others without ever diminishing its own flame — and when you teach your child, you teach your child's child.”",
+    },
+]
+
+
+def get_community_heritage() -> dict:
+    """Return date-prioritized Jewish Birthdays, In Memoriam (Yahrzeits), Brussels/Global Facts & Wit."""
+    snap = sacred_astronomy.get_sacred_moment()
+    he = snap["hebrew_date"]
+    h_month, h_day = int(he["month"]), int(he["day"])
+    now = datetime.now()
+    g_month, g_day = now.month, now.day
+
+    def _score(it):
+        if it["kind"] == "birthday" and it.get("g_month"):
+            dist = abs((it["g_month"] * 31 + it["g_day"]) - (g_month * 31 + g_day))
+            return (0 if dist <= 14 else 2, dist)
+        if it["kind"] == "memoriam" and it.get("h_month"):
+            dist = abs((it["h_month"] * 30 + it["h_day"]) - (h_month * 30 + h_day))
+            return (0 if dist <= 20 else 2, dist)
+        return (1, 0)
+
+    ranked = sorted(COMMUNITY_HERITAGE_ITEMS, key=_score)
+    # Interleave Birthday -> In Memoriam -> Community Fact -> Wit so rotation feels rich & varied!
+    buckets = {k: [x for x in ranked if x["kind"] == k] for k in ("birthday", "memoriam", "community", "wit")}
+    ordered = []
+    for i in range(max(len(v) for v in buckets.values())):
+        for k in ("birthday", "memoriam", "community", "wit"):
+            if i < len(buckets[k]):
+                ordered.append(buckets[k][i])
+    return {
+        "hebrew_date": he,
+        "items": ordered,
+        "count": len(ordered),
+    }

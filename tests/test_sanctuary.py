@@ -207,6 +207,12 @@ class TestDatabaseAndRAG(unittest.TestCase):
         self.assertGreaterEqual(len(lit["tefillin"]["say_with_me"]), 5)
         self.assertIn("melody", lit["songs"][0])
 
+        heritage = sacred_liturgy.get_community_heritage()
+        self.assertGreaterEqual(heritage["count"], 18)
+        kinds = {it["kind"] for it in heritage["items"]}
+        for required_kind in ("birthday", "memoriam", "community", "wit"):
+            self.assertIn(required_kind, kinds)
+
     def test_scripture_foundation_and_studio_voice(self):
         import scripture_foundation
         import voice_engine
@@ -277,6 +283,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/quizzes",
             "/api/liturgy/today",
             "/api/liturgy/psalm?chapter=24",
+            "/api/community/heritage",
             "/api/holidays",
             "/api/foundation?parasha=vayishlach",
             "/api/books/library",

@@ -415,6 +415,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(sacred_liturgy.get_holidays_encyclopedia())
             return
 
+        if path == "/api/community/heritage":
+            self._send_json(sacred_liturgy.get_community_heritage())
+            return
+
         if path == "/api/foundation":
             p_slug = qs.get("parasha", [""])[0].strip()
             topic = qs.get("topic", [""])[0].strip()
