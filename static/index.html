@@ -952,32 +952,67 @@
     85%  { opacity: 0.9; }
     100% { transform: translateY(-108vh) rotate(10deg) scale(1.12); opacity: 0; }
   }
-  /* ===== DYNAMIC SPACE-AWARE SIDE RAILS (ZERO OVERLAP BETWEEN ARTIFACTS, CHARACTERS & PANELS!) ===== */
+  /* ===== SYNAGOGUE-GRADE ARCHITECTURAL SIDE RAILS (ILLUMINATED PILLARS + BREATHING ROOM) ===== */
   .sanctuary-rail {
     position: fixed; z-index: 6; pointer-events: none;
     display: flex; flex-direction: column; align-items: center;
-    justify-content: space-between; gap: 14px;
+    justify-content: space-evenly; gap: 12px;
     width: 276px;
-    transition: opacity 0.45s ease, left 0.35s ease, right 0.35s ease, width 0.35s ease;
+    padding: 20px 10px 10px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(228,188,105,0.045) 0%, rgba(14,24,46,0.0) 38%, rgba(228,188,105,0.03) 100%);
+    border-top: 1px solid rgba(228,188,105,0.22);
+    transition: opacity 0.55s ease, left 0.35s ease, right 0.35s ease, width 0.35s ease, box-shadow 0.7s ease, border-color 0.7s ease;
   }
-  #railLeft  { left: 26px; top: 148px; bottom: 58px; }
-  #railRight { right: 26px; top: 148px; bottom: 268px; }
+  #railLeft  { left: 26px; top: 170px; bottom: 58px; }
+  #railRight { right: 26px; top: 170px; bottom: 268px; }
   .sanctuary-rail.rail-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+  /* Subtle eye-flow warm halo when a character reacts to the active verse or quiz */
+  .sanctuary-rail.rail-gaze-cue {
+    border-top-color: rgba(243,215,150,0.68);
+    box-shadow: inset 0 18px 34px -22px rgba(243,215,150,0.38), 0 0 28px rgba(228,188,105,0.12);
+  }
+  .rail-arch-crest {
+    flex: 0 0 auto; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    margin-bottom: 4px; opacity: 0.78;
+  }
+  .rail-arch-crest .crest-he {
+    font-family: var(--hebrew); font-size: 0.92rem; color: var(--gold);
+    letter-spacing: 0.04em; text-shadow: 0 0 12px rgba(228,188,105,0.35);
+  }
+  .rail-arch-crest .crest-line {
+    width: 74%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(228,188,105,0.65), transparent);
+  }
+  .rail-filament {
+    width: 1px; height: 22px; flex: 0 0 auto;
+    background: linear-gradient(180deg, rgba(228,188,105,0.08), rgba(228,188,105,0.42), rgba(228,188,105,0.08));
+  }
+  /* Center spotlight gentle eye-focus pulse when a new slide arrives */
+  @keyframes stageGazePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(228,188,105,0); }
+    35%  { box-shadow: 0 0 36px 2px rgba(228,188,105,0.22); }
+    100% { box-shadow: 0 0 0 0 rgba(228,188,105,0); }
+  }
+  .spotlight.gaze-focus-stage {
+    animation: stageGazePulse 2.2s ease-out;
+  }
 
   .bg-vignette {
     position: relative; z-index: 1; pointer-events: none;
-    width: 175px; height: 158px; flex: 0 0 auto;
+    width: 162px; height: 146px; flex: 0 0 auto;
     display: flex; align-items: center; justify-content: center;
-    opacity: 0; transform: translateY(14px) scale(0.92);
-    transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.22,1,0.36,1);
-    filter: drop-shadow(0 0 20px rgba(228,188,105,0.22));
+    opacity: 0;
+    filter: drop-shadow(0 0 20px rgba(228,188,105,0.25));
+    will-change: transform, opacity, filter;
   }
   .bg-vignette svg { width: 100%; height: 100%; object-fit: contain; }
-  .bg-vignette.visible { opacity: 0.56; transform: translateY(0) scale(1); }
-  .bg-vignette.vignette-yielding { opacity: 0.24 !important; transform: scale(0.9); }
-  #bgSceneRight { width: 156px; height: 140px; }
+  .bg-vignette.visible { opacity: 0.62; }
+  .bg-vignette.vignette-yielding { opacity: 0.24 !important; transform: scale(0.92); transition: opacity 0.6s ease, transform 0.6s ease; }
+  #bgSceneRight { width: 148px; height: 134px; }
 
-  /* ===== WALKING ANIMATED CHARACTERS & ANGELS IN THEIR OWN BREATHING SPACE ===== */
+  /* ===== 5 VARIED SYNAGOGUE-ELEGANT CHOREOGRAPHIES (FLY, POOF, ASCEND, UNVEIL, ARC) ===== */
   .margin-stage {
     position: relative; z-index: 2; pointer-events: none;
     width: 100%; flex: 1 1 auto; min-height: 0;
@@ -987,18 +1022,58 @@
     .sanctuary-rail { display: none !important; }
   }
   .walker-wrap {
+    position: relative;
     width: 100%; display: flex; flex-direction: column; align-items: center;
-    opacity: 0;
+    opacity: 0; will-change: transform, opacity, filter;
   }
-  .walker-wrap.enter-left {
-    animation: walkInLeft 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* Subtle golden stardust poof ring */
+  .poof-ring {
+    position: absolute; top: 34px; left: 50%; width: 112px; height: 112px;
+    margin-left: -56px; border-radius: 50%; pointer-events: none;
+    border: 1.5px solid rgba(255,229,136,0.75);
+    box-shadow: 0 0 22px rgba(255,229,136,0.55), inset 0 0 18px rgba(228,188,105,0.35);
+    animation: poofRingExpand 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .walker-wrap.enter-right {
-    animation: walkInRight 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  @keyframes poofRingExpand {
+    0%   { opacity: 0.95; transform: scale(0.35); }
+    60%  { opacity: 0.55; transform: scale(1.22); }
+    100% { opacity: 0; transform: scale(1.55); }
   }
-  .walker-wrap.glide-angel {
-    animation: angelGlideIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
+
+  /* 1. Silky Fly-In / Fly-Out */
+  .choreo-fly-in-l  { animation: choreoFlyInL  1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .choreo-fly-out-l { animation: choreoFlyOutL 0.52s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards; }
+  .choreo-fly-in-r  { animation: choreoFlyInR  1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .choreo-fly-out-r { animation: choreoFlyOutR 0.52s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards; }
+  @keyframes choreoFlyInL  { 0% { opacity: 0; transform: translateX(-115px) translateY(10px) scale(0.92); } 65% { opacity: 1; transform: translateX(4px) translateY(-3px) scale(1.01); } 100% { opacity: 1; transform: translateX(0) translateY(0) scale(1); } }
+  @keyframes choreoFlyOutL { 0% { opacity: 1; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(-95px) translateY(-10px) scale(0.9); } }
+  @keyframes choreoFlyInR  { 0% { opacity: 0; transform: translateX(115px) translateY(10px) scale(0.92); } 65% { opacity: 1; transform: translateX(-4px) translateY(-3px) scale(1.01); } 100% { opacity: 1; transform: translateX(0) translateY(0) scale(1); } }
+  @keyframes choreoFlyOutR { 0% { opacity: 1; transform: translateX(0) scale(1); } 100% { opacity: 0; transform: translateX(95px) translateY(-10px) scale(0.9); } }
+
+  /* 2. Luminous Stardust Poof-In / Poof-Out */
+  .choreo-poof-in  { animation: choreoPoofIn  1.0s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .choreo-poof-out { animation: choreoPoofOut 0.48s ease-in forwards; }
+  @keyframes choreoPoofIn  { 0% { opacity: 0; transform: scale(0.58); filter: blur(9px) brightness(1.45); } 65% { opacity: 1; transform: scale(1.04); filter: blur(0px) brightness(1.1); } 100% { opacity: 1; transform: scale(1); filter: blur(0px) brightness(1); } }
+  @keyframes choreoPoofOut { 0% { opacity: 1; transform: scale(1); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.16); filter: blur(10px) brightness(1.35); } }
+
+  /* 3. Heavenly Ascend / Descend */
+  .choreo-ascend-in  { animation: choreoAscendIn  1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .choreo-ascend-out { animation: choreoAscendOut 0.52s ease-in forwards; }
+  @keyframes choreoAscendIn  { 0% { opacity: 0; transform: translateY(48px) scale(0.88); } 68% { opacity: 1; transform: translateY(-4px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes choreoAscendOut { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-44px) scale(0.9); } }
+
+  /* 4. Manuscript Unveil (Soft Float-Down) */
+  .choreo-unveil-in  { animation: choreoUnveilIn  1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .choreo-unveil-out { animation: choreoUnveilOut 0.5s ease-in forwards; }
+  @keyframes choreoUnveilIn  { 0% { opacity: 0; transform: translateY(-42px) scale(0.92); filter: blur(4px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); } }
+  @keyframes choreoUnveilOut { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(34px) scale(0.92); filter: blur(4px); } }
+
+  /* 5. Ceremonial Curved Arc */
+  .choreo-arc-in  { animation: choreoArcIn  1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  .choreo-arc-out { animation: choreoArcOut 0.52s ease-in forwards; }
+  @keyframes choreoArcIn  { 0% { opacity: 0; transform: translate(-45px, 32px) rotate(-4deg) scale(0.88); } 65% { opacity: 1; transform: translate(4px, -4px) rotate(1deg) scale(1.01); } 100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); } }
+  @keyframes choreoArcOut { 0% { opacity: 1; transform: translate(0, 0) rotate(0deg); } 100% { opacity: 0; transform: translate(42px, -26px) rotate(3deg) scale(0.9); } }
+
   .walker-wrap.walker-cheer .walker-figure {
     animation: walkerCheer 0.72s cubic-bezier(0.22, 1, 0.36, 1) 2 !important;
   }
@@ -1006,23 +1081,6 @@
     0%, 100% { transform: translateY(0) scale(1); }
     40%      { transform: translateY(-16px) scale(1.09) rotate(-3deg); }
     70%      { transform: translateY(-4px) scale(1.03) rotate(2deg); }
-  }
-  @keyframes walkInLeft {
-    0%   { opacity: 0; transform: translateX(-120px) translateY(8px); }
-    35%  { opacity: 0.9; transform: translateX(-48px) translateY(-5px); }
-    68%  { opacity: 1; transform: translateX(-12px) translateY(3px); }
-    100% { opacity: 1; transform: translateX(0) translateY(0); }
-  }
-  @keyframes walkInRight {
-    0%   { opacity: 0; transform: translateX(120px) translateY(8px); }
-    35%  { opacity: 0.9; transform: translateX(48px) translateY(-5px); }
-    68%  { opacity: 1; transform: translateX(12px) translateY(3px); }
-    100% { opacity: 1; transform: translateX(0) translateY(0); }
-  }
-  @keyframes angelGlideIn {
-    0%   { opacity: 0; transform: translateY(-54px) scale(0.84); }
-    65%  { opacity: 1; transform: translateY(5px) scale(1.03); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   @keyframes figureBob {
     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -1265,10 +1323,15 @@
 </style>
 </head>
 <body>
-<!-- AMBIENT LIVING STORYBOOK BACKGROUND & SPACE-AWARE SIDE RAILS -->
+<!-- AMBIENT LIVING STORYBOOK BACKGROUND & SYNAGOGUE ILLUMINATED SIDE RAILS -->
 <div id="sanctuaryBackdrop"></div>
 <aside id="railLeft" class="sanctuary-rail" aria-hidden="true">
+  <div class="rail-arch-crest">
+    <span class="crest-he">שִׁוִּיתִי ה׳ לְנֶגְדִּי תָמִיד</span>
+    <span class="crest-line"></span>
+  </div>
   <div id="bgSceneLeft" class="bg-vignette"></div>
+  <div class="rail-filament"></div>
   <div id="marginStageLeft" class="margin-stage"></div>
   <div id="sanctuaryToast" onclick="this.classList.remove('show')">
     <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
@@ -1276,7 +1339,12 @@
   </div>
 </aside>
 <aside id="railRight" class="sanctuary-rail" aria-hidden="true">
+  <div class="rail-arch-crest">
+    <span class="crest-he">כִּי נֵר מִצְוָה וְתוֹרָה אוֹר</span>
+    <span class="crest-line"></span>
+  </div>
   <div id="bgSceneRight" class="bg-vignette"></div>
+  <div class="rail-filament"></div>
   <div id="marginStageRight" class="margin-stage"></div>
 </aside>
 <div id="sparkBurstLayer" class="spark-burst-layer"></div>
@@ -2117,14 +2185,30 @@ function updateBackgroundIllustrations(slide) {
     </svg>`;
   }
 
-  left.classList.remove('visible');
-  right.classList.remove('visible');
-  setTimeout(() => {
+  // Graceful varied exit -> entrance choreography for flanking sacred emblems!
+  const vigStyles = [
+    { outL: 'choreo-poof-out',   inL: 'choreo-poof-in',   outR: 'choreo-poof-out',   inR: 'choreo-poof-in' },
+    { outL: 'choreo-fly-out-l',  inL: 'choreo-fly-in-l',  outR: 'choreo-fly-out-r',  inR: 'choreo-fly-in-r' },
+    { outL: 'choreo-unveil-out', inL: 'choreo-unveil-in', outR: 'choreo-ascend-out', inR: 'choreo-ascend-in' },
+    { outL: 'choreo-ascend-out', inL: 'choreo-ascend-in', outR: 'choreo-poof-out',   inR: 'choreo-poof-in' },
+  ];
+  window._vigChoreoTick = ((window._vigChoreoTick || 0) + 1) % vigStyles.length;
+  const vs = vigStyles[window._vigChoreoTick];
+  const allChoreo = ['choreo-fly-in-l','choreo-fly-out-l','choreo-fly-in-r','choreo-fly-out-r','choreo-poof-in','choreo-poof-out','choreo-ascend-in','choreo-ascend-out','choreo-unveil-in','choreo-unveil-out','choreo-arc-in','choreo-arc-out'];
+
+  left.classList.remove(...allChoreo);
+  right.classList.remove(...allChoreo);
+  if (left.innerHTML.trim()) left.classList.add(vs.outL);
+  if (right.innerHTML.trim()) right.classList.add(vs.outR);
+  if (window._vigSwapTimer) clearTimeout(window._vigSwapTimer);
+  window._vigSwapTimer = setTimeout(() => {
+    left.classList.remove(...allChoreo);
+    right.classList.remove(...allChoreo);
     left.innerHTML = leftSvg;
     right.innerHTML = rightSvg;
-    left.classList.add('visible');
-    right.classList.add('visible');
-  }, 140);
+    left.classList.add('visible', vs.inL);
+    right.classList.add('visible', vs.inR);
+  }, left.innerHTML.trim() ? 420 : 60);
 }
 
 // Sparkling Celebration Burst When a Quiz Answer Reveals!
@@ -2564,7 +2648,8 @@ function layoutSanctuaryRails() {
   const railW = Math.max(210, Math.min(278, minGutter - 38));
   const leftX = Math.max(14, Math.floor((leftGutter - railW) / 2));
   const rightX = Math.max(14, Math.floor((rightGutter - railW) / 2));
-  const topY = Math.max(138, Math.ceil(((ribbonEl && ribbonEl.getBoundingClientRect().bottom) || (headerEl && headerEl.getBoundingClientRect().bottom) || 138) + 12));
+  // Generous architectural top margin below the Celestial Ribbon so crests & emblems sit gracefully!
+  const topY = Math.max(166, Math.ceil(((ribbonEl && ribbonEl.getBoundingClientRect().bottom) || (headerEl && headerEl.getBoundingClientRect().bottom) || 138) + 28));
   const footerH = (footerEl && footerEl.getBoundingClientRect().height) || 44;
 
   railL.style.width = railW + 'px';
@@ -2648,7 +2733,83 @@ function cheerMarginCharacters() {
   });
 }
 
-function drawMarginStages() {
+let marginChoreoStep = 0;
+let marginSwapTimerL = null;
+let marginSwapTimerR = null;
+let marginLastRenderedL = '';
+let marginLastRenderedR = '';
+
+function pulseGazeFocus(target) {
+  const spot = document.querySelector('.spotlight');
+  const rL = document.getElementById('railLeft');
+  const rR = document.getElementById('railRight');
+  if (target === 'stage' && spot) {
+    spot.classList.remove('gaze-focus-stage');
+    void spot.offsetWidth;
+    spot.classList.add('gaze-focus-stage');
+  }
+  if (rL) rL.classList.toggle('rail-gaze-cue', target === 'left' || target === 'both');
+  if (rR) rR.classList.toggle('rail-gaze-cue', target === 'right' || target === 'both');
+  if (target === 'left' || target === 'right' || target === 'both') {
+    setTimeout(() => {
+      if (rL) rL.classList.remove('rail-gaze-cue');
+      if (rR) rR.classList.remove('rail-gaze-cue');
+    }, 3400);
+  }
+}
+
+function pickCharacterChoreo(side, role, step) {
+  // Varied graceful synagogue-grade entrances & exits: Fly, Stardust Poof, Heavenly Ascend, Manuscript Unveil, Ceremonial Arc
+  if (role === 'angel') {
+    return (step % 2 === 0)
+      ? { enter: 'choreo-ascend-in', exit: 'choreo-ascend-out', poof: false }
+      : { enter: 'choreo-poof-in',   exit: 'choreo-poof-out',   poof: true };
+  }
+  const seq = [
+    { enter: side === 'left' ? 'choreo-fly-in-l' : 'choreo-fly-in-r', exit: side === 'left' ? 'choreo-fly-out-l' : 'choreo-fly-out-r', poof: false },
+    { enter: 'choreo-poof-in',   exit: 'choreo-poof-out',   poof: true },
+    { enter: 'choreo-unveil-in', exit: 'choreo-unveil-out', poof: false },
+    { enter: 'choreo-arc-in',    exit: 'choreo-arc-out',    poof: false },
+    { enter: 'choreo-ascend-in', exit: 'choreo-ascend-out', poof: true },
+  ];
+  return seq[(step + (side === 'right' ? 2 : 0)) % seq.length];
+}
+
+function mountMarginCharacter(host, item, side, awareText, choreo) {
+  if (!host || !item) return;
+  const introShort = (item.intro || '').length > 120 ? item.intro.slice(0, 117).trim() + '...' : (item.intro || '');
+  const html = `
+    <div class="walker-wrap ${choreo.enter}">
+      ${choreo.poof ? '<div class="poof-ring"></div>' : ''}
+      ${awareText ? `<div class="walker-aware-pill">${esc(awareText)}</div>` : ''}
+      ${renderIllustratedFigureSvg(item.role, item.name)}
+      <div class="walker-card role-${esc(item.role)}">
+        <div class="walker-role-tag"><span>${esc(item.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(item.he || '')}</span></div>
+        <div class="walker-name">${side === 'left' ? '👋 ' : ''}${esc(item.name)}</div>
+        <div class="walker-speech">${esc(introShort)}</div>
+      </div>
+    </div>`;
+
+  const existing = host.querySelector('.walker-wrap');
+  const setTimer = (fn, ms) => {
+    if (side === 'left') {
+      if (marginSwapTimerL) clearTimeout(marginSwapTimerL);
+      marginSwapTimerL = setTimeout(fn, ms);
+    } else {
+      if (marginSwapTimerR) clearTimeout(marginSwapTimerR);
+      marginSwapTimerR = setTimeout(fn, ms);
+    }
+  };
+  if (existing) {
+    existing.classList.remove('choreo-fly-in-l','choreo-fly-in-r','choreo-poof-in','choreo-ascend-in','choreo-unveil-in','choreo-arc-in');
+    existing.classList.add(choreo.exit);
+    setTimer(() => { host.innerHTML = html; }, 470);
+  } else {
+    host.innerHTML = html;
+  }
+}
+
+function drawMarginStages(force = false) {
   layoutSanctuaryRails();
   const leftHost = document.getElementById('marginStageLeft');
   const rightHost = document.getElementById('marginStageRight');
@@ -2658,36 +2819,22 @@ function drawMarginStages() {
   rightHost.style.display = showStages ? 'flex' : 'none';
   if (!showStages) return;
 
+  marginChoreoStep++;
   const lm = marginLeftCast[marginLeftIdx];
-  if (lm) {
-    const enterCls = lm.role === 'angel' ? 'glide-angel' : 'enter-left';
-    const introShort = (lm.intro || '').length > 125 ? lm.intro.slice(0, 122).trim() + '...' : (lm.intro || '');
-    leftHost.innerHTML = `
-      <div class="walker-wrap ${enterCls}">
-        ${marginAwareLeft ? `<div class="walker-aware-pill">${esc(marginAwareLeft)}</div>` : ''}
-        ${renderIllustratedFigureSvg(lm.role, lm.name)}
-        <div class="walker-card role-${esc(lm.role)}">
-          <div class="walker-role-tag"><span>${esc(lm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(lm.he || '')}</span></div>
-          <div class="walker-name">👋 ${esc(lm.name)}</div>
-          <div class="walker-speech">${esc(introShort)}</div>
-        </div>
-      </div>`;
+  const keyL = lm ? `${lm.name}|${marginAwareLeft}` : '';
+  if (lm && (force || keyL !== marginLastRenderedL)) {
+    marginLastRenderedL = keyL;
+    mountMarginCharacter(leftHost, lm, 'left', marginAwareLeft, pickCharacterChoreo('left', lm.role, marginChoreoStep));
   }
   const rm = marginRightCast[marginRightIdx];
-  if (rm) {
-    const enterCls = rm.role === 'angel' ? 'glide-angel' : 'enter-right';
-    const introShort = (rm.intro || '').length > 125 ? rm.intro.slice(0, 122).trim() + '...' : (rm.intro || '');
-    rightHost.innerHTML = `
-      <div class="walker-wrap ${enterCls}">
-        ${marginAwareRight ? `<div class="walker-aware-pill">${esc(marginAwareRight)}</div>` : ''}
-        ${renderIllustratedFigureSvg(rm.role, rm.name)}
-        <div class="walker-card role-${esc(rm.role)}">
-          <div class="walker-role-tag"><span>${esc(rm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(rm.he || '')}</span></div>
-          <div class="walker-name">${esc(rm.name)}</div>
-          <div class="walker-speech">${esc(introShort)}</div>
-        </div>
-      </div>`;
+  const keyR = rm ? `${rm.name}|${marginAwareRight}` : '';
+  if (rm && (force || keyR !== marginLastRenderedR)) {
+    marginLastRenderedR = keyR;
+    mountMarginCharacter(rightHost, rm, 'right', marginAwareRight, pickCharacterChoreo('right', rm.role, marginChoreoStep));
   }
+  if (marginAwareLeft && marginAwareRight) pulseGazeFocus('both');
+  else if (marginAwareLeft) pulseGazeFocus('left');
+  else if (marginAwareRight) pulseGazeFocus('right');
 }
 
 function revealCurrentQuiz(pickedIdx = null) {
@@ -2745,6 +2892,7 @@ function renderSpotlight() {
   quizManualPick = null;
 
   const s = dailyData.slides[spotIdx] || dailyData.slides[0];
+  pulseGazeFocus('stage');
   updateBackgroundIllustrations(s);
   syncMarginCastToSlide(s);
   const rich = dailyData.rich || {};
