@@ -1464,6 +1464,47 @@
   [data-theme="parchment"] .qr-dock-title { color: #1f1810; }
   [data-theme="parchment"] .qr-dock-sub { color: #4c4234; }
 
+  /* Bottom-Right Symmetrical Dock: Upcoming Big Events, Shabbat & Sacred Moments */
+  .moments-sanctuary-dock {
+    width: 100%; flex: 0 0 auto; pointer-events: auto; cursor: pointer;
+    min-height: 158px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 12px; border-radius: 15px;
+    background: linear-gradient(145deg, rgba(14,24,46,0.95), rgba(22,36,68,0.95));
+    border: 1.5px solid rgba(228,188,105,0.62);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.48), 0 0 18px rgba(228,188,105,0.14);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .moments-sanctuary-dock:hover { transform: translateY(-2px); border-color: #ffe588; }
+  .moments-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 5px;
+  }
+  .moments-kicker {
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold);
+  }
+  .moments-dots { display: flex; gap: 4px; }
+  .moments-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: rgba(228,188,105,0.28);
+    border: none; padding: 0; cursor: pointer; transition: all 0.2s ease;
+  }
+  .moments-dot.active { background: var(--gold); transform: scale(1.25); }
+  .moments-body { transition: opacity 0.45s ease; }
+  .moments-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    padding: 4px 0; border-bottom: 1px solid rgba(228,188,105,0.14); font-size: 0.75rem; line-height: 1.28;
+  }
+  .moments-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .moments-row .m-lbl { color: #f3ead8; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .moments-row .m-val { color: var(--gold); font-weight: 800; flex-shrink: 0; font-size: 0.72rem; }
+  .moments-foot { font-size: 0.66rem; color: var(--accent); margin-top: 6px; font-weight: 700; display: flex; justify-content: space-between; }
+  [data-theme="parchment"] .moments-sanctuary-dock {
+    background: linear-gradient(145deg, #fffdf7, #f5e9d0);
+    border-color: #9a6918; box-shadow: 0 8px 22px rgba(92,64,20,0.16);
+  }
+  [data-theme="parchment"] .moments-row .m-lbl { color: #241b12; }
+  [data-theme="parchment"] .moments-row .m-val { color: #8a5a0c; }
+  [data-theme="parchment"] .moments-row { border-bottom-color: rgba(154,105,24,0.18); }
+
   .give-modal-backdrop {
     display: none; position: fixed; inset: 0; z-index: 260;
     background: rgba(5,10,22,0.86); backdrop-filter: blur(8px);
@@ -1927,6 +1968,18 @@
   <div id="bgSceneRight" class="bg-vignette"></div>
   <div class="rail-filament"></div>
   <div id="marginStageRight" class="margin-stage"></div>
+  <div id="upcomingMomentsDock" class="moments-sanctuary-dock" onclick="openActiveMomentTarget()" title="Upcoming Shul Events, Shabbat Times &amp; Sacred Holidays">
+    <div>
+      <div class="moments-head">
+        <span class="moments-kicker" id="momentsKicker">🕯 UPCOMING MOMENTS</span>
+        <div class="moments-dots" id="momentsDots"></div>
+      </div>
+      <div class="moments-body" id="momentsBody">
+        <div class="muted" style="font-size:0.75rem;">Loading Shabbat &amp; upcoming sacred milestones...</div>
+      </div>
+    </div>
+    <div class="moments-foot"><span id="momentsFootLeft">The European Synagogue</span><span id="momentsFootRight">Tap to explore →</span></div>
+  </div>
 </aside>
 <div id="sparkBurstLayer" class="spark-burst-layer"></div>
 
@@ -4004,7 +4057,7 @@ function layoutSanctuaryRails() {
     railR.style.width = railW + 'px';
     railR.style.right = rightX + 'px';
     railR.style.top = topY + 'px';
-    railR.style.bottom = Math.max(footerH + 225, Math.round(window.innerHeight * 0.25)) + 'px';
+    railR.style.bottom = (footerH + 14) + 'px';
     railR.classList.remove('rail-hidden');
   } else {
     railR.classList.add('rail-hidden');
@@ -7504,12 +7557,149 @@ async function syncAlwaysOnQr() {
   } catch (e) {}
 }
 
+// =============================================================================
+// BOTTOM-RIGHT SYMMETRICAL DOCK: UPCOMING BIG EVENTS, SHABBAT & SACRED MOMENTS
+// =============================================================================
+let upcomingMomentCards = [];
+let upcomingMomentIdx = 0;
+
+async function loadUpcomingMomentsDock() {
+  try {
+    const [rEv, rHol] = await Promise.all([fetch('/api/shul/events'), fetch('/api/holidays')]);
+    const dEv = await rEv.json();
+    const dHol = await rHol.json();
+    const cards = [];
+
+    // 1. This Shabbat at The Shul
+    const sh = dEv.shabbat_times || {};
+    cards.push({
+      kicker: '🕯 THIS SHABBAT · BRUSSELS',
+      footLeft: sh.shabbat_parasha || 'Shabbat Shalom',
+      footRight: 'Shul Schedule →',
+      target: 'shul',
+      rows: [
+        { lbl: '🕯 Candle Lighting', val: sh.candle_lighting || 'Fri 16:24' },
+        { lbl: '📖 Shabbat Shacharit', val: 'Sat 10:00' },
+        { lbl: '🎈 Kids Shul Program', val: 'Sat 11:15' },
+        { lbl: '🥂 Buffet Kiddush', val: 'Sat 12:15' },
+        { lbl: '✨ Havdalah', val: sh.havdalah || 'Sat 17:38' },
+      ],
+    });
+
+    // 2. Upcoming Big Sacred Holidays & High Holidays
+    const hols = (dHol.holidays || [])
+      .filter(h => h.is_active_today || (h.days_away !== null && h.days_away >= 0))
+      .sort((a, b) => (a.is_active_today ? -1 : a.days_away) - (b.is_active_today ? -1 : b.days_away))
+      .slice(0, 4);
+    if (hols.length) {
+      cards.push({
+        kicker: '✨ UPCOMING BIG HOLIDAYS',
+        footLeft: '5-Layer Encyclopedia',
+        footRight: 'Explore Holidays →',
+        target: 'holidays',
+        rows: hols.map(h => ({
+          lbl: `${h.emoji || '✡'} ${h.name.split('(')[0].trim()}`,
+          val: h.is_active_today ? 'TODAY!' : (h.days_away === 1 ? 'Tomorrow' : `in ${h.days_away}d`),
+        })),
+      });
+    }
+
+    // 3. Upcoming Community Events at The Shul
+    const evs = (dEv.events || []).slice(0, 4);
+    if (evs.length) {
+      cards.push({
+        kicker: '📅 UPCOMING AT THE SHUL',
+        footLeft: 'Rabbi Michoel · theshul.eu',
+        footRight: 'All Events →',
+        target: 'shul',
+        rows: evs.map(e => ({
+          lbl: `${e.title}`,
+          val: e.time_label || e.date_label || 'Weekly',
+        })),
+      });
+    }
+
+    // 4. Special Sacred Moments (This Month in History + Rosh Chodesh + Lunar)
+    const mc = dHol.month_chronicle || {};
+    const mRows = [];
+    if (celestialData && celestialData.year_context && celestialData.year_context.milestones && celestialData.year_context.milestones.next_rosh_chodesh) {
+      const rc = celestialData.year_context.milestones.next_rosh_chodesh;
+      mRows.push({ lbl: `🌙 Rosh Chodesh ${rc.month_en || ''}`, val: rc.days_away !== undefined ? `in ${rc.days_away}d` : (rc.gregorian || '') });
+    }
+    (mc.events || []).slice(0, 3).forEach(ev => {
+      const parts = String(ev).split(/[:—–-]/);
+      mRows.push({ lbl: parts[0].trim(), val: (parts[1] || mc.month || '').trim().slice(0, 18) });
+    });
+    if (mRows.length) {
+      cards.push({
+        kicker: `🏛 SPECIAL MOMENTS · ${(mc.month || 'SACRED YEAR').toUpperCase()}`,
+        footLeft: mc.he || 'Living Jewish Calendar',
+        footRight: 'Sky & Calendar →',
+        target: 'sky',
+        rows: mRows.slice(0, 4),
+      });
+    }
+
+    upcomingMomentCards = cards;
+    renderUpcomingMomentCard(0);
+  } catch (e) {}
+}
+
+function renderUpcomingMomentCard(idx) {
+  if (!upcomingMomentCards.length) return;
+  upcomingMomentIdx = ((idx % upcomingMomentCards.length) + upcomingMomentCards.length) % upcomingMomentCards.length;
+  const c = upcomingMomentCards[upcomingMomentIdx];
+  const body = document.getElementById('momentsBody');
+  const kick = document.getElementById('momentsKicker');
+  const fl = document.getElementById('momentsFootLeft');
+  const fr = document.getElementById('momentsFootRight');
+  const dots = document.getElementById('momentsDots');
+  if (!body || !kick) return;
+
+  body.style.opacity = '0.18';
+  setTimeout(() => {
+    kick.textContent = c.kicker;
+    if (fl) fl.textContent = c.footLeft || '';
+    if (fr) fr.textContent = c.footRight || 'Explore →';
+    body.innerHTML = (c.rows || []).map(r => `
+      <div class="moments-row">
+        <span class="m-lbl">${esc(r.lbl)}</span>
+        <span class="m-val">${esc(r.val)}</span>
+      </div>`).join('');
+    if (dots) {
+      dots.innerHTML = upcomingMomentCards.map((_, i) =>
+        `<button type="button" class="moments-dot ${i === upcomingMomentIdx ? 'active' : ''}" onclick="event.stopPropagation(); renderUpcomingMomentCard(${i});"></button>`
+      ).join('');
+    }
+    body.style.opacity = '1';
+  }, 200);
+}
+
+function openActiveMomentTarget() {
+  const c = upcomingMomentCards[upcomingMomentIdx];
+  if (!c) return;
+  if (c.target === 'holidays') {
+    switchView('liturgy');
+    setTimeout(() => switchLiturgyTab('holidays'), 80);
+  } else if (c.target === 'sky') {
+    switchView('sky');
+  } else {
+    switchView('shul');
+  }
+}
+
 loadHealth();
 loadCelestial();
 loadToday();
 pollMeshIncoming();
 syncAlwaysOnQr();
 syncTefillinQuickTrigger();
+setTimeout(loadUpcomingMomentsDock, 1200);
+setInterval(() => {
+  if (currentViewName === 'today' && upcomingMomentCards.length > 1) {
+    renderUpcomingMomentCard(upcomingMomentIdx + 1);
+  }
+}, 11000);
 setTimeout(syncAlwaysOnQr, 5000);
 setTimeout(syncAlwaysOnQr, 14000);
 try {
