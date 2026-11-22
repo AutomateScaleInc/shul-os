@@ -1467,9 +1467,9 @@
   /* Bottom-Right Symmetrical Dock: Upcoming Big Events, Shabbat & Sacred Moments */
   .moments-sanctuary-dock {
     width: 100%; flex: 0 0 auto; pointer-events: auto; cursor: pointer;
-    min-height: 158px;
+    min-height: 142px;
     display: flex; flex-direction: column; justify-content: space-between;
-    padding: 10px 12px; border-radius: 15px;
+    padding: 8px 11px; border-radius: 15px;
     background: linear-gradient(145deg, rgba(14,24,46,0.95), rgba(22,36,68,0.95));
     border: 1.5px solid rgba(228,188,105,0.62);
     box-shadow: 0 10px 26px rgba(0,0,0,0.48), 0 0 18px rgba(228,188,105,0.14);
@@ -1477,7 +1477,7 @@
   }
   .moments-sanctuary-dock:hover { transform: translateY(-2px); border-color: #ffe588; }
   .moments-head {
-    display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 5px;
+    display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 4px;
   }
   .moments-kicker {
     font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold);
@@ -1491,12 +1491,12 @@
   .moments-body { transition: opacity 0.45s ease; }
   .moments-row {
     display: flex; justify-content: space-between; align-items: center; gap: 6px;
-    padding: 4px 0; border-bottom: 1px solid rgba(228,188,105,0.14); font-size: 0.75rem; line-height: 1.28;
+    padding: 3px 0; border-bottom: 1px solid rgba(228,188,105,0.14); font-size: 0.74rem; line-height: 1.24;
   }
   .moments-row:last-child { border-bottom: none; padding-bottom: 0; }
   .moments-row .m-lbl { color: #f3ead8; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .moments-row .m-val { color: var(--gold); font-weight: 800; flex-shrink: 0; font-size: 0.72rem; }
-  .moments-foot { font-size: 0.66rem; color: var(--accent); margin-top: 6px; font-weight: 700; display: flex; justify-content: space-between; }
+  .moments-foot { font-size: 0.65rem; color: var(--accent); margin-top: 5px; font-weight: 700; display: flex; justify-content: space-between; }
   [data-theme="parchment"] .moments-sanctuary-dock {
     background: linear-gradient(145deg, #fffdf7, #f5e9d0);
     border-color: #9a6918; box-shadow: 0 8px 22px rgba(92,64,20,0.16);
@@ -1506,11 +1506,13 @@
   [data-theme="parchment"] .moments-row { border-bottom-color: rgba(154,105,24,0.18); }
 
   /* Ornate Filigree Community Chronicle Plaque (Birthdays, In Memoriam & Jewish Heritage) */
+  #railRight .margin-figure-card { padding: 8px 11px; }
+  #railRight .margin-figure-desc { -webkit-line-clamp: 2; }
   .heritage-plaque {
     width: 100%; flex: 0 0 auto; pointer-events: auto; cursor: pointer;
-    min-height: 126px;
+    min-height: 110px;
     display: flex; flex-direction: column; justify-content: space-between;
-    padding: 10px 13px 10px; border-radius: 15px; position: relative;
+    padding: 8px 12px 9px; border-radius: 15px; position: relative;
     background:
       radial-gradient(ellipse at 50% 0%, rgba(228,188,105,0.13), transparent 68%),
       linear-gradient(155deg, rgba(20,31,58,0.95), rgba(10,18,36,0.97));
@@ -1526,26 +1528,26 @@
   }
   .heritage-plaque:hover { transform: translateY(-1px); border-color: #ffe588; }
   .heritage-plaque .hp-top {
-    display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 4px;
-    padding-bottom: 4px; border-bottom: 1px solid rgba(228,188,105,0.2);
+    display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 3px;
+    padding-bottom: 3px; border-bottom: 1px solid rgba(228,188,105,0.2);
   }
   .heritage-plaque .hp-badge {
-    font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold);
+    font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .heritage-plaque .hp-date {
     font-size: 0.62rem; color: var(--accent); font-weight: 700; white-space: nowrap; flex-shrink: 0;
   }
   .heritage-plaque .hp-title {
-    font-family: var(--serif); font-size: 0.93rem; font-weight: 700; color: #fff6df; line-height: 1.18;
+    font-family: var(--serif); font-size: 0.9rem; font-weight: 700; color: #fff6df; line-height: 1.18;
     letter-spacing: 0.01em;
   }
   .heritage-plaque .hp-sub {
-    font-family: var(--serif); font-style: italic; font-size: 0.71rem; color: #f3d796; margin: 2px 0 4px;
+    font-family: var(--serif); font-style: italic; font-size: 0.69rem; color: #f3d796; margin: 1px 0 3px;
   }
   .heritage-plaque .hp-text {
-    font-family: var(--serif); font-size: 0.72rem; color: #d8e1ee; line-height: 1.35;
-    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    font-family: var(--serif); font-size: 0.71rem; color: #d8e1ee; line-height: 1.32;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
   .heritage-plaque .hp-body { transition: opacity 0.5s ease; }
   [data-theme="parchment"] .heritage-plaque {
