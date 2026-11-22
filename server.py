@@ -261,7 +261,9 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                     "symbols": [{"slug": s.get("slug", ""), "name": s.get("name", ""), "he_name": s.get("he_name", "")} for s in syms_s[:3]],
                     "today_points": today_s[:2],
                 }
-                daily["show_extras"] = sanctuary_rich_data.get_handsfree_show_extras(daily.get("parasha", {}).get("slug", ""))
+                p_obj = daily.get("parasha") or {}
+                p_key = (p_obj.get("slug") or p_obj.get("en_name") or "").lower().replace(" ", "-")
+                daily["show_extras"] = sanctuary_rich_data.get_handsfree_show_extras(p_key)
             except Exception:
                 pass
             try:
