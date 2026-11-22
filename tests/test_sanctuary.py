@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT))
 import ai_engine
 import broadcast_hub
 import sacred_astronomy as sa
+import sacred_liturgy
 import sanctuary_rich_data as srd
 import shul_events
 import torah_db
@@ -181,6 +182,26 @@ class TestDatabaseAndRAG(unittest.TestCase):
         ):
             self.assertIn(needle, m["html"])
 
+    def test_liturgy_psalms_tefillin_meals_songs_and_holidays(self):
+        lit = sacred_liturgy.get_today_liturgy()
+        self.assertGreaterEqual(len(lit["shir_shel_yom"]["verses"]), 5)
+        self.assertGreaterEqual(len(lit["monthly_tehillim"]["psalms"]), 1)
+        self.assertGreaterEqual(len(lit["tefillin"]["steps"]), 7)
+        self.assertGreaterEqual(len(lit["before_meal_blessings"]), 7)
+        self.assertGreaterEqual(len(lit["after_meal_blessings"]["birkat_hamazon"]["sections"]), 6)
+        self.assertGreaterEqual(len(lit["songs"]), 11)
+
+        ps23 = sacred_liturgy.get_psalm_chapter(23)
+        self.assertEqual(ps23["chapter"], 23)
+        self.assertEqual(ps23["verses_count"], 6)
+
+        hols = sacred_liturgy.get_holidays_encyclopedia()
+        self.assertGreaterEqual(len(hols["holidays"]), 11)
+        art_dir = ROOT / "static" / "art"
+        for h in hols["holidays"]:
+            self.assertGreaterEqual(len(h["prominent_celebrations"]), 2, f"Missing prominent stories in {h['slug']}")
+            self.assertTrue((art_dir / h["art"].replace("/art/", "")).exists(), f"Missing holiday art {h['art']}")
+
 
 LIVE_URL = os.environ.get("TORAH_TEST_URL", "").rstrip("/")
 
@@ -197,6 +218,9 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/symbols",
             "/api/timeline",
             "/api/quizzes",
+            "/api/liturgy/today",
+            "/api/liturgy/psalm?chapter=24",
+            "/api/holidays",
             "/api/shul/events",
             "/api/shul/mailing",
             "/api/scribe/status",

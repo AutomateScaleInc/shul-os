@@ -17,6 +17,7 @@ import urllib.request
 import ai_engine
 import broadcast_hub
 import sacred_astronomy
+import sacred_liturgy
 import sanctuary_rich_data
 import shul_events
 import torah_db
@@ -182,6 +183,22 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json({"quizzes": sanctuary_rich_data.list_quizzes()})
             return
 
+        if path == "/api/liturgy/today":
+            self._send_json(sacred_liturgy.get_today_liturgy())
+            return
+
+        if path == "/api/liturgy/psalm":
+            try:
+                ch = int(qs.get("chapter", ["23"])[0])
+            except ValueError:
+                ch = 23
+            self._send_json(sacred_liturgy.get_psalm_chapter(ch))
+            return
+
+        if path == "/api/holidays":
+            self._send_json(sacred_liturgy.get_holidays_encyclopedia())
+            return
+
         if path == "/api/presentation":
             kind = qs.get("kind", ["parasha"])[0].strip().lower()
             slug = qs.get("slug", [""])[0].strip()
@@ -272,6 +289,20 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 p_obj = daily.get("parasha") or {}
                 p_key = (p_obj.get("slug") or p_obj.get("en_name") or "").lower().replace(" ", "-")
                 daily["show_extras"] = sanctuary_rich_data.get_handsfree_show_extras(p_key)
+                # Weave Today's Temple Psalm (Shir Shel Yom) + Month Chronicle right into show_extras!
+                try:
+                    lit = sacred_liturgy.get_today_liturgy()
+                    daily["show_extras"]["daily_psalm"] = {
+                        "day_en": lit["shir_shel_yom"]["day_en"],
+                        "chapter": lit["shir_shel_yom"]["chapter"],
+                        "title": lit["shir_shel_yom"]["title"],
+                        "temple_history": lit["shir_shel_yom"]["temple_history"],
+                        "prominent_note": lit["shir_shel_yom"]["prominent_note"],
+                        "monthly_label": lit["monthly_tehillim"]["label"],
+                    }
+                    daily["show_extras"]["month_chronicle"] = lit["month_chronicle"]
+                except Exception:
+                    pass
                 # Tag each verse slide with cute cast/angel badges for the right-hand panel!
                 for sl in (daily.get("slides") or []):
                     sl["cast_badges"] = sanctuary_rich_data.detect_verse_cast(sl.get("en_text", "") + " " + sl.get("commentary", ""))

@@ -1220,6 +1220,48 @@
     border-radius: 14px;
     padding: 14px 16px;
   }
+
+  /* Prayers, Psalms, Tefillin, Songs & Layered Holiday Encyclopedia */
+  .liturgy-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px;
+  }
+  .liturgy-tab {
+    padding: 9px 15px; border-radius: 12px;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    color: var(--text); font-weight: 700; font-size: 0.88rem; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .liturgy-tab:hover { border-color: var(--gold); color: var(--gold); }
+  .liturgy-tab.active {
+    background: linear-gradient(135deg, rgba(228,188,105,0.22), rgba(92,182,229,0.14));
+    border-color: var(--gold); color: var(--gold);
+    box-shadow: 0 4px 14px rgba(228,188,105,0.18);
+  }
+  .liturgy-pane { display: none; }
+  .liturgy-pane.active { display: block; animation: sanctuaryReveal 0.4s ease both; }
+  .blessing-card, .prayer-step, .song-card {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 14px; padding: 15px 17px; margin-bottom: 12px;
+  }
+  .blessing-card .b-he, .prayer-step .b-he, .song-card .b-he {
+    font-family: var(--hebrew); direction: rtl; text-align: right;
+    font-size: 1.38rem; line-height: 1.9; color: var(--gold);
+    margin: 8px 0 6px; white-space: pre-line;
+  }
+  .b-tr { font-style: italic; color: #9fd8f8; font-size: 0.92rem; line-height: 1.5; margin-bottom: 6px; white-space: pre-line; }
+  .b-en { font-family: var(--serif); color: var(--text); font-size: 0.98rem; line-height: 1.56; white-space: pre-line; }
+  .holiday-card {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .holiday-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 8px 22px rgba(0,0,0,0.35); }
+  .holiday-card.active-holiday { border-color: #4ade80; box-shadow: 0 0 18px rgba(74,222,128,0.24); }
+  .prominent-item {
+    background: rgba(228,188,105,0.08); border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin-bottom: 8px;
+    font-size: 0.92rem; line-height: 1.55;
+  }
 </style>
 </head>
 <body>
@@ -1251,6 +1293,7 @@
     <nav id="mainNav">
       <button class="active" data-view="today">Today's Reading</button>
       <button data-view="sky">🌙 Sky &amp; Zmanim</button>
+      <button data-view="liturgy">🙏 Prayers &amp; Holidays</button>
       <button data-view="stories">Torah Stories</button>
       <button data-view="characters">Characters</button>
       <button data-view="symbols">Symbols &amp; Art</button>
@@ -1409,6 +1452,33 @@
     </section>
 
     <!-- 1. ASK & INTERPRET -->
+    <!-- 1C. PRAYERS, PSALMS, TEFILLIN, BLESSINGS, SONGS & LAYERED HOLIDAY ENCYCLOPEDIA -->
+    <section id="view-liturgy" class="view">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;" id="liturgyDateBadge">✡ LIVING DAILY LITURGY, SONGS &amp; SACRED CALENDAR</div>
+            <h2 style="margin:3px 0 4px;">Psalms, Tefillin, Meal Blessings, Sacred Songs &amp; Holiday History</h2>
+            <p class="muted" style="margin:0;">Complete offline prayer companion synced to today's exact Hebrew date &amp; Zmanim — with layered Biblical origins &amp; stories of how prominent figures celebrated every sacred day.</p>
+          </div>
+          <button class="btn-secondary" onclick="loadLiturgy(true)">↻ Refresh Today's Liturgy</button>
+        </div>
+        <div class="liturgy-tabs" id="liturgyTabBar">
+          <button class="liturgy-tab active" data-ltab="psalms" onclick="switchLiturgyTab('psalms')">📖 Daily Psalms (Tehillim)</button>
+          <button class="liturgy-tab" data-ltab="tefillin" onclick="switchLiturgyTab('tefillin')">🕯 Tefillin &amp; Morning</button>
+          <button class="liturgy-tab" data-ltab="meals" onclick="switchLiturgyTab('meals')">🍞 Before &amp; After Dinner</button>
+          <button class="liturgy-tab" data-ltab="songs" onclick="switchLiturgyTab('songs')">🎵 Sacred Songs &amp; Zemirot</button>
+          <button class="liturgy-tab" data-ltab="holidays" onclick="switchLiturgyTab('holidays')">🏛 Holidays &amp; High Holidays</button>
+        </div>
+      </div>
+
+      <div id="ltab-psalms" class="liturgy-pane active"><div class="card muted">Loading today's Psalms...</div></div>
+      <div id="ltab-tefillin" class="liturgy-pane"><div class="card muted">Loading Tefillin &amp; Morning guide...</div></div>
+      <div id="ltab-meals" class="liturgy-pane"><div class="card muted">Loading Before &amp; After Meal Blessings...</div></div>
+      <div id="ltab-songs" class="liturgy-pane"><div class="card muted">Loading Sacred Songs &amp; Zemirot...</div></div>
+      <div id="ltab-holidays" class="liturgy-pane"><div class="card muted">Loading Deep Holiday &amp; High Holiday Encyclopedia...</div></div>
+    </section>
+
     <section id="view-ask" class="view">
       <div class="ask-layout">
         <div>
@@ -1861,6 +1931,20 @@ function showTimelyPopup() {
       text: av.en_text.slice(0, 175) + (av.en_text.length > 175 ? '...' : ''),
     });
   }
+  const dps = dailyData && dailyData.show_extras && dailyData.show_extras.daily_psalm;
+  if (dps && dps.title) {
+    popups.splice(1, 0, {
+      tag: `📖 TODAY'S TEMPLE PSALM · ${dps.day_en.toUpperCase()}`,
+      text: `${dps.title} — ${dps.prominent_note.slice(0, 145)}... (${dps.monthly_label})`,
+    });
+  }
+  const mch = dailyData && dailyData.show_extras && dailyData.show_extras.month_chronicle;
+  if (mch && mch.events && mch.events.length) {
+    popups.splice(3, 0, {
+      tag: `🏛 THIS MONTH IN HISTORY · ${mch.month.toUpperCase()} (${mch.he})`,
+      text: `${mch.theme} — ${mch.events[0]}`,
+    });
+  }
   if (!popups.length) return;
   const item = popups[toastIdx % popups.length];
   toastIdx++;
@@ -2075,6 +2159,7 @@ function switchView(name) {
   if (name === 'today' && !dailyData) loadToday();
   drawMarginStages();
   if (name === 'sky') loadCelestial();
+  if (name === 'liturgy' && !window._liturgyLoaded) loadLiturgy(false);
   if (name === 'shul' && !window._shulLoaded) loadShul(false);
   if (name === 'parasha' && !window._parashaLoaded) loadParasha('');
   if (name === 'reader' && !booksCache.length) loadBooks();
@@ -4308,6 +4393,334 @@ function renderCelestialRibbon(cel) {
     <span class="cel-chip">${esc(moon.emoji || '🌙')} <strong>${moon.illumination_pct}% ${esc(moon.phase_en || '')}</strong> <span class="muted">(Alt ${moon.altitude_deg >= 0 ? '+' : ''}${moon.altitude_deg}° ${esc(moon.compass || '')} · Rise ${esc(moon.moonrise || '—')})</span></span>
     ${nz ? `<span class="cel-chip" style="color:var(--gold);font-weight:700;">⏳ ${esc(nz.name)}: ${esc(nz.time)} (${esc(nz.countdown)})</span>` : ''}
   `;
+}
+
+// =============================================================================
+// LIVING LITURGY, PSALMS (TEHILLIM), TEFILLIN, BLESSINGS, SONGS & HOLIDAYS
+// =============================================================================
+let liturgyCache = null;
+let holidaysCache = null;
+let activeHolidaySlug = null;
+
+function switchLiturgyTab(tabKey) {
+  document.querySelectorAll('#liturgyTabBar .liturgy-tab').forEach(b => b.classList.toggle('active', b.dataset.ltab === tabKey));
+  document.querySelectorAll('#view-liturgy .liturgy-pane').forEach(p => p.classList.toggle('active', p.id === 'ltab-' + tabKey));
+}
+
+async function loadLiturgy(force = false) {
+  window._liturgyLoaded = true;
+  if (!force && liturgyCache && holidaysCache) return;
+  try {
+    const [rLit, rHol] = await Promise.all([fetch('/api/liturgy/today'), fetch('/api/holidays')]);
+    liturgyCache = await rLit.json();
+    holidaysCache = await rHol.json();
+    const he = liturgyCache.hebrew_date || {};
+    const badge = document.getElementById('liturgyDateBadge');
+    if (badge) badge.textContent = `✡ ${he.en_str || ''} (${he.he_str || ''}) · ${liturgyCache.location || ''} · ${(liturgyCache.watch && liturgyCache.watch.en) || ''}`;
+    renderLiturgyPsalms(liturgyCache);
+    renderLiturgyTefillin(liturgyCache);
+    renderLiturgyMeals(liturgyCache);
+    renderLiturgySongs(liturgyCache);
+    renderLiturgyHolidays(holidaysCache);
+  } catch (e) {
+    console.error('Liturgy load failed:', e);
+  }
+}
+
+function renderVersesBlock(verses) {
+  return (verses || []).map(v => `
+    <div style="padding:8px 0;border-bottom:1px solid rgba(228,188,105,0.12);">
+      <div style="font-family:var(--hebrew);direction:rtl;text-align:right;font-size:1.3rem;line-height:1.85;color:var(--gold);"><span class="muted" style="font-size:0.78rem;margin-left:8px;">${esc(String(v.verse))}</span>${esc(v.he_text)}</div>
+      <div style="font-family:var(--serif);font-size:0.96rem;line-height:1.55;color:var(--text);margin-top:3px;"><strong style="color:var(--accent);font-size:0.8rem;">${esc(String(v.verse))}.</strong> ${esc(v.en_text)}</div>
+    </div>`).join('');
+}
+
+function renderLiturgyPsalms(lit) {
+  const host = document.getElementById('ltab-psalms');
+  if (!host) return;
+  const s = lit.shir_shel_yom || {};
+  const mt = lit.monthly_tehillim || {};
+  const shirPlain = (s.verses || []).map(v => v.en_text).join(' ');
+  const topicBtns = (lit.topical_psalms || []).map(t => `
+    <button class="btn-secondary" style="text-align:left;padding:8px 12px;" onclick="openPsalmChapter(${t.chapter})">
+      <div style="font-size:0.7rem;color:var(--gold);text-transform:uppercase;font-weight:800;">${esc(t.tag)}</div>
+      <div style="font-size:0.88rem;font-weight:700;color:#fff;">${esc(t.title)}</div>
+    </button>`).join('');
+  const monthlyBtns = (mt.chapters || []).map(ch => `
+    <button class="btn-primary" style="padding:6px 12px;font-size:0.84rem;" onclick="openPsalmChapter(${ch})">Psalm ${ch}</button>`).join('');
+
+  host.innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;">🏛 SHIR SHEL YOM · TODAY'S TEMPLE LEVITE PSALM (${esc(s.day_en || '')})</div>
+          <h3 style="margin:4px 0;font-family:var(--serif);font-size:1.45rem;color:#fff;">${esc(s.title || '')}</h3>
+          <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.12rem;">${esc(s.he_intro || '')}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="speakText(this.dataset.txt)" data-txt="${esc(s.title + '. ' + shirPlain)}">🔊 Read Psalm ${s.chapter} Aloud</button>
+          <button class="btn-secondary" onclick="quickAsk('Explain Psalm ${s.chapter} (Today\\'s Shir Shel Yom) with Rashi, Temple history, and meaning today.', 'scholar')">🤖 Ask AI Scholar</button>
+        </div>
+      </div>
+      <div class="spot-comm" style="margin-top:12px;"><div class="c-label">🏛 Jerusalem Temple History</div><div>${esc(s.temple_history || '')}</div></div>
+      <div class="prominent-item"><strong>👑 Historical Highlight:</strong> ${esc(s.prominent_note || '')}</div>
+      <div style="max-height:360px;overflow-y:auto;padding-right:6px;margin-top:10px;">${renderVersesBlock(s.verses)}</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:800;">🌙 30-DAY MONTHLY TEHILLIM CYCLE · ${esc(mt.label || '')}</div>
+          <h3 style="margin:2px 0 0;">Read Any Psalm (1–150) Offline in Verbatim Hebrew &amp; English</h3>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="psalmJumpInput" class="form-input" min="1" max="150" value="${(mt.chapters && mt.chapters[0]) || 23}" style="width:92px;">
+          <button class="btn-primary" onclick="openPsalmChapter(document.getElementById('psalmJumpInput').value)">Open Psalm</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="muted" style="font-size:0.84rem;align-self:center;">Today's Monthly Portion:</span>
+        ${monthlyBtns}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:12px;">${topicBtns}</div>
+      <div id="psalmReaderBox" style="display:none;background:rgba(11,17,32,0.72);border:1px solid var(--border);border-radius:14px;padding:14px 16px;"></div>
+    </div>`;
+}
+
+async function openPsalmChapter(ch) {
+  const n = Math.max(1, Math.min(150, parseInt(ch, 10) || 23));
+  const box = document.getElementById('psalmReaderBox');
+  if (!box) return;
+  box.style.display = 'block';
+  box.innerHTML = `<div class="muted">Loading Psalm ${n}...</div>`;
+  const r = await fetch('/api/liturgy/psalm?chapter=' + n);
+  const d = await r.json();
+  const plain = (d.verses || []).map(v => v.en_text).join(' ');
+  box.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+      <div>
+        <h3 style="margin:0;color:var(--gold);font-family:var(--serif);">${esc(d.title)} · <span style="font-family:var(--hebrew);">${esc(d.he_title)}</span></h3>
+        <div class="muted" style="font-size:0.82rem;">${d.verses_count} verses · Offline Verbatim Tanakh</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-primary" style="padding:5px 12px;font-size:0.82rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(d.title + '. ' + plain)}">🔊 Read Aloud</button>
+        <button class="btn-secondary" style="padding:5px 12px;font-size:0.82rem;" onclick="quickAsk('Interpret Psalm ${n} with classical Jewish commentators and modern application.', 'scholar')">🤖 Ask AI</button>
+      </div>
+    </div>
+    <div style="max-height:420px;overflow-y:auto;padding-right:6px;">${renderVersesBlock(d.verses)}</div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderLiturgyTefillin(lit) {
+  const host = document.getElementById('ltab-tefillin');
+  if (!host) return;
+  const tf = lit.tefillin || {};
+  const ov = tf.overview || {};
+  const ls = tf.live_status || {};
+  host.innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:${ls.wear_today ? '#4ade80' : 'var(--gold)'};font-weight:800;">${esc(ls.badge || '')}</div>
+          <h3 style="margin:4px 0;font-family:var(--serif);font-size:1.45rem;color:#fff;">${esc(ov.title || '')} · <span style="font-family:var(--hebrew);color:var(--gold);">${esc(ov.he_title || '')}</span></h3>
+          <div class="muted" style="font-size:0.88rem;">${esc(ls.detail || '')}</div>
+        </div>
+        <button class="btn-secondary" onclick="quickAsk('Explain the deeper meaning, laws, and archaeology of Tallit and Tefillin (Deuteronomy 6:8, Qumran scrolls) in today\\'s terms.', 'scholar')">🤖 Ask AI Deeper</button>
+      </div>
+      <div class="today-box" style="margin-top:12px;padding:12px 14px;">
+        <h4 style="margin-bottom:4px;font-size:0.92rem;">✨ Meaning &amp; 2,000-Year Archaeological Continuity</h4>
+        <div style="font-size:0.9rem;margin-bottom:6px;">${esc(ov.meaning || '')}</div>
+        <div class="muted" style="font-size:0.84rem;">📜 ${esc(ov.history || '')}</div>
+      </div>
+    </div>
+    ${(tf.steps || []).map(st => `
+      <div class="prayer-step">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <span class="trait-pill" style="margin-right:6px;">STEP ${esc(st.step)}</span>
+            <strong style="font-family:var(--serif);font-size:1.12rem;color:#fff;">${esc(st.title)}</strong>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(st.he_title)}</span>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(st.title + '. ' + st.english)}">🔊 Hear</button>
+          </div>
+        </div>
+        <div class="muted" style="font-size:0.8rem;margin-top:4px;">⏰ ${esc(st.when)}</div>
+        <div class="b-he">${esc(st.hebrew)}</div>
+        <div class="b-tr">${esc(st.translit)}</div>
+        <div class="b-en">${esc(st.english)}</div>
+        ${st.note ? `<div style="margin-top:8px;font-size:0.83rem;color:#f3d796;border-left:2px solid var(--gold);padding-left:10px;">💡 ${esc(st.note)}</div>` : ''}
+      </div>`).join('')}`;
+}
+
+function renderLiturgyMeals(lit) {
+  const host = document.getElementById('ltab-meals');
+  if (!host) return;
+  const before = lit.before_meal_blessings || [];
+  const after = lit.after_meal_blessings || {};
+  const bhm = after.birkat_hamazon || {};
+  const inserts = after.active_inserts || [];
+  const insertBanner = inserts.length ? `
+    <div class="today-box" style="margin-bottom:12px;padding:12px 14px;border-color:#4ade80;">
+      <h4 style="color:#4ade80;margin-bottom:4px;">✨ ACTIVE CALENDAR INSERT TODAY IN BIRKAT HAMAZON</h4>
+      ${inserts.map(ins => `<div style="font-size:0.9rem;"><strong>${esc(ins.name)}</strong> (<span style="font-family:var(--hebrew);color:var(--gold);">${esc(ins.he)}</span>) — ${esc(ins.note)}</div>`).join('')}
+    </div>` : `<div class="muted" style="font-size:0.84rem;margin-bottom:10px;">Standard weekday Birkat HaMazon today (on Shabbat, Rosh Chodesh, Chanukah &amp; Festivals, special inserts automatically appear right here!).</div>`;
+
+  host.innerHTML = `
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-family:var(--serif);color:var(--gold);">🍽 Before Dinner &amp; Food Blessings (Brachot Rishonot)</h3>
+      <p class="muted" style="margin:0 0 12px;font-size:0.88rem;">Pause for 5 seconds of gratitude before eating — turning every ordinary meal into a sacred sanctuary table.</p>
+      <div class="cards-grid">
+        ${before.map(b => `
+          <div class="blessing-card" style="margin:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+              <strong style="color:#fff;font-size:1.02rem;">${esc(b.emoji)} ${esc(b.name)}</strong>
+              <button class="btn-secondary" style="padding:3px 9px;font-size:0.76rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(b.name + '. ' + b.english)}">🔊</button>
+            </div>
+            <div class="muted" style="font-size:0.8rem;margin-top:3px;">${esc(b.for_foods)}</div>
+            <div class="b-he" style="font-size:1.22rem;">${esc(b.hebrew)}</div>
+            <div class="b-tr" style="font-size:0.85rem;">${esc(b.translit)}</div>
+            <div class="b-en" style="font-size:0.88rem;">${esc(b.english)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
+        <div>
+          <h3 style="margin:0;font-family:var(--serif);color:var(--gold);">🙏 ${esc(bhm.title || 'Birkat HaMazon')} · <span style="font-family:var(--hebrew);">${esc(bhm.he_title || '')}</span></h3>
+          <div class="muted" style="font-size:0.82rem;">${esc(bhm.source_ref || '')}</div>
+        </div>
+        <button class="btn-secondary" onclick="quickAsk('Tell the fascinating historical origin of all 4 blessings of Birkat HaMazon (Moses, Joshua, David, Solomon, and Yavneh).', 'history')">🏛 History of Grace After Meals</button>
+      </div>
+      <div class="prominent-item">${esc(bhm.history || '')}</div>
+      ${insertBanner}
+      ${(bhm.sections || []).map(sec => `
+        <div class="blessing-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div><span class="trait-pill" style="margin-right:6px;">${esc(sec.num)}</span><strong style="color:#fff;">${esc(sec.title)}</strong></div>
+            <button class="btn-secondary" style="padding:3px 9px;font-size:0.76rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(sec.title + '. ' + sec.english)}">🔊 Hear</button>
+          </div>
+          <div class="b-he">${esc(sec.hebrew)}</div>
+          <div class="b-tr">${esc(sec.translit)}</div>
+          <div class="b-en">${esc(sec.english)}</div>
+        </div>`).join('')}
+      <h4 style="color:var(--gold);margin:16px 0 8px;">Short After-Blessings (No Bread Eaten)</h4>
+      ${(after.short_after || []).map(sa => `
+        <div class="blessing-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <strong style="color:#fff;">${esc(sa.title)}</strong>
+            <span style="font-family:var(--hebrew);color:var(--gold);">${esc(sa.he_title)}</span>
+          </div>
+          <div class="muted" style="font-size:0.8rem;margin-top:2px;">${esc(sa.for_foods)}</div>
+          <div class="b-he" style="font-size:1.22rem;">${esc(sa.hebrew)}</div>
+          <div class="b-tr">${esc(sa.translit)}</div>
+          <div class="b-en">${esc(sa.english)}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderLiturgySongs(lit) {
+  const host = document.getElementById('ltab-songs');
+  if (!host) return;
+  const songs = lit.songs || [];
+  host.innerHTML = `
+    <div class="cards-grid">
+      ${songs.map(sg => `
+        <div class="song-card" style="margin:0;display:flex;flex-direction:column;">
+          ${renderLivingScene(sg.art, '145px', '', '', 'margin-bottom:10px;')}
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+            <span class="trait-pill">${esc(sg.occasion)}</span>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(sg.title + '. ' + sg.english + ' ' + sg.story)}">🔊 Hear Lyrics</button>
+          </div>
+          <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.35rem;margin-top:6px;">${esc(sg.he_title)}</div>
+          <h3 style="margin:2px 0 4px;font-family:var(--serif);color:#fff;font-size:1.12rem;">${esc(sg.title)}</h3>
+          <div class="muted" style="font-size:0.78rem;margin-bottom:6px;">✍ ${esc(sg.composer)}</div>
+          <div class="b-he" style="font-size:1.18rem;margin:4px 0;">${esc(sg.hebrew)}</div>
+          <div class="b-tr" style="font-size:0.84rem;">${esc(sg.translit)}</div>
+          <div class="b-en" style="font-size:0.88rem;margin-bottom:8px;">${esc(sg.english)}</div>
+          <div style="margin-top:auto;font-size:0.82rem;color:#f3d796;border-left:2px solid var(--gold);padding-left:9px;">🏛 ${esc(sg.story)}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderLiturgyHolidays(data) {
+  const host = document.getElementById('ltab-holidays');
+  if (!host) return;
+  const mc = data.month_chronicle || {};
+  const hols = data.holidays || [];
+  const defaultHol = hols.find(h => h.is_active_today) || hols.find(h => h.days_away !== null && h.days_away <= 25) || hols[0];
+  activeHolidaySlug = activeHolidaySlug || (defaultHol && defaultHol.slug);
+
+  host.innerHTML = `
+    <div class="card" style="background:linear-gradient(135deg,rgba(228,188,105,0.12),rgba(14,24,46,0.92));border-color:rgba(228,188,105,0.45);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;">📜 THIS HEBREW MONTH IN BIBLICAL &amp; JEWISH HISTORY · ${esc(mc.month || '')} (${esc(mc.he || '')})</div>
+          <h3 style="margin:3px 0 6px;font-family:var(--serif);color:#fff;">${esc(mc.theme || '')}</h3>
+        </div>
+        <button class="btn-secondary" onclick="quickAsk('Give a deep, layered history of the Hebrew month of ${esc(mc.month || '')} in the Tanakh and Jewish tradition — and how great Sages honored it.', 'history')">🤖 Explore Month Deeper</button>
+      </div>
+      <ul style="margin:0;padding-left:18px;font-size:0.9rem;line-height:1.55;">
+        ${(mc.events || []).map(ev => `<li style="margin-bottom:4px;">${esc(ev)}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div id="holidayDeepDiveHost" style="margin-bottom:14px;"></div>
+
+    <div class="cards-grid">
+      ${hols.map(h => `
+        <div class="holiday-card ${h.is_active_today ? 'active-holiday' : ''}" onclick="openHolidayDeepDive('${esc(h.slug)}')">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="font-size:1.3rem;">${esc(h.emoji)}</span>
+            ${h.is_active_today ? `<span class="trait-pill" style="background:rgba(74,222,128,0.2);color:#86efac;">✨ ACTIVE TODAY</span>` : (h.days_away !== null ? `<span class="trait-pill">⏳ in ${h.days_away}d · ${esc(h.next_gregorian)}</span>` : `<span class="trait-pill">${esc(h.category)}</span>`)}
+          </div>
+          <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.12rem;">${esc(h.he_name)}</div>
+          <h3 style="margin:2px 0 4px;font-family:var(--serif);color:#fff;font-size:1.05rem;">${esc(h.name)}</h3>
+          <div class="muted" style="font-size:0.8rem;">${esc(h.hebrew_date_label)}</div>
+        </div>`).join('')}
+    </div>`;
+
+  if (activeHolidaySlug) openHolidayDeepDive(activeHolidaySlug, false);
+}
+
+function openHolidayDeepDive(slug, scroll = true) {
+  if (!holidaysCache) return;
+  const h = (holidaysCache.holidays || []).find(x => x.slug === slug);
+  const box = document.getElementById('holidayDeepDiveHost');
+  if (!h || !box) return;
+  activeHolidaySlug = slug;
+  box.innerHTML = `
+    <div class="card sanctuary-reveal" style="border-color:rgba(228,188,105,0.55);">
+      ${renderLivingScene(h.art, '220px', `<div><div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:#f3d796;font-weight:800;">${esc(h.emoji)} ${esc(h.category)} · ${esc(h.hebrew_date_label)}</div><div style="font-family:var(--serif);font-size:1.6rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.85);">${esc(h.name)}</div></div><div style="font-family:var(--hebrew);color:#f3d796;font-size:1.45rem;text-shadow:0 2px 10px rgba(0,0,0,0.85);">${esc(h.he_name)}</div>`, '', 'margin-bottom:14px;')}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn-primary" onclick="speakText(this.dataset.txt)" data-txt="${esc(h.name + '. ' + h.biblical_origins + ' ' + h.deep_history + ' ' + h.today_meaning)}">🔊 Listen to Overview</button>
+        <button class="btn-secondary" onclick="quickAsk('Give an immersive historical & Torah deep-dive into ${esc(h.name)} (${esc(h.hebrew_date_label)}) — how King David, the Second Temple, Hillel, Rashi, and Rambam celebrated it, and how we live it today.', 'history')">🤖 Deep-Dive with AI Historian</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-bottom:14px;">
+        <div class="blessing-card" style="margin:0;">
+          <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;">📜 Layer 1 · Biblical &amp; Old Testament Origins</div>
+          <p style="font-size:0.92rem;line-height:1.58;margin:6px 0 0;">${esc(h.biblical_origins)}</p>
+        </div>
+        <div class="blessing-card" style="margin:0;">
+          <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:800;">🏛 Layer 2 · Deep Historical Evolution</div>
+          <p style="font-size:0.92rem;line-height:1.58;margin:6px 0 0;">${esc(h.deep_history)}</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;margin-bottom:8px;">👑 Layer 3 · How Prominent Historical Figures Celebrated ${esc(h.name.split('—')[0].trim())}</div>
+        ${(h.prominent_celebrations || []).map(pc => `<div class="prominent-item">${esc(pc)}</div>`).join('')}
+      </div>
+
+      <div class="spot-comm"><div class="c-label">🕯 Layer 4 · Prayers, Songs &amp; Special Rituals</div><div>${esc(h.rituals_and_prayers)}</div></div>
+      <div class="today-box" style="margin:0;padding:12px 15px;">
+        <h4 style="margin-bottom:4px;font-size:0.92rem;">✨ Layer 5 · Living This Sacred Day Today</h4>
+        <div style="font-size:0.93rem;">${esc(h.today_meaning)}</div>
+      </div>
+    </div>`;
+  if (scroll) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 async function loadCelestial() {
