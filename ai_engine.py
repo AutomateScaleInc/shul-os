@@ -51,14 +51,14 @@ MODE_INSTRUCTIONS = {
     "scholar": (
         "You are a warm, deeply learned Torah & Tanakh scholar at a community synagogue study station. "
         "Structure your answer with clarity and reverence using the Jewish PaRDeS interpretive tradition where helpful: "
-        "plain text meaning (Peshat), classical Jewish commentators (Rashi, Ramban, Ibn Ezra, Sforno, Midrash, Pirkei Avot / Talmud) "
+        "plain text meaning (Peshat), classical Jewish commentators (Rashi, Or HaChaim, Ramban, Ibn Ezra, Sforno, Kli Yakar, Chizkuni, Midrash, Pirkei Avot / Talmud) "
         "grounded in the provided sources, and a concise ethical/spiritual takeaway. "
         "Cite exact book, chapter, and verse numbers (e.g., Genesis 1:1, Exodus 3:14). Never invent quotes."
     ),
     "storyteller": (
         "You are a beloved synagogue Torah storyteller speaking warmly to kids, families, and newcomers. "
         "Tell the story vividly, faithfully, and engagingly (using concrete imagery and gentle warmth), "
-        "anchor it in the exact Torah/Tanakh verses provided, include one charming insight from Rashi or Midrash, "
+        "anchor it in the exact Torah/Tanakh verses provided, include one charming insight from Rashi, Or HaChaim, or Midrash, "
         "and end with 2 thoughtful Shabbat-table questions a family can discuss together. Never invent quotes."
     ),
     "history": (
@@ -69,11 +69,11 @@ MODE_INSTRUCTIONS = {
     ),
     "all": (
         "You are Torah Sanctuary — a deeply knowledgeable, warm Torah & Old Testament study guide for a synagogue community. "
-        "Give a well-structured, illuminating response covering: "
+        "Give a crisp, well-structured, illuminating response covering: "
         "(1) **Plain Text & Story** (what happens & exact verse citations), "
-        "(2) **Classical Jewish Interpretation** (citing Rashi, Ramban, Ibn Ezra, Sforno, or Midrash from the provided context), "
+        "(2) **Classical Jewish Interpretation** (citing Rashi, Or HaChaim, Ramban, Ibn Ezra, Sforno, or Midrash from the provided context), "
         "(3) **Historical & Broader Context** (when relevant), and "
-        "(4) **Living Lesson** (what this teaches us today). "
+        "(4) **Living Lesson** (applying this in today's terms). "
         "Stay faithful to the verbatim texts provided and never fabricate verse quotes."
     ),
 }
@@ -128,11 +128,21 @@ def check_ollama_status(cfg: dict = None) -> dict:
         return {"online": False, "models": [], "target_model": model, "model_ready": False, "error": str(e)}
 
 
-def build_rag_context(question: str, mode: str = "all") -> tuple[str, dict]:
-    """Retrieve verbatim local verses, commentaries, parashiyot, and curated dossiers."""
-    hits = torah_db.search_all(question, limit_verses=6, limit_comm=5, limit_docs=3)
+def build_rag_context(question: str, mode: str = "all", compact: bool = False) -> tuple[str, dict]:
+    """Retrieve verbatim local verses, diverse classical commentaries, parashiyot, and curated / Mini-Orca study sheets.
+
+    When compact=True (local Ollama CPU), allocates balanced budgets across verses, diverse commentators,
+    and study sheets so Living Scribe dossiers & Or HaChaim/Ramban notes are NEVER truncated away!
+    """
+    hits = torah_db.search_all(question, limit_verses=6, limit_comm=6, limit_docs=3)
     parts = []
     sources = {"verses": [], "commentaries": [], "documents": [], "parashiyot": []}
+
+    v_max = 3 if compact else 6
+    c_max = 4 if compact else 6
+    c_snip = 260 if compact else 550
+    d_max = 1 if compact else 2
+    d_snip = 620 if compact else 1100
 
     # Exact verse matches first
     seen_refs = set()
@@ -141,12 +151,18 @@ def build_rag_context(question: str, mode: str = "all") -> tuple[str, dict]:
             continue
         seen_refs.add(v["ref"])
         sources["verses"].append(v)
-        parts.append(f"[VERSE {v['ref']}]\nEnglish: {v['en_text']}\nHebrew: {v['he_text']}")
+        if len(sources["verses"]) <= v_max:
+            en_v = (v["en_text"] or "")[:240 if compact else 500]
+            if compact:
+                parts.append(f"[VERSE {v['ref']}] {en_v}")
+            else:
+                parts.append(f"[VERSE {v['ref']}]\nEnglish: {en_v}\nHebrew: {v['he_text']}")
 
-    for c in hits["commentaries"][:5]:
+    for c in hits["commentaries"][:6]:
         sources["commentaries"].append(c)
-        en_snip = (c["en_text"] or "")[:550]
-        parts.append(f"[COMMENTARY {c['commentator']} on {c['target_ref']}]\n{en_snip}")
+        if len(sources["commentaries"]) <= c_max:
+            en_snip = (c["en_text"] or "")[:c_snip]
+            parts.append(f"[COMMENTARY {c['commentator']} on {c['target_ref']}] {en_snip}")
 
     for d in hits["documents"][:2]:
         sources["documents"].append({
@@ -157,16 +173,20 @@ def build_rag_context(question: str, mode: str = "all") -> tuple[str, dict]:
             "subtitle": d["subtitle"],
             "refs": d["refs"],
         })
-        if mode == "storyteller" and d.get("kid_story"):
-            parts.append(f"[STORY DOSSIER: {d['title']} ({d['refs']})]\n{d['kid_story'][:900]}\nCommentators: {d.get('commentators_note', '')[:500]}")
-        else:
-            parts.append(f"[KNOWLEDGE DOSSIER ({d['category']}): {d['title']} ({d['refs']})]\n{d['body_md'][:1100]}")
+        if len(sources["documents"]) <= d_max:
+            if mode == "storyteller" and d.get("kid_story"):
+                parts.append(f"[STORY DOSSIER: {d['title']} ({d['refs']})]\n{d['kid_story'][:d_snip]}")
+            else:
+                label = "LIVING SCRIBE STUDY SHEET" if (d.get("category") or "").startswith("scribe_") else f"KNOWLEDGE DOSSIER ({d['category']})"
+                parts.append(f"[{label}: {d['title']} ({d['refs']})]\n{(d.get('body_md') or '')[:d_snip]}")
 
     for p in hits["parashiyot"][:2]:
         sources["parashiyot"].append(p)
-        parts.append(f"[PARASHAH {p['en_name']} ({p['he_name']}, {p['ref']})]\nHaftarah: {p['haftarah_ref']}\nSummary: {p['summary']}")
+        if len(sources["parashiyot"]) <= (1 if compact else 2):
+            parts.append(f"[PARASHAH {p['en_name']} ({p['he_name']}, {p['ref']}) · Haftarah: {p['haftarah_ref']}] {(p.get('summary') or '')[:260]}")
 
-    context_str = "\n\n".join(parts)[:6200]
+    max_len = 2450 if compact else 6200
+    context_str = "\n\n".join(parts)[:max_len]
     return context_str, sources
 
 
@@ -260,13 +280,13 @@ def _stream_cloud_gemini(cfg: dict, system_prompt: str, messages: list):
 def _stream_ollama(cfg: dict, system_prompt: str, messages: list):
     url = cfg.get("ollama_url", "http://127.0.0.1:11434").rstrip("/") + "/api/chat"
     model = cfg.get("ollama_model", "qwen2.5:1.5b")
-    # Keep local CPU prefill crisp on Sentinel's 2013 i5-4570R
-    local_sys = system_prompt[:2800]
+    # Keep local CPU prefill crisp on Sentinel's 2013 i5-4570R (compact RAG already packs every category cleanly!)
+    local_sys = system_prompt[:3100]
     payload = {
         "model": model,
         "stream": True,
         "keep_alive": "30m",
-        "options": {"temperature": 0.4, "num_ctx": 2048, "num_predict": 480},
+        "options": {"temperature": 0.35, "num_ctx": 2048, "num_predict": 440},
         "messages": [{"role": "system", "content": local_sys}] + messages,
     }
     req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json"})
@@ -315,7 +335,11 @@ def stream_answer(question: str, mode: str = "all", history: list = None):
     """
     cfg = load_config()
     mode = mode if mode in MODE_INSTRUCTIONS else "all"
-    context_str, sources = build_rag_context(question, mode=mode)
+    cloud_prov = (cfg.get("cloud_provider") or "none").lower().strip()
+    cloud_key = (cfg.get("cloud_api_key") or "").strip()
+    use_cloud = cloud_prov in ("openai", "anthropic", "gemini") and bool(cloud_key)
+
+    context_str, sources = build_rag_context(question, mode=mode, compact=not use_cloud)
 
     system_prompt = (
         MODE_INSTRUCTIONS[mode]
@@ -329,14 +353,11 @@ def stream_answer(question: str, mode: str = "all", history: list = None):
             messages.append({"role": h["role"], "content": str(h["content"])[:1500]})
     messages.append({"role": "user", "content": question})
 
-    cloud_prov = (cfg.get("cloud_provider") or "none").lower().strip()
-    cloud_key = (cfg.get("cloud_api_key") or "").strip()
-
     backend_used = None
     yield {"type": "sources", "sources": sources}
 
     # 1. Try optional Cloud API if configured
-    if cloud_prov in ("openai", "anthropic", "gemini") and cloud_key:
+    if use_cloud:
         try:
             gen = (
                 _stream_cloud_openai(cfg, system_prompt, messages)

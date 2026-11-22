@@ -73,8 +73,86 @@ STOPWORDS = {
     "does", "did", "about", "into", "your", "their", "have", "has", "had", "was", "were", "are", "is",
     "tell", "story", "explain", "mean", "meaning", "say", "says", "teach", "torah", "bible", "old",
     "testament", "verse", "chapter", "book", "please", "can", "you", "me", "give", "show", "interpret",
-    "interpretation", "commentary", "rashi", "ramban", "midrash",
+    "interpretation", "commentary", "rashi", "ramban", "midrash", "sforno", "ibn", "ezra", "chaim",
+    "hachaim", "yakar", "chizkuni", "rashbam", "parasha", "parashat", "parshah", "today", "terms",
+    "apply", "applying", "aliyah", "reading", "weekly", "portion", "families", "warmly",
 }
+
+COMMENTATOR_HINTS = [
+    ("or hachaim", "Or HaChaim"),
+    ("ohr hachaim", "Or HaChaim"),
+    ("rashi", "Rashi"),
+    ("ramban", "Ramban"),
+    ("nachmanides", "Ramban"),
+    ("ibn ezra", "Ibn Ezra"),
+    ("sforno", "Sforno"),
+    ("kli yakar", "Kli Yakar"),
+    ("chizkuni", "Chizkuni"),
+    ("rashbam", "Rashbam"),
+    ("metzudat david", "Metzudat David"),
+    ("midrash", "Midrash"),
+    ("pirkei avot", "Pirkei Avot"),
+    ("avot", "Pirkei Avot"),
+]
+
+COMMENTATOR_PRIORITY = {
+    "Rashi": 1,
+    "Or HaChaim": 2,
+    "Ramban": 3,
+    "Ibn Ezra": 4,
+    "Sforno": 5,
+    "Kli Yakar": 6,
+    "Chizkuni": 7,
+    "Rashbam": 8,
+    "Metzudat David": 9,
+}
+
+
+def _detect_requested_commentators(query: str) -> list[str]:
+    low = (query or "").lower()
+    hits = []
+    for kw, name in COMMENTATOR_HINTS:
+        if kw in low and name not in hits:
+            hits.append(name)
+    return hits
+
+
+def _diversify_commentaries(rows: list[dict], limit: int, preferred: list[str] = None) -> list[dict]:
+    """Round-robin across distinct commentators so Or HaChaim, Ramban, Kli Yakar, etc. aren't crowded out by 5 Rashi rows."""
+    if not rows:
+        return []
+    preferred = preferred or []
+
+    def _pref_rank(name: str) -> tuple:
+        for i, p in enumerate(preferred):
+            if p.lower() in name.lower():
+                return (0, i, name)
+        return (1, COMMENTATOR_PRIORITY.get(name, 20), name)
+
+    buckets: dict[str, list[dict]] = {}
+    seen_refs = set()
+    for r in rows:
+        ref_k = r.get("ref") or f"{r.get('commentator')}:{r.get('target_ref')}:{(r.get('en_text') or '')[:40]}"
+        if ref_k in seen_refs:
+            continue
+        seen_refs.add(ref_k)
+        c_name = r.get("commentator") or "Classical"
+        buckets.setdefault(c_name, []).append(r)
+
+    ordered_names = sorted(buckets.keys(), key=_pref_rank)
+    out = []
+    while len(out) < limit and ordered_names:
+        next_round = []
+        for name in ordered_names:
+            if len(out) >= limit:
+                break
+            b = buckets[name]
+            if b:
+                out.append(b.pop(0))
+            if b:
+                next_round.append(name)
+        ordered_names = next_round
+    return out
 
 
 def get_conn() -> sqlite3.Connection:
@@ -195,10 +273,14 @@ def get_verse_commentaries(book_slug_or_title: str, chapter: int, verse: int) ->
             ORDER BY
                 CASE commentator
                     WHEN 'Rashi' THEN 1
-                    WHEN 'Ramban' THEN 2
-                    WHEN 'Ibn Ezra' THEN 3
-                    WHEN 'Sforno' THEN 4
-                    ELSE 5
+                    WHEN 'Or HaChaim' THEN 2
+                    WHEN 'Ramban' THEN 3
+                    WHEN 'Ibn Ezra' THEN 4
+                    WHEN 'Sforno' THEN 5
+                    WHEN 'Kli Yakar' THEN 6
+                    WHEN 'Chizkuni' THEN 7
+                    WHEN 'Rashbam' THEN 8
+                    ELSE 9
                 END, comment_idx
             """,
             (slug, chapter, verse),
@@ -213,31 +295,76 @@ def search_all(query: str, limit_verses: int = 8, limit_comm: int = 6, limit_doc
 
     exact_verses = lookup_verses(q, max_verses=10)
     fts_q = _fts_query(q)
-    verses, comms, docs, paras = [], [], [], []
+    req_comms = _detect_requested_commentators(q)
+    verses, comm_pool, docs, paras = [], [], [], []
     with get_conn() as conn:
-        # Also pull commentaries directly for exact verse hits!
+        # 1. Pull commentaries directly for exact verse hits (wide pool -> diversified across commentators!)
         if exact_verses:
-            v0 = exact_verses[0]
-            bk_slug = v0["book_title"].replace(" ", "_")
-            c_rows = conn.execute(
-                """
-                SELECT commentator, ref, target_ref, en_text, he_text
-                FROM commentaries
-                WHERE target_book = ? AND chapter = ? AND verse = ?
-                ORDER BY CASE commentator WHEN 'Rashi' THEN 1 WHEN 'Ramban' THEN 2 WHEN 'Ibn Ezra' THEN 3 WHEN 'Sforno' THEN 4 ELSE 5 END, comment_idx
-                LIMIT ?
-                """,
-                (bk_slug, v0["chapter"], v0["verse"], limit_comm),
-            ).fetchall()
-            comms.extend(dict(r) for r in c_rows)
+            for v_hit in exact_verses[:2]:
+                bk_slug = v_hit["book_title"].replace(" ", "_")
+                c_rows = conn.execute(
+                    """
+                    SELECT commentator, ref, target_ref, en_text, he_text
+                    FROM commentaries
+                    WHERE target_book = ? AND chapter = ? AND verse = ?
+                    ORDER BY
+                        CASE commentator
+                            WHEN 'Rashi' THEN 1
+                            WHEN 'Or HaChaim' THEN 2
+                            WHEN 'Ramban' THEN 3
+                            WHEN 'Ibn Ezra' THEN 4
+                            WHEN 'Sforno' THEN 5
+                            WHEN 'Kli Yakar' THEN 6
+                            WHEN 'Chizkuni' THEN 7
+                            WHEN 'Rashbam' THEN 8
+                            ELSE 9
+                        END, comment_idx
+                    LIMIT ?
+                    """,
+                    (bk_slug, v_hit["chapter"], v_hit["verse"], limit_comm * 3),
+                ).fetchall()
+                comm_pool.extend(dict(r) for r in c_rows)
 
-        # Match parasha by name/summary
-        like_q = f"%{q}%"
-        p_rows = conn.execute(
-            "SELECT * FROM parashiyot WHERE lower(en_name) LIKE lower(?) OR he_name LIKE ? OR lower(summary) LIKE lower(?) ORDER BY order_num LIMIT 4",
-            (like_q, like_q, like_q),
-        ).fetchall()
-        paras = [dict(r) for r in p_rows]
+        # 2. Match Parashah by exact name/slug tokens inside conversational questions too!
+        q_low = q.lower()
+        q_tokens = set(re.findall(r"[a-z]{2,}", q_low))
+        all_paras = [dict(r) for r in conn.execute("SELECT * FROM parashiyot ORDER BY order_num").fetchall()]
+        for p in all_paras:
+            p_slug = (p.get("slug") or "").lower()
+            p_name = (p.get("en_name") or "").lower()
+            if (p_name and p_name in q_low) or (p_slug and p_slug in q_tokens) or (p.get("he_name") and p["he_name"] in q):
+                paras.append(p)
+        if not paras:
+            like_q = f"%{q}%"
+            p_rows = conn.execute(
+                "SELECT * FROM parashiyot WHERE lower(en_name) LIKE lower(?) OR he_name LIKE ? OR lower(summary) LIKE lower(?) ORDER BY order_num LIMIT 3",
+                (like_q, like_q, like_q),
+            ).fetchall()
+            paras = [dict(r) for r in p_rows]
+        paras = paras[:3]
+
+        # 3. Auto-boost matching Living Scribe (Mini-Orca) Parashah & Tanakh Book study sheets!
+        seen_doc_slugs = set()
+        for p in paras[:2]:
+            s_slug = f"scribe-parasha-{p['slug']}"
+            row = conn.execute(
+                "SELECT slug, category, title, he_title, subtitle, refs, kid_story, adult_analysis, commentators_note, discussion_questions, body_md FROM documents WHERE slug = ?",
+                (s_slug,),
+            ).fetchone()
+            if row and row["slug"] not in seen_doc_slugs:
+                docs.append(dict(row))
+                seen_doc_slugs.add(row["slug"])
+        for alias, book_title in BOOK_ALIASES.items():
+            if len(alias) >= 4 and re.search(rf"\b{re.escape(alias)}\b", q_low):
+                b_slug = f"scribe-book-{book_title.lower().replace(' ', '-')}"
+                row = conn.execute(
+                    "SELECT slug, category, title, he_title, subtitle, refs, kid_story, adult_analysis, commentators_note, discussion_questions, body_md FROM documents WHERE slug = ?",
+                    (b_slug,),
+                ).fetchone()
+                if row and row["slug"] not in seen_doc_slugs:
+                    docs.append(dict(row))
+                    seen_doc_slugs.add(row["slug"])
+                    break
 
         if fts_q:
             try:
@@ -256,27 +383,38 @@ def search_all(query: str, limit_verses: int = 8, limit_comm: int = 6, limit_doc
             except sqlite3.OperationalError:
                 pass
 
-            if len(comms) < limit_comm:
-                try:
-                    c_rows = conn.execute(
-                        """
+            # Pull FTS commentaries (including explicit commentator boost if requested!)
+            try:
+                if req_comms:
+                    like_clauses = " OR ".join("lower(c.commentator) LIKE ?" for _ in req_comms)
+                    like_params = [f"%{rc.lower()}%" for rc in req_comms]
+                    c_pref = conn.execute(
+                        f"""
                         SELECT c.commentator, c.ref, c.target_ref, c.en_text, c.he_text
                         FROM commentaries_fts f
                         JOIN commentaries c ON c.id = f.rowid
-                        WHERE commentaries_fts MATCH ?
+                        WHERE commentaries_fts MATCH ? AND ({like_clauses})
                         ORDER BY bm25(commentaries_fts)
                         LIMIT ?
                         """,
-                        (fts_q, limit_comm - len(comms)),
+                        (fts_q, *like_params, limit_comm * 2),
                     ).fetchall()
-                    seen = {c["ref"] for c in comms}
-                    for r in c_rows:
-                        d = dict(r)
-                        if d["ref"] not in seen:
-                            comms.append(d)
-                            seen.add(d["ref"])
-                except sqlite3.OperationalError:
-                    pass
+                    comm_pool.extend(dict(r) for r in c_pref)
+
+                c_rows = conn.execute(
+                    """
+                    SELECT c.commentator, c.ref, c.target_ref, c.en_text, c.he_text
+                    FROM commentaries_fts f
+                    JOIN commentaries c ON c.id = f.rowid
+                    WHERE commentaries_fts MATCH ?
+                    ORDER BY bm25(commentaries_fts)
+                    LIMIT ?
+                    """,
+                    (fts_q, limit_comm * 3),
+                ).fetchall()
+                comm_pool.extend(dict(r) for r in c_rows)
+            except sqlite3.OperationalError:
+                pass
 
             try:
                 d_rows = conn.execute(
@@ -288,17 +426,22 @@ def search_all(query: str, limit_verses: int = 8, limit_comm: int = 6, limit_doc
                     ORDER BY bm25(documents_fts)
                     LIMIT ?
                     """,
-                    (fts_q, limit_docs),
+                    (fts_q, limit_docs + 2),
                 ).fetchall()
-                docs = [dict(r) for r in d_rows]
+                for r in d_rows:
+                    d = dict(r)
+                    if d["slug"] not in seen_doc_slugs:
+                        docs.append(d)
+                        seen_doc_slugs.add(d["slug"])
             except sqlite3.OperationalError:
                 pass
 
+    comms = _diversify_commentaries(comm_pool, limit=limit_comm, preferred=req_comms)
     return {
         "exact_verses": exact_verses,
         "verses": verses,
         "commentaries": comms,
-        "documents": docs,
+        "documents": docs[:limit_docs],
         "parashiyot": paras,
     }
 
