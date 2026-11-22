@@ -20,6 +20,7 @@ import community_hub
 import sacred_astronomy
 import sacred_liturgy
 import sanctuary_rich_data
+import scripture_foundation
 import shul_events
 import shul_mesh
 import torah_db
@@ -310,6 +311,12 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
         if path == "/api/holidays":
             self._send_json(sacred_liturgy.get_holidays_encyclopedia())
+            return
+
+        if path == "/api/foundation":
+            p_slug = qs.get("parasha", [""])[0].strip()
+            topic = qs.get("topic", [""])[0].strip()
+            self._send_json(scripture_foundation.get_foundation_dossier(parasha_slug=p_slug, topic=topic))
             return
 
         if path == "/api/presentation":
@@ -764,17 +771,19 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             txt = (body.get("text") or "").strip()[:2600]
             cfg = ai_engine.load_config()
             prof = (body.get("profile") or cfg.get("voice_profile") or "grand_narrator").strip()
+            lang = (body.get("lang") or "auto").strip()
+            pace = (body.get("pace") or "normal").strip()
             if not txt:
                 self._send_json({"error": "No text"}, status=400)
                 return
             try:
-                wav_bytes = voice_engine.synthesize_wav(txt, profile=prof)
+                audio_bytes, ctype = voice_engine.synthesize_audio(txt, profile=prof, lang=lang, pace=pace)
                 self.send_response(200)
-                self.send_header("Content-Type", "audio/wav")
+                self.send_header("Content-Type", ctype)
                 self.send_header("Access-Control-Allow-Origin", "*")
-                self.send_header("Content-Length", str(len(wav_bytes)))
+                self.send_header("Content-Length", str(len(audio_bytes)))
                 self.end_headers()
-                self.wfile.write(wav_bytes)
+                self.wfile.write(audio_bytes)
             except Exception as e:
                 self._send_json({"error": f"TTS unavailable: {e}"}, status=500)
             return

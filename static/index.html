@@ -1764,6 +1764,62 @@
     }
     .ticker-badge { font-size: 0.68rem; padding: 3px 8px; }
   }
+
+  /* SWATHS / CROWDS / ARMIES BADGE + TEFILLIN SAY-WITH-ME COACH + SOURCE STANDARD TIERS */
+  .crowd-scale-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: 800;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    background: rgba(228,188,105,0.18); border: 1px solid rgba(228,188,105,0.55); color: #fde68a;
+    margin-bottom: 4px;
+  }
+  .tefillin-ribbon-btn {
+    background: linear-gradient(135deg, rgba(56,189,248,0.22), rgba(37,99,235,0.28));
+    border: 1px solid rgba(92,182,229,0.72); color: #e0f2fe;
+    border-radius: 999px; padding: 3px 11px; font-size: 0.74rem; font-weight: 800;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+    transition: all 0.2s ease;
+  }
+  .tefillin-ribbon-btn:hover { background: rgba(56,189,248,0.38); transform: translateY(-1px); }
+  .tefillin-ribbon-btn.active-window {
+    border-color: #4ade80; box-shadow: 0 0 14px rgba(74,222,128,0.28);
+  }
+  .coach-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 270;
+    background: rgba(5,10,22,0.88); backdrop-filter: blur(10px);
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .coach-backdrop.open { display: flex; }
+  .coach-card {
+    width: 100%; max-width: 740px; max-height: 92dvh; overflow-y: auto;
+    background: linear-gradient(155deg, rgba(16,28,54,0.98), rgba(9,16,32,0.98));
+    border: 1.5px solid var(--gold); border-radius: 22px; padding: 22px 24px;
+    box-shadow: 0 28px 70px rgba(0,0,0,0.72);
+  }
+  .coach-phrase-stage {
+    text-align: center; padding: 22px 18px; border-radius: 16px; margin: 14px 0;
+    background: rgba(8,15,30,0.72); border: 1.5px solid rgba(228,188,105,0.45);
+  }
+  .coach-he { font-family: var(--hebrew); font-size: clamp(1.7rem, 3.6vw, 2.5rem); color: var(--gold); direction: rtl; line-height: 1.5; }
+  .coach-tr { font-size: clamp(1.05rem, 2vw, 1.32rem); color: #93c5fd; font-weight: 700; margin: 8px 0 4px; }
+  .coach-en { font-size: 0.96rem; color: var(--text); opacity: 0.92; }
+  .coach-turn-bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; margin-top: 14px; }
+  .coach-turn-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4ade80, #e4bc69); transition: width 0.12s linear; }
+  .tier-badge-scripture {
+    display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    background: rgba(228,188,105,0.18); border: 1px solid rgba(228,188,105,0.6); color: var(--gold);
+  }
+  .tier-badge-interp {
+    display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    background: rgba(92,182,229,0.16); border: 1px solid rgba(92,182,229,0.55); color: #93c5fd;
+  }
+  [data-theme="parchment"] .coach-card { background: linear-gradient(155deg, #fffdf7, #f4e8ce); color: #1d1710; }
+  [data-theme="parchment"] .coach-phrase-stage { background: #fbf4e4; }
+  [data-theme="parchment"] .coach-tr { color: #1d4e89; }
+  [data-theme="parchment"] .tier-badge-interp { color: #1d4e89; background: rgba(29,78,137,0.1); }
+  [data-theme="parchment"] .tefillin-ribbon-btn { background: #e0f2fe; color: #0c4a6e; border-color: #0284c7; }
 </style>
 </head>
 <body>
@@ -1840,7 +1896,10 @@
 
   <div class="celestial-ribbon" id="celestialRibbon" onclick="switchView('sky')" title="Click to open the Sacred Celestial, Sun, Moon & Jewish Calendar Observatory">
     <div class="cel-group" id="celRibbonLeft"><span class="muted">Calculating live Sun, Moon &amp; Hebrew Calendar...</span></div>
-    <div class="cel-group" id="celRibbonRight"></div>
+    <div class="cel-group" style="gap:10px;">
+      <button type="button" class="tefillin-ribbon-btn" id="hdrTefillinBtn" style="display:none;" onclick="event.stopPropagation(); openTefillinCoach();">🟦 Tefillin · Say With Me</button>
+      <div class="cel-group" id="celRibbonRight"></div>
+    </div>
   </div>
 
   <div class="mesh-incoming-bar" id="meshIncomingBar">
@@ -1888,6 +1947,19 @@
           <div id="dailyStreamList"></div>
         </div>
       </div>
+
+      <!-- VERIFIED SOURCE FOUNDATION PANEL: PRIMARY SCRIPTURE PARALLELS vs. CITED MULTI-LENS INTERPRETATIONS -->
+      <details class="card" id="foundationCard" style="margin-top:16px;margin-bottom:0;border-color:rgba(228,188,105,0.42);">
+        <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;list-style:none;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="tier-badge-scripture">📜 Verified Scripture Parallels</span>
+            <span class="tier-badge-interp">⚖️ Cited Talmud &amp; Multi-Lens Interpretations</span>
+            <strong style="font-family:var(--serif);color:var(--gold);font-size:1.0rem;" id="foundationSummaryTitle">Source Foundation Standard · Compare Verbatim Scripture &amp; Classical Views</strong>
+          </div>
+          <span class="muted" style="font-size:0.8rem;">Expand Sources &amp; Perspectives ▾</span>
+        </summary>
+        <div id="foundationPanelBody" style="margin-top:14px;" class="muted">Loading verified coinciding scripture &amp; cited interpretations...</div>
+      </details>
     </section>
 
     <!-- 0A. SACRED CELESTIAL, SUN, MOON & JEWISH YEAR OBSERVATORY -->
@@ -2528,6 +2600,37 @@
   </footer>
 </div>
 
+<!-- GUIDED TEFILLIN "SAY IT WITH ME" REPEAT-AFTER-ME COACH MODAL -->
+<div class="coach-backdrop" id="tefillinCoachModal" onclick="if(event.target===this) closeTefillinCoach()">
+  <div class="coach-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+      <div>
+        <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);" id="coachWindowLabel">🟦 GUIDED TEFILLIN · SAY IT WITH ME</div>
+        <h2 style="margin:3px 0 0;font-family:var(--serif);color:var(--gold);" id="coachStepTitle">Tallit &amp; Tefillin Companion</h2>
+      </div>
+      <button class="tool-btn" onclick="closeTefillinCoach()">✕ Close</button>
+    </div>
+    <div id="coachStepPills" style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;"></div>
+    <div id="coachCueBox" class="today-box" style="padding:10px 13px;font-size:0.86rem;margin-bottom:10px;"></div>
+    <div class="coach-phrase-stage">
+      <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:8px;" id="coachTurnStatus">Ready · Press Start to Hear Studio Hebrew &amp; Repeat Aloud</div>
+      <div class="coach-he" id="coachHe">שְׁמַע יִשְׂרָאֵל</div>
+      <div class="coach-tr" id="coachTr">Sh'ma Yis-ra-eil</div>
+      <div class="coach-en" id="coachEn">Hear, O Israel</div>
+      <div class="coach-turn-bar"><div class="coach-turn-fill" id="coachTurnFill"></div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
+      <button class="btn-primary" id="coachPlayBtn" onclick="toggleTefillinCoachPlay()">▶ Start Say-With-Me</button>
+      <button class="btn-secondary" onclick="repeatCurrentCoachPhrase()">🔁 Repeat Phrase</button>
+      <button class="btn-secondary" onclick="stepCoachPhrase(-1)">◀ Prev</button>
+      <button class="btn-secondary" onclick="stepCoachPhrase(1)">Next ▶</button>
+      <button class="btn-secondary" onclick="speakCoachEnglish()">🔊 Hear English</button>
+      <button class="tool-btn" id="coachPaceBtn" onclick="toggleCoachPace()">🐢 Slow Pace</button>
+    </div>
+    <div id="coachSourceFooter" class="muted" style="font-size:0.76rem;text-align:center;border-top:1px solid var(--border);padding-top:8px;"></div>
+  </div>
+</div>
+
 <!-- FULL-SCREEN SCANNABLE QR & SPONSORSHIP CALL-TO-ACTION MODAL -->
 <div class="give-modal-backdrop" id="giveModal" onclick="if(event.target===this) closeGiveModal()">
   <div class="give-modal-card sanctuary-reveal">
@@ -3058,6 +3161,7 @@ async function loadToday(dayIdx = null) {
 
   document.getElementById('streamTitle').textContent = `Parashat ${dailyData.parasha.en_name} · ${dailyData.aliyah_en}`;
   document.getElementById('streamSub').textContent = `${dailyData.date_str} · ${dailyData.aliyah_ref} (${dailyData.verses_count} verses + living show)`;
+  loadFoundationDossier(dailyData.parasha.slug || dailyData.parasha.en_name || '');
 
   // Render charming auto-introducing Cast, Angels & Friends strip at top of right panel!
   renderRightCastStrip(dailyData.show_extras && dailyData.show_extras.story_anatomy);
@@ -3355,8 +3459,90 @@ function _svgKidBody(cx, cy, scale = 1, tunic = '#2563eb', accent = '#fde047', d
   </g>`;
 }
 
-function renderIllustratedFigureSvg(role, name) {
+function detectCrowdSpec(name, introText = '') {
+  const txt = `${name || ''} ${introText || ''}`.toLowerCase();
+  const isArmy = /\b(army|armies|armed|soldiers|warriors|chariots|guards|troops|philistines|legion|phalanx|400 men|300 men)\b/.test(txt);
+  const isKids = /\b(children|kids|sons|daughters|12 tribes|twelve tribes|twelve sons|11 sons|brothers)\b/.test(txt);
+  const isNation = /\b(600,000|600000|multitude|nation|congregation|camp|70 souls|seventy|elders|israelites|host|crowd|swath|people)\b/.test(txt);
+  const numMatch = txt.match(/\b(\d{1,3}(?:,\d{3})+|\d{1,4})\b/);
+  let count = 0;
+  if (numMatch) count = parseInt(numMatch[1].replace(/,/g, ''), 10) || 0;
+  else if (txt.includes('twelve')) count = 12;
+  else if (txt.includes('fifteen')) count = 15;
+  else if (txt.includes('seventy')) count = 70;
+  else if (txt.includes('ten')) count = 10;
+  else if (txt.includes('four hundred')) count = 400;
+  else if (txt.includes('three hundred')) count = 300;
+
+  if (isArmy && (count >= 10 || txt.includes('army') || txt.includes('armed') || txt.includes('soldiers') || txt.includes('chariots'))) {
+    const label = count ? `⚔️ ${count.toLocaleString()} Armed Men` : '⚔️ Advancing Army';
+    return { kind: 'army', count: count || 100, label };
+  }
+  if (count >= 4 && count <= 24) {
+    const noun = isKids ? 'Children / Sons' : (txt.includes('spies') ? 'Spies' : (txt.includes('brothers') ? 'Brothers' : (txt.includes('elders') ? 'Elders' : 'People')));
+    return { kind: isKids ? 'kids_group' : 'group', count, label: `${isKids ? '👨‍👩‍👧‍👦' : '👥'} ${count} ${noun}` };
+  }
+  if (count > 24 || isNation) {
+    const label = count >= 1000 ? `✡ ${count.toLocaleString()}+ Nation` : (count ? `👥 ${count.toLocaleString()} Souls` : '👥 Community Camp');
+    return { kind: 'multitude', count: count || 70, label };
+  }
+  return null;
+}
+
+function _svgMiniSwathBackdrop(spec) {
+  if (!spec) return '';
+  const els = [];
+  if (spec.kind === 'army') {
+    // 3 receding perspective rows of miniature soldiers with helmets, shields & spears!
+    const rows = [
+      { y: 58, n: 11, s: 0.44, op: 0.42 },
+      { y: 74, n: 10, s: 0.56, op: 0.62 },
+      { y: 92, n: 9,  s: 0.68, op: 0.80 },
+    ];
+    rows.forEach((row, rIdx) => {
+      for (let i = 0; i < row.n; i++) {
+        const x = 16 + (i * (188 / Math.max(1, row.n - 1))) + (rIdx % 2 ? 5 : 0);
+        els.push(`<g transform="translate(${x.toFixed(1)},${row.y}) scale(${row.s})" opacity="${row.op}">
+          <line x1="7" y1="-18" x2="7" y2="14" stroke="#cbd5e1" stroke-width="1.6"/>
+          <polygon points="7,-22 5,-16 9,-16" fill="#fde68a"/>
+          <circle cx="0" cy="-8" r="5" fill="#d97706" stroke="#fde68a" stroke-width="0.9"/>
+          <path d="M-6 0 C-6 -3,6 -3,6 0 L8 14 L-8 14 Z" fill="#991b1b" stroke="#f59e0b" stroke-width="0.8"/>
+          <ellipse cx="-5" cy="6" rx="3.4" ry="5" fill="#b45309" stroke="#fde68a" stroke-width="0.8"/>
+        </g>`);
+      }
+    });
+  } else {
+    // Exact countable tiny little people (when count <= 24, e.g. 15 people or 12 kids!) or panoramic multitude swath
+    const drawCount = spec.kind === 'multitude' ? 30 : Math.max(4, Math.min(24, spec.count));
+    const palette = ['#2563eb','#0f766e','#b45309','#6d28d9','#0369a1','#be185d','#15803d','#ca8a04'];
+    const cols = drawCount <= 8 ? drawCount : (drawCount <= 16 ? Math.ceil(drawCount / 2) : Math.ceil(drawCount / 3));
+    const rows = Math.ceil(drawCount / cols);
+    let idx = 0;
+    for (let r = 0; r < rows; r++) {
+      const inRow = Math.min(cols, drawCount - idx);
+      const y = 58 + r * 20;
+      const sc = 0.52 + r * 0.11;
+      const op = 0.55 + r * 0.16;
+      const span = Math.min(184, inRow * 18);
+      const startX = 110 - span / 2;
+      for (let c = 0; c < inRow; c++) {
+        const x = inRow === 1 ? 110 : startX + (c * span) / (inRow - 1);
+        const col = palette[(idx + r) % palette.length];
+        els.push(`<g transform="translate(${x.toFixed(1)},${y}) scale(${sc.toFixed(2)})" opacity="${Math.min(0.95, op).toFixed(2)}">
+          <circle cx="0" cy="-7" r="4.6" fill="#f5d0a9"/>
+          <path d="M-5.5 -1 C-5.5 -3.5,5.5 -3.5,5.5 -1 L7 13 L-7 13 Z" fill="${col}" stroke="#fde68a" stroke-width="0.7"/>
+        </g>`);
+        idx++;
+      }
+    }
+  }
+  return els.join('');
+}
+
+function renderIllustratedFigureSvg(role, name, introText = '') {
   const n = String(name || '').toLowerCase();
+  const crowd = detectCrowdSpec(name, introText);
+  const crowdBg = _svgMiniSwathBackdrop(crowd);
   const isPluralAngels = (role === 'angel' || n.includes('angel') || n.includes('malach') || n.includes('cherub')) && (n.includes('angels') || n.includes('three') || n.includes('mahanaim') || n.includes('ladder') || n.includes('cherubim') || n.includes('host'));
   const hasKids = n.includes('children') || n.includes('child') || n.includes('12') || n.includes('tribes') || n.includes('family') || n.includes('kids') || n.includes('benjamin') || n.includes('isaac');
   const isEsauAndAngel = n.includes('esau') && n.includes('angel');
@@ -3369,22 +3555,32 @@ function renderIllustratedFigureSvg(role, name) {
         <radialGradient id="angAura_m" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.82"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.25"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
         <linearGradient id="angRobe_m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
       </defs>
+      ${crowdBg}
       ${_svgAngelBody(46, 80, 0.68, 'm', 0.5)}
       ${_svgAngelBody(174, 80, 0.68, 'm', 1.1)}
       ${_svgAngelBody(110, 74, 0.94, 'm', 0)}
     </svg>`;
   }
 
-  // 2. Esau & the Night Angel standing face-to-face!
+  // 2. Esau & the Night Angel (with Esau's advancing 400 armed men swath behind them!)
   if (isEsauAndAngel) {
     return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
       <defs>
         <radialGradient id="angAura_ea" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.8"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.24"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
         <linearGradient id="angRobe_ea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
       </defs>
-      ${_svgAntagonistBody(66, 78, 0.88)}
-      ${_svgAngelBody(154, 74, 0.84, 'ea', 0.3)}
+      ${crowdBg}
+      ${_svgAntagonistBody(64, 82, 0.86)}
+      ${_svgAngelBody(156, 76, 0.82, 'ea', 0.3)}
     </svg>`;
+  }
+
+  // 2B. Standalone Army, Crowd, or Countable Swath of Little People (e.g. 15 people, 70 elders, 300 warriors, 600,000 nation!)
+  if (crowd && !hasKids && !isDuo) {
+    const lead = role === 'antagonist'
+      ? _svgAntagonistBody(110, 86, 0.82)
+      : _svgHeroBody(110, 86, 0.82, '#1e40af', '#172554', true);
+    return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">${crowdBg}${lead}</svg>`;
   }
 
   // 3. Family & Little Kid Characters (e.g. Rachel, Leah & 12 Children / Questioning Child / Abraham, Sarah & Isaac)
@@ -3396,10 +3592,11 @@ function renderIllustratedFigureSvg(role, name) {
       </svg>`;
     }
     const leftAdult = (n.includes('abraham') || n.includes('noah') || n.includes('judah'))
-      ? _svgHeroBody(52, 76, 0.82, '#1e40af', '#172554', false)
-      : _svgMatriarchBody(50, 76, 0.82, '#0f766e', '#4ade80', false);
-    const rightAdult = _svgMatriarchBody(168, 76, 0.82, '#6d28d9', '#e4bc69', false);
+      ? _svgHeroBody(42, 82, 0.78, '#1e40af', '#172554', false)
+      : _svgMatriarchBody(40, 82, 0.78, '#0f766e', '#4ade80', false);
+    const rightAdult = _svgMatriarchBody(180, 82, 0.78, '#6d28d9', '#e4bc69', false);
     return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+      ${crowdBg}
       ${leftAdult}
       ${rightAdult}
       ${_svgKidBody(94, 96, 0.88, '#2563eb', '#fde047', 0)}
@@ -3706,11 +3903,13 @@ function pickCharacterChoreo(side, role, step) {
 function mountMarginCharacter(host, item, side, awareText, choreo) {
   if (!host || !item) return;
   const introShort = (item.intro || '').length > 120 ? item.intro.slice(0, 117).trim() + '...' : (item.intro || '');
+  const crowd = detectCrowdSpec(item.name, item.intro);
   const html = `
     <div class="walker-wrap ${choreo.enter}">
       ${choreo.poof ? '<div class="poof-ring"></div>' : ''}
       ${awareText ? `<div class="walker-aware-pill">${esc(awareText)}</div>` : ''}
-      ${renderIllustratedFigureSvg(item.role, item.name)}
+      ${crowd ? `<div class="crowd-scale-pill">${esc(crowd.label)}</div>` : ''}
+      ${renderIllustratedFigureSvg(item.role, item.name, item.intro)}
       <div class="walker-card role-${esc(item.role)}">
         <div class="walker-role-tag"><span>${esc(item.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(item.he || '')}</span></div>
         <div class="walker-name">${side === 'left' ? '👋 ' : ''}${esc(item.name)}</div>
@@ -4198,12 +4397,13 @@ let lastAskWasVoice = false;
 
 function stopSpeaking() {
   ttsQueueId++;
+  if (typeof stopSacredSong === 'function') stopSacredSong();
   if (ttsAudio) {
     try { ttsAudio.pause(); ttsAudio.currentTime = 0; } catch (e) {}
     ttsAudio = null;
   }
   const btn = document.getElementById('stopSpeakBtn');
-  if (btn) btn.style.display = 'none';
+  if (btn) { btn.style.display = 'none'; btn.textContent = '⏹ Stop Voice'; }
 }
 
 function splitSpeechChunks(text) {
@@ -4224,34 +4424,35 @@ function splitSpeechChunks(text) {
   return chunks;
 }
 
-async function fetchTtsUrl(chunkText, profile) {
+async function fetchTtsUrl(chunkText, profile, lang = 'auto', pace = 'normal') {
   const r = await fetch('/api/tts', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ text: chunkText, profile: profile || currentVoiceProfile })
+    body: JSON.stringify({ text: chunkText, profile: profile || currentVoiceProfile, lang, pace })
   });
   if (!r.ok) throw new Error('TTS HTTP ' + r.status);
   const blob = await r.blob();
   return URL.createObjectURL(blob);
 }
 
-async function speakText(text, profileOverride = null) {
+async function speakText(text, profileOverride = null, lang = 'auto', pace = 'normal') {
   stopSpeaking();
+  stopSacredSong();
   const myId = ++ttsQueueId;
   const chunks = splitSpeechChunks(text);
   if (!chunks.length) return;
-  const prof = profileOverride || currentVoiceProfile;
+  const prof = profileOverride || (lang === 'he' ? 'hebrew_cantor' : currentVoiceProfile);
   const stopBtn = document.getElementById('stopSpeakBtn');
   if (stopBtn) stopBtn.style.display = 'inline-block';
 
   try {
-    let nextPromise = fetchTtsUrl(chunks[0], prof);
+    let nextPromise = fetchTtsUrl(chunks[0], prof, lang, pace);
     for (let i = 0; i < chunks.length; i++) {
       if (myId !== ttsQueueId) break;
       const audioUrl = await nextPromise;
       if (myId !== ttsQueueId) { URL.revokeObjectURL(audioUrl); break; }
       if (i + 1 < chunks.length) {
-        nextPromise = fetchTtsUrl(chunks[i + 1], prof);
+        nextPromise = fetchTtsUrl(chunks[i + 1], prof, lang, pace);
       }
       await new Promise((resolve) => {
         ttsAudio = new Audio(audioUrl);
@@ -4262,6 +4463,10 @@ async function speakText(text, profileOverride = null) {
     }
   } catch (e) {}
   if (myId === ttsQueueId && stopBtn) stopBtn.style.display = 'none';
+}
+
+function speakHebrew(text, pace = 'normal') {
+  return speakText(text, 'hebrew_cantor', 'he', pace);
 }
 
 function testNarratorVoice() {
@@ -5607,7 +5812,10 @@ function renderLiturgyTefillin(lit) {
           <h3 style="margin:4px 0;font-family:var(--serif);font-size:1.45rem;color:#fff;">${esc(ov.title || '')} · <span style="font-family:var(--hebrew);color:var(--gold);">${esc(ov.he_title || '')}</span></h3>
           <div class="muted" style="font-size:0.88rem;">${esc(ls.detail || '')}</div>
         </div>
-        <button class="btn-secondary" onclick="quickAsk('Explain the deeper meaning, laws, and archaeology of Tallit and Tefillin (Deuteronomy 6:8, Qumran scrolls) in today\\'s terms.', 'scholar')">🤖 Ask AI Deeper</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="openTefillinCoach()">🟦 Say It With Me (Hebrew Coach)</button>
+          <button class="btn-secondary" onclick="quickAsk('Explain the deeper meaning, laws, and archaeology of Tallit and Tefillin (Deuteronomy 6:8, Qumran scrolls) citing both Primary Scripture and differing rabbinic interpretations.', 'scholar')">🤖 Ask AI Deeper</button>
+        </div>
       </div>
       <div class="today-box" style="margin-top:12px;padding:12px 14px;">
         <h4 style="margin-bottom:4px;font-size:0.92rem;">✨ Meaning &amp; 2,000-Year Archaeological Continuity</h4>
@@ -5622,9 +5830,10 @@ function renderLiturgyTefillin(lit) {
             <span class="trait-pill" style="margin-right:6px;">STEP ${esc(st.step)}</span>
             <strong style="font-family:var(--serif);font-size:1.12rem;color:#fff;">${esc(st.title)}</strong>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(st.he_title)}</span>
-            <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(st.title + '. ' + st.english)}">🔊 Hear</button>
+            <button class="btn-primary" style="padding:4px 10px;font-size:0.76rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(st.hebrew)}">🔊 Hebrew</button>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:0.76rem;" onclick="speakText(this.dataset.txt, null, 'en')" data-txt="${esc(st.title + '. ' + st.english)}">🔊 English</button>
           </div>
         </div>
         <div class="muted" style="font-size:0.8rem;margin-top:4px;">⏰ ${esc(st.when)}</div>
@@ -5655,9 +5864,12 @@ function renderLiturgyMeals(lit) {
       <div class="cards-grid">
         ${before.map(b => `
           <div class="blessing-card" style="margin:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
               <strong style="color:#fff;font-size:1.02rem;">${esc(b.emoji)} ${esc(b.name)}</strong>
-              <button class="btn-secondary" style="padding:3px 9px;font-size:0.76rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(b.name + '. ' + b.english)}">🔊</button>
+              <div style="display:flex;gap:5px;">
+                <button class="btn-primary" style="padding:3px 8px;font-size:0.74rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(b.hebrew)}">🔊 He</button>
+                <button class="btn-secondary" style="padding:3px 8px;font-size:0.74rem;" onclick="speakText(this.dataset.txt, null, 'en')" data-txt="${esc(b.name + '. ' + b.english)}">🔊 En</button>
+              </div>
             </div>
             <div class="muted" style="font-size:0.8rem;margin-top:3px;">${esc(b.for_foods)}</div>
             <div class="b-he" style="font-size:1.22rem;">${esc(b.hebrew)}</div>
@@ -5706,18 +5918,24 @@ function renderLiturgySongs(lit) {
   const host = document.getElementById('ltab-songs');
   if (!host) return;
   const songs = lit.songs || [];
+  window._sacredSongsMap = {};
+  songs.forEach(sg => { window._sacredSongsMap[sg.slug] = sg; });
   host.innerHTML = `
     <div class="cards-grid">
       ${songs.map(sg => `
         <div class="song-card" style="margin:0;display:flex;flex-direction:column;">
           ${renderLivingScene(sg.art, '145px', '', '', 'margin-bottom:10px;')}
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
             <span class="trait-pill">${esc(sg.occasion)}</span>
-            <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(sg.title + '. ' + sg.english + ' ' + sg.story)}">🔊 Hear Lyrics</button>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button class="btn-primary" style="padding:4px 9px;font-size:0.75rem;" onclick="singSacredSong('${esc(sg.slug)}')">🎵 Sing</button>
+              <button class="btn-secondary" style="padding:4px 9px;font-size:0.75rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(sg.hebrew)}">🔊 Hebrew</button>
+              <button class="btn-secondary" style="padding:4px 9px;font-size:0.75rem;" onclick="speakText(this.dataset.txt, null, 'en')" data-txt="${esc(sg.title + '. ' + sg.english + ' ' + sg.story)}">🔊 English</button>
+            </div>
           </div>
           <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.35rem;margin-top:6px;">${esc(sg.he_title)}</div>
           <h3 style="margin:2px 0 4px;font-family:var(--serif);color:#fff;font-size:1.12rem;">${esc(sg.title)}</h3>
-          <div class="muted" style="font-size:0.78rem;margin-bottom:6px;">✍ ${esc(sg.composer)}</div>
+          <div class="muted" style="font-size:0.78rem;margin-bottom:6px;">✍ ${esc(sg.composer)}${sg.melody && sg.melody.mode ? ' · 🎼 ' + esc(sg.melody.mode) : ''}</div>
           <div class="b-he" style="font-size:1.18rem;margin:4px 0;">${esc(sg.hebrew)}</div>
           <div class="b-tr" style="font-size:0.84rem;">${esc(sg.translit)}</div>
           <div class="b-en" style="font-size:0.88rem;margin-bottom:8px;">${esc(sg.english)}</div>
@@ -6558,6 +6776,309 @@ async function dismissMeshIncoming() {
   if (bar) bar.classList.remove('show');
 }
 
+// =============================================================================
+// POLYPHONIC SACRED SONG SYNTHESIZER + GUIDED TEFILLIN "SAY WITH ME" + SOURCE FOUNDATION
+// =============================================================================
+let songAudioCtx = null;
+let songStopTimer = null;
+
+function stopSacredSong() {
+  if (songStopTimer) { clearTimeout(songStopTimer); songStopTimer = null; }
+  if (songAudioCtx) {
+    try { songAudioCtx.close(); } catch (e) {}
+    songAudioCtx = null;
+  }
+}
+
+const NOTE_FREQS = {
+  'C4':261.63,'C#4':277.18,'D4':293.66,'Eb4':311.13,'E4':329.63,'F4':349.23,'F#4':369.99,
+  'G4':392.00,'G#4':415.30,'A4':440.00,'Bb4':466.16,'B4':493.88,
+  'C5':523.25,'C#5':554.37,'D5':587.33,'Eb5':622.25,'E5':659.25,'F5':698.46,'G5':783.99,
+};
+
+function singSacredSong(slug) {
+  stopSpeaking();
+  stopSacredSong();
+  const sg = (window._sacredSongsMap || {})[slug];
+  if (!sg || !sg.melody || !(sg.melody.notes || []).length) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  songAudioCtx = new AC();
+  const ctx = songAudioCtx;
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.24, ctx.currentTime);
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(2100, ctx.currentTime);
+  master.connect(filter);
+  filter.connect(ctx.destination);
+
+  const stopBtn = document.getElementById('stopSpeakBtn');
+  if (stopBtn) { stopBtn.style.display = 'inline-block'; stopBtn.textContent = '⏹ Stop Song'; }
+
+  const secPerBeat = 60 / (sg.melody.bpm || 100);
+  let t = ctx.currentTime + 0.08;
+  for (const [note, beats] of sg.melody.notes) {
+    const freq = NOTE_FREQS[note] || 329.63;
+    const dur = Math.max(0.2, beats * secPerBeat);
+
+    // Warm Cantor / Choir lead voice (detuned warm triangle + sine octave harmonic)
+    const o1 = ctx.createOscillator();
+    const o2 = ctx.createOscillator();
+    const g = ctx.createGain();
+    o1.type = 'triangle';
+    o2.type = 'sine';
+    o1.frequency.setValueAtTime(freq, t);
+    o2.frequency.setValueAtTime(freq * 1.003, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.32, t + 0.045);
+    g.gain.exponentialRampToValueAtTime(0.18, t + dur * 0.72);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.14);
+    o1.connect(g); o2.connect(g); g.connect(master);
+    o1.start(t); o2.start(t);
+    o1.stop(t + dur + 0.16); o2.stop(t + dur + 0.16);
+
+    // Warm plucked Harp bass harmony one octave below on strong beats
+    if (beats >= 1) {
+      const ob = ctx.createOscillator();
+      const gb = ctx.createGain();
+      ob.type = 'sine';
+      ob.frequency.setValueAtTime(freq * 0.5, t);
+      gb.gain.setValueAtTime(0.0001, t);
+      gb.gain.exponentialRampToValueAtTime(0.16, t + 0.025);
+      gb.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.28);
+      ob.connect(gb); gb.connect(master);
+      ob.start(t); ob.stop(t + dur + 0.30);
+    }
+    t += dur;
+  }
+  const totalMs = Math.ceil((t - ctx.currentTime + 0.5) * 1000);
+  songStopTimer = setTimeout(() => {
+    stopSacredSong();
+    if (stopBtn) { stopBtn.style.display = 'none'; stopBtn.textContent = '⏹ Stop Voice'; }
+  }, totalMs);
+}
+
+// Guided Tefillin "Say It With Me" Repeat-After-Me Coach
+let tefillinDeckCache = [];
+let tefillinWindowCache = null;
+let coachStepIdx = 0;
+let coachPhraseIdx = 0;
+let coachRunning = false;
+let coachSlowPace = true;
+let coachRunToken = 0;
+
+async function syncTefillinQuickTrigger() {
+  try {
+    const r = await fetch('/api/liturgy/today');
+    const d = await r.json();
+    const tf = d.tefillin || {};
+    tefillinDeckCache = tf.say_with_me || [];
+    tefillinWindowCache = tf.live_status || null;
+    const btn = document.getElementById('hdrTefillinBtn');
+    if (btn && tefillinWindowCache) {
+      if (!tefillinWindowCache.wear_today) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'inline-flex';
+        btn.classList.toggle('active-window', !!tefillinWindowCache.active_now);
+        btn.textContent = tefillinWindowCache.short_cta || '🟦 Tefillin · Say With Me';
+      }
+    }
+  } catch (e) {}
+}
+
+async function openTefillinCoach() {
+  if (!tefillinDeckCache.length) await syncTefillinQuickTrigger();
+  const modal = document.getElementById('tefillinCoachModal');
+  if (!modal || !tefillinDeckCache.length) return;
+  coachRunning = false;
+  coachRunToken++;
+  coachStepIdx = 0;
+  coachPhraseIdx = 0;
+  modal.classList.add('open');
+  renderCoachUi();
+}
+
+function closeTefillinCoach() {
+  coachRunning = false;
+  coachRunToken++;
+  stopSpeaking();
+  const modal = document.getElementById('tefillinCoachModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function renderCoachUi() {
+  const st = tefillinDeckCache[coachStepIdx];
+  if (!st) return;
+  const ph = st.phrases[coachPhraseIdx] || st.phrases[0];
+  const win = tefillinWindowCache || {};
+  document.getElementById('coachWindowLabel').textContent = win.short_cta || '🟦 GUIDED TEFILLIN · SAY IT WITH ME';
+  document.getElementById('coachStepTitle').textContent = `Step ${st.step} of ${tefillinDeckCache.length}: ${st.title}`;
+  document.getElementById('coachCueBox').innerHTML = `<strong>Guidance:</strong> ${esc(st.cue)}`;
+  document.getElementById('coachHe').textContent = ph.he;
+  document.getElementById('coachTr').textContent = ph.translit;
+  document.getElementById('coachEn').textContent = ph.en;
+  document.getElementById('coachSourceFooter').textContent = `📜 Source Standard: ${st.source}`;
+  document.getElementById('coachPlayBtn').textContent = coachRunning ? '⏸ Pause Coach' : '▶ Start Say-With-Me';
+  document.getElementById('coachPaceBtn').textContent = coachSlowPace ? '🐢 Slow Pace' : '🐇 Normal Pace';
+  document.getElementById('coachStepPills').innerHTML = tefillinDeckCache.map((s, idx) =>
+    `<button class="ch-pill ${idx === coachStepIdx ? 'active' : ''}" onclick="selectCoachStep(${idx})">${s.step}. ${esc(s.title.split('(')[0].trim())}</button>`
+  ).join('');
+}
+
+function selectCoachStep(idx) {
+  coachStepIdx = Math.max(0, Math.min(idx, tefillinDeckCache.length - 1));
+  coachPhraseIdx = 0;
+  document.getElementById('coachTurnFill').style.width = '0%';
+  document.getElementById('coachTurnStatus').textContent = 'Ready · Press Start to Hear Studio Hebrew & Repeat Aloud';
+  renderCoachUi();
+  if (coachRunning) runCoachLoop(++coachRunToken);
+}
+
+function toggleCoachPace() {
+  coachSlowPace = !coachSlowPace;
+  renderCoachUi();
+}
+
+function stepCoachPhrase(delta) {
+  const st = tefillinDeckCache[coachStepIdx];
+  if (!st) return;
+  coachPhraseIdx += delta;
+  if (coachPhraseIdx < 0) {
+    if (coachStepIdx > 0) { coachStepIdx--; coachPhraseIdx = tefillinDeckCache[coachStepIdx].phrases.length - 1; }
+    else coachPhraseIdx = 0;
+  } else if (coachPhraseIdx >= st.phrases.length) {
+    if (coachStepIdx + 1 < tefillinDeckCache.length) { coachStepIdx++; coachPhraseIdx = 0; }
+    else coachPhraseIdx = st.phrases.length - 1;
+  }
+  document.getElementById('coachTurnFill').style.width = '0%';
+  renderCoachUi();
+  if (coachRunning) runCoachLoop(++coachRunToken);
+}
+
+function repeatCurrentCoachPhrase() {
+  const st = tefillinDeckCache[coachStepIdx];
+  if (!st) return;
+  const ph = st.phrases[coachPhraseIdx];
+  if (!ph) return;
+  document.getElementById('coachTurnStatus').textContent = '🔊 Listening to Studio Hebrew...';
+  speakHebrew(ph.he, coachSlowPace ? 'slow' : 'normal').then(() => {
+    document.getElementById('coachTurnStatus').textContent = '🎙 Your Turn — Repeat Aloud!';
+  });
+}
+
+function speakCoachEnglish() {
+  const st = tefillinDeckCache[coachStepIdx];
+  if (!st) return;
+  const ph = st.phrases[coachPhraseIdx];
+  if (ph) speakText(ph.en, null, 'en', 'normal');
+}
+
+function toggleTefillinCoachPlay() {
+  coachRunning = !coachRunning;
+  renderCoachUi();
+  if (coachRunning) {
+    runCoachLoop(++coachRunToken);
+  } else {
+    coachRunToken++;
+    stopSpeaking();
+    document.getElementById('coachTurnStatus').textContent = 'Paused — press Start anytime to continue';
+  }
+}
+
+async function runCoachLoop(token) {
+  while (coachRunning && token === coachRunToken) {
+    const st = tefillinDeckCache[coachStepIdx];
+    if (!st) break;
+    const ph = st.phrases[coachPhraseIdx];
+    if (!ph) break;
+    renderCoachUi();
+    const statusEl = document.getElementById('coachTurnStatus');
+    const fillEl = document.getElementById('coachTurnFill');
+    if (statusEl) statusEl.textContent = '🔊 Listen Carefully (Studio Hebrew)...';
+    if (fillEl) fillEl.style.width = '0%';
+
+    await speakHebrew(ph.he, coachSlowPace ? 'slow' : 'normal');
+    if (!coachRunning || token !== coachRunToken) break;
+
+    if (statusEl) statusEl.textContent = '🎙 YOUR TURN — Repeat Aloud Now...';
+    const pauseMs = Math.round((ph.pause_ms || 3000) * (coachSlowPace ? 1.15 : 0.9));
+    const started = Date.now();
+    while (coachRunning && token === coachRunToken && (Date.now() - started) < pauseMs) {
+      const pct = Math.min(100, ((Date.now() - started) / pauseMs) * 100);
+      if (fillEl) fillEl.style.width = pct.toFixed(1) + '%';
+      await new Promise(r => setTimeout(r, 80));
+    }
+    if (!coachRunning || token !== coachRunToken) break;
+    if (fillEl) fillEl.style.width = '100%';
+
+    if (coachPhraseIdx + 1 < st.phrases.length) {
+      coachPhraseIdx++;
+    } else if (coachStepIdx + 1 < tefillinDeckCache.length) {
+      coachStepIdx++;
+      coachPhraseIdx = 0;
+    } else {
+      coachRunning = false;
+      if (statusEl) statusEl.textContent = '✨ Yasher Koach! Complete Tefillin & Shema Recited!';
+      renderCoachUi();
+      break;
+    }
+  }
+}
+
+// Verified Source Foundation Dossier Renderer (Tier 1 Primary Scripture Parallels vs. Tier 2 Multi-Lens Talmud & Sages)
+async function loadFoundationDossier(parashaSlug = '') {
+  try {
+    const r = await fetch('/api/foundation?parasha=' + encodeURIComponent(parashaSlug || ''));
+    const d = await r.json();
+    const titleEl = document.getElementById('foundationSummaryTitle');
+    if (titleEl && d.topic) titleEl.textContent = d.topic;
+    const body = document.getElementById('foundationPanelBody');
+    if (!body) return;
+    body.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;">
+        <div class="settings-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span class="tier-badge-scripture">📜 TIER 1 · PRIMARY VERIFIED SCRIPTURE PARALLELS</span>
+            <span class="muted" style="font-size:0.74rem;">Hydrated verbatim from local Tanakh DB</span>
+          </div>
+          ${(d.coinciding_scripture || []).map(p => `
+            <div style="padding:10px 12px;border-radius:10px;background:rgba(228,188,105,0.07);border:1px solid rgba(228,188,105,0.28);">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                <strong style="color:var(--gold);font-size:0.86rem;">${esc(p.ref)} (${esc(p.he_book)})</strong>
+                <div style="display:flex;gap:4px;">
+                  <button class="btn-secondary" style="padding:2px 7px;font-size:0.7rem;" onclick="speakHebrew(this.dataset.he)" data-he="${esc(p.he_text)}">🔊 He</button>
+                  <button class="btn-secondary" style="padding:2px 7px;font-size:0.7rem;" onclick="speakText(this.dataset.en, null, 'en')" data-en="${esc(p.en_text)}">🔊 En</button>
+                </div>
+              </div>
+              <div style="font-family:var(--hebrew);direction:rtl;color:var(--gold);font-size:1.08rem;margin:4px 0;">${esc(p.he_text)}</div>
+              <div style="font-size:0.86rem;line-height:1.45;">"${esc(p.en_text)}"</div>
+              <div class="muted" style="font-size:0.76rem;margin-top:4px;">✦ ${esc(p.relation)}</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="settings-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span class="tier-badge-interp">⚖️ TIER 2 · CITED INTERPRETATIONS (NON-EXCLUSIVE)</span>
+            <span class="muted" style="font-size:0.74rem;">Talmud &amp; Sages — multiple lenses compared</span>
+          </div>
+          ${(d.interpretations || []).map(it => `
+            <div style="padding:10px 12px;border-radius:10px;background:rgba(92,182,229,0.07);border:1px solid rgba(92,182,229,0.3);">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+                <strong style="color:var(--accent);font-size:0.86rem;">${esc(it.source)}</strong>
+                <span class="trait-pill" style="font-size:0.68rem;">${esc(it.lens)}</span>
+              </div>
+              <div style="font-size:0.85rem;line-height:1.45;margin-bottom:6px;">${esc(it.position)}</div>
+              <div style="font-size:0.8rem;line-height:1.4;padding-left:9px;border-left:2px solid var(--gold);color:var(--text-muted);">
+                <strong style="color:var(--gold);">Alternative / Differing Lens:</strong> ${esc(it.counter_or_other_lens)}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } catch (e) {}
+}
+
 let _lastQrGiveUrl = '';
 async function syncAlwaysOnQr() {
   try {
@@ -6587,6 +7108,7 @@ loadCelestial();
 loadToday();
 pollMeshIncoming();
 syncAlwaysOnQr();
+syncTefillinQuickTrigger();
 setTimeout(syncAlwaysOnQr, 5000);
 setTimeout(syncAlwaysOnQr, 14000);
 try {

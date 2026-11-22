@@ -203,6 +203,23 @@ class TestDatabaseAndRAG(unittest.TestCase):
         self.assertGreaterEqual(len(lit["before_meal_blessings"]), 7)
         self.assertGreaterEqual(len(lit["after_meal_blessings"]["birkat_hamazon"]["sections"]), 6)
         self.assertGreaterEqual(len(lit["songs"]), 11)
+        self.assertIn("say_with_me", lit["tefillin"])
+        self.assertGreaterEqual(len(lit["tefillin"]["say_with_me"]), 5)
+        self.assertIn("melody", lit["songs"][0])
+
+    def test_scripture_foundation_and_studio_voice(self):
+        import scripture_foundation
+        import voice_engine
+        f = scripture_foundation.get_foundation_dossier(parasha_slug="vayishlach")
+        self.assertGreaterEqual(len(f["coinciding_scripture"]), 2)
+        self.assertTrue(all(p["verified_from_db"] for p in f["coinciding_scripture"]))
+        self.assertGreaterEqual(len(f["interpretations"]), 2)
+        for it in f["interpretations"]:
+            self.assertEqual(it["tier"], "CITED_INTERPRETATION")
+            self.assertTrue(bool(it.get("counter_or_other_lens")))
+        self.assertEqual(voice_engine.detect_language("שְׁמַע יִשְׂרָאֵל", "auto"), "he")
+        self.assertEqual(voice_engine.detect_language("In the beginning", "auto"), "en")
+        self.assertIn("אֲדֹנָי", voice_engine.clean_for_speech("בָּרוּךְ אַתָּה ה׳", lang="he"))
 
         ps23 = sacred_liturgy.get_psalm_chapter(23)
         self.assertEqual(ps23["chapter"], 23)
@@ -253,6 +270,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/liturgy/today",
             "/api/liturgy/psalm?chapter=24",
             "/api/holidays",
+            "/api/foundation?parasha=vayishlach",
             "/api/shul/events",
             "/api/shul/mailing",
             "/api/scribe/status",

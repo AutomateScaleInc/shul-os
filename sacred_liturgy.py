@@ -737,6 +737,143 @@ HEBREW_MONTH_CHRONICLES = {
 }
 
 
+TEFILLIN_SAY_WITH_ME = [
+    {
+        "step": 1,
+        "title": "Tallit Blessing (Optional — Before Tefillin)",
+        "cue": "Stand, hold the Tallit open, inspect the fringes (Tzitzit), and recite before wrapping around your shoulders.",
+        "source": "Numbers 15:38–39 (Primary Scripture) · Talmud Bavli, Menachot 43a (Cited Halachic Tradition)",
+        "phrases": [
+            {"he": "בָּרוּךְ אַתָּה אֲדֹנָי", "translit": "Ba-ruch a-tah A-do-nai", "en": "Blessed are You, Lord", "pause_ms": 2800},
+            {"he": "אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "translit": "E-lo-hei-nu Me-lech ha-o-lam", "en": "our God, King of the universe", "pause_ms": 3000},
+            {"he": "אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו", "translit": "a-sher kid-sha-nu b'mitz-vo-tav", "en": "Who has sanctified us with His commandments", "pause_ms": 3200},
+            {"he": "וְצִוָּנוּ לְהִתְעַטֵּף בַּצִּיצִת", "translit": "v'tzi-va-nu l'hit-a-teif ba-tzi-tzit", "en": "and commanded us to wrap ourselves in Tzitzit.", "pause_ms": 3200},
+        ],
+    },
+    {
+        "step": 2,
+        "title": "Arm Tefillin (Shel Yad)",
+        "cue": "Place the Arm Tefillin box on your weaker bicep angled slightly toward your heart. Say the blessing BEFORE tightening the knot, then wrap 7 times down the forearm.",
+        "source": "Deuteronomy 6:8 & Exodus 13:9 (Primary Scripture) · Talmud Bavli, Menachot 36a (Cited Tradition)",
+        "phrases": [
+            {"he": "בָּרוּךְ אַתָּה אֲדֹנָי", "translit": "Ba-ruch a-tah A-do-nai", "en": "Blessed are You, Lord", "pause_ms": 2800},
+            {"he": "אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "translit": "E-lo-hei-nu Me-lech ha-o-lam", "en": "our God, King of the universe", "pause_ms": 3000},
+            {"he": "אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו", "translit": "a-sher kid-sha-nu b'mitz-vo-tav", "en": "Who has sanctified us with His commandments", "pause_ms": 3200},
+            {"he": "וְצִוָּנוּ לְהָנִיחַ תְּפִלִּין", "translit": "v'tzi-va-nu l'ha-ni-ach t'fi-lin", "en": "and commanded us to put on Tefillin.", "pause_ms": 3400},
+        ],
+    },
+    {
+        "step": 3,
+        "title": "Head Tefillin (Shel Rosh)",
+        "cue": "Without talking between arm and head, center the Head Tefillin above your hairline aligned between your eyes (knot at the base of the skull). Ashkenazi custom adds the second blessing + Baruch Shem.",
+        "source": "Deuteronomy 6:8 (Primary Scripture) · Talmud Bavli, Menachot 36a (Ashkenazi vs. Sephardi customs noted)",
+        "phrases": [
+            {"he": "בָּרוּךְ אַתָּה אֲדֹנָי אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם", "translit": "Ba-ruch a-tah A-do-nai E-lo-hei-nu Me-lech ha-o-lam", "en": "Blessed are You, Lord our God, King of the universe", "pause_ms": 3400},
+            {"he": "אֲשֶׁר קִדְּשָׁנוּ בְּמִצְוֹתָיו", "translit": "a-sher kid-sha-nu b'mitz-vo-tav", "en": "Who has sanctified us with His commandments", "pause_ms": 3000},
+            {"he": "וְצִוָּנוּ עַל מִצְוַת תְּפִלִּין", "translit": "v'tzi-va-nu al mitz-vat t'fi-lin", "en": "and commanded us concerning the mitzvah of Tefillin.", "pause_ms": 3400},
+            {"he": "בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ לְעוֹלָם וָעֶד", "translit": "Ba-ruch shem k'vod mal-chu-to l'o-lam va-ed", "en": "Blessed is the name of His glorious kingdom forever and ever.", "pause_ms": 3600},
+        ],
+    },
+    {
+        "step": 4,
+        "title": "Wrapping the Fingers — Hosea 2:21–22",
+        "cue": "Wrap the remaining strap 3 times around your middle finger (like a covenant ring) while reciting the prophet Hosea's vows of faithfulness.",
+        "source": "Hosea 2:21–22 (Primary Verified Prophetic Scripture)",
+        "phrases": [
+            {"he": "וְאֵרַשְׂתִּיךְ לִי לְעוֹלָם", "translit": "V'ei-ras-tich li l'o-lam", "en": "And I will betroth you to Me forever;", "pause_ms": 3000},
+            {"he": "וְאֵרַשְׂתִּיךְ לִי בְּצֶדֶק וּבְמִשְׁפָּט", "translit": "v'ei-ras-tich li b'tze-dek u-v'mish-pat", "en": "I will betroth you to Me in righteousness and in justice,", "pause_ms": 3400},
+            {"he": "וּבְחֶסֶד וּבְרַחֲמִים", "translit": "u-v'che-sed u-v'ra-cha-mim", "en": "and in loving-kindness and in compassion.", "pause_ms": 3200},
+            {"he": "וְאֵרַשְׂתִּיךְ לִי בֶּאֱמוּנָה", "translit": "V'ei-ras-tich li be-e-mu-nah", "en": "And I will betroth you to Me in faithfulness,", "pause_ms": 3200},
+            {"he": "וְיָדַעַתְּ אֶת אֲדֹנָי", "translit": "v'ya-da-at et A-do-nai", "en": "and you shall know the Lord.", "pause_ms": 3000},
+        ],
+    },
+    {
+        "step": 5,
+        "title": "Shema Yisrael — Deuteronomy 6:4–5",
+        "cue": "Cover your eyes gently with your right hand, focus your heart on the Oneness of God, and repeat slowly.",
+        "source": "Deuteronomy 6:4–9 (Primary Verified Torah Scripture)",
+        "phrases": [
+            {"he": "שְׁמַע יִשְׂרָאֵל", "translit": "Sh'ma Yis-ra-eil", "en": "Hear, O Israel:", "pause_ms": 2800},
+            {"he": "אֲדֹנָי אֱלֹהֵינוּ אֲדֹנָי אֶחָד", "translit": "A-do-nai E-lo-hei-nu, A-do-nai E-chad", "en": "the Lord is our God, the Lord is One!", "pause_ms": 3600},
+            {"he": "בָּרוּךְ שֵׁם כְּבוֹד מַלְכוּתוֹ לְעוֹלָם וָעֶד", "translit": "(Whisper) Ba-ruch shem k'vod mal-chu-to l'o-lam va-ed", "en": "Blessed is the name of His glorious kingdom forever and ever.", "pause_ms": 3500},
+            {"he": "וְאָהַבְתָּ אֵת אֲדֹנָי אֱלֹהֶיךָ", "translit": "V'a-hav-ta eit A-do-nai E-lo-hei-cha", "en": "And you shall love the Lord your God", "pause_ms": 3400},
+            {"he": "בְּכָל לְבָבְךָ וּבְכָל נַפְשְׁךָ וּבְכָל מְאֹדֶךָ", "translit": "b'chol l'va-v'cha u-v'chol naf-sh'cha u-v'chol m'o-de-cha", "en": "with all your heart, with all your soul, and with all your might.", "pause_ms": 4000},
+        ],
+    },
+]
+
+# Authentic traditional Jewish liturgical melodies (note name + beat duration) for warm polyphonic harp/choir playback
+SONG_MELODIES = {
+    "shalom-aleichem": {
+        "mode": "D Minor (Traditional Goldfarb Niggun)",
+        "bpm": 96,
+        "notes": [
+            ["D4", 1], ["F4", 1], ["A4", 1.5], ["G4", 0.5], ["F4", 1], ["E4", 1], ["D4", 2],
+            ["F4", 1], ["A4", 1], ["C5", 1.5], ["Bb4", 0.5], ["A4", 1], ["G4", 1], ["A4", 2],
+            ["D5", 1], ["C5", 1], ["Bb4", 1], ["A4", 1], ["G4", 1], ["F4", 1], ["E4", 1], ["A4", 1],
+            ["F4", 1], ["E4", 1], ["D4", 1], ["C#4", 1], ["D4", 3],
+        ],
+    },
+    "lecha-dodi": {
+        "mode": "Freygish / Ahavah Rabbah (Safed Welcome)",
+        "bpm": 106,
+        "notes": [
+            ["E4", 1], ["G#4", 1], ["A4", 1], ["B4", 1], ["C5", 1.5], ["B4", 0.5], ["A4", 2],
+            ["B4", 1], ["A4", 1], ["G#4", 1], ["F4", 1], ["E4", 2.5], ["E4", 0.5],
+            ["A4", 1], ["B4", 1], ["C5", 1], ["D5", 1], ["C5", 1], ["B4", 1], ["A4", 2],
+            ["G#4", 1], ["A4", 1], ["F4", 1], ["E4", 3],
+        ],
+    },
+    "adon-olam": {
+        "mode": "F Major (Joyful Synagogue Anthem)",
+        "bpm": 112,
+        "notes": [
+            ["C4", 1], ["F4", 1], ["A4", 1], ["F4", 1], ["G4", 1], ["Bb4", 1], ["A4", 2],
+            ["G4", 1], ["A4", 1], ["Bb4", 1], ["G4", 1], ["A4", 1], ["G4", 1], ["F4", 2],
+            ["A4", 1], ["C5", 1], ["D5", 1], ["C5", 1], ["Bb4", 1], ["A4", 1], ["G4", 2],
+            ["C5", 1], ["Bb4", 1], ["A4", 1], ["G4", 1], ["F4", 3],
+        ],
+    },
+    "eshet-chayil": {
+        "mode": "G Minor (Warm Shabbat Home Niggun)",
+        "bpm": 92,
+        "notes": [
+            ["D4", 1], ["G4", 1.5], ["A4", 0.5], ["Bb4", 1], ["A4", 1], ["G4", 2],
+            ["Bb4", 1], ["C5", 1.5], ["D5", 0.5], ["C5", 1], ["Bb4", 1], ["A4", 2],
+            ["D5", 1], ["C5", 1], ["Bb4", 1], ["A4", 1], ["G4", 1.5], ["F#4", 0.5], ["G4", 3],
+        ],
+    },
+    "yedid-nefesh": {
+        "mode": "E Minor (Twilight Yearning — Zweig Style)",
+        "bpm": 86,
+        "notes": [
+            ["E4", 1], ["G4", 1], ["B4", 2], ["A4", 1], ["G4", 1], ["F#4", 2],
+            ["G4", 1], ["A4", 1], ["B4", 1.5], ["C5", 0.5], ["B4", 2],
+            ["E5", 1.5], ["D5", 0.5], ["C5", 1], ["B4", 1], ["A4", 1], ["G4", 1], ["F#4", 1], ["E4", 3],
+        ],
+    },
+    "maoz-tzur": {
+        "mode": "C Major (Classic Chanukah Rock of Ages)",
+        "bpm": 108,
+        "notes": [
+            ["C4", 1], ["G4", 1], ["C4", 1], ["F4", 1], ["E4", 1], ["D4", 1], ["C4", 2],
+            ["G4", 1], ["A4", 1], ["D4", 1], ["G4", 1], ["F#4", 1], ["E4", 1], ["D4", 2],
+            ["G4", 1], ["G4", 1], ["A4", 1], ["G4", 1], ["F4", 1], ["E4", 1], ["D4", 2],
+            ["E4", 1], ["F4", 1], ["G4", 1], ["E4", 1], ["D4", 1], ["D4", 1], ["C4", 3],
+        ],
+    },
+    "default": {
+        "mode": "Warm Chasidic Niggun (D Minor)",
+        "bpm": 100,
+        "notes": [
+            ["D4", 1], ["F4", 1], ["A4", 1.5], ["G4", 0.5], ["F4", 1], ["E4", 1], ["D4", 2],
+            ["A4", 1], ["Bb4", 1], ["C5", 1], ["A4", 1], ["G4", 1], ["F4", 1], ["E4", 2],
+            ["F4", 1], ["G4", 1], ["A4", 1], ["F4", 1], ["E4", 1], ["D4", 3],
+        ],
+    },
+}
+
+
 def get_psalm_chapter(chapter: int) -> dict:
     ch = max(1, min(150, int(chapter)))
     data = torah_db.get_chapter("Psalms", ch)
@@ -797,18 +934,50 @@ def get_today_liturgy() -> dict:
         })
 
     # Live Tefillin window status from real Zmanim
+    def _hm_to_min(hm_str: str) -> int | None:
+        try:
+            hh, mm = str(hm_str).strip().split(":")[:2]
+            return int(hh) * 60 + int(mm)
+        except Exception:
+            return None
+
+    now_min = _hm_to_min(snap.get("local_time", ""))
+    mish_min = _hm_to_min(zmap.get("misheyakir", ""))
+    sun_min = _hm_to_min(zmap.get("sunset", ""))
+
     if snap.get("is_shabbat") or snap.get("shabbat_mode") or yc.get("is_yom_tov"):
         tefillin_status = {
             "wear_today": False,
+            "active_now": False,
             "badge": "🕯 Shabbat / Yom Tov — Tefillin Rest Today",
+            "short_cta": "🕯 Shabbat · No Tefillin Today",
             "detail": "Tefillin are not worn on Shabbat or Yom Tov because the holy day itself is our living sign ('Ot') of the Covenant!",
         }
     else:
+        in_window = bool(
+            now_min is not None and mish_min is not None and sun_min is not None
+            and mish_min <= now_min < sun_min
+        )
+        if in_window:
+            short_cta = f"🟦 Tefillin Time · Say With Me (until {zmap.get('sunset', '')})"
+        elif now_min is not None and mish_min is not None and now_min < mish_min:
+            short_cta = f"🌅 Tefillin Opens at {zmap.get('misheyakir', '')} · Practice Now"
+        else:
+            short_cta = f"🌙 After Sunset · Tefillin Resumes {zmap.get('misheyakir', '')}"
         tefillin_status = {
             "wear_today": True,
+            "active_now": in_window,
+            "misheyakir": zmap.get("misheyakir", ""),
+            "sunset": zmap.get("sunset", ""),
             "badge": f"🕯 Weekday Tefillin Window: {zmap.get('misheyakir', '')} – {zmap.get('sunset', '')}",
+            "short_cta": short_cta,
             "detail": f"Earliest Tallit & Tefillin (Misheyakir): {zmap.get('misheyakir', '')} · Sof Zman Shema (GRA): {zmap.get('shema_gra', '')} · Sunset: {zmap.get('sunset', '')} ({snap['location']['city']}).",
         }
+
+    enriched_songs = []
+    for s in SACRED_SONGS:
+        mel = SONG_MELODIES.get(s["slug"], SONG_MELODIES["default"])
+        enriched_songs.append({**s, "melody": mel})
 
     month_chronicle = HEBREW_MONTH_CHRONICLES.get(h_month, HEBREW_MONTH_CHRONICLES[9])
 
@@ -824,10 +993,10 @@ def get_today_liturgy() -> dict:
             "psalms": monthly_psalms,
         },
         "topical_psalms": TOPICAL_PSALMS,
-        "tefillin": {**TEFILLIN_AND_MORNING, "live_status": tefillin_status},
+        "tefillin": {**TEFILLIN_AND_MORNING, "live_status": tefillin_status, "say_with_me": TEFILLIN_SAY_WITH_ME},
         "before_meal_blessings": BEFORE_MEAL_BLESSINGS,
         "after_meal_blessings": {**AFTER_MEAL_BLESSINGS, "active_inserts": active_inserts},
-        "songs": SACRED_SONGS,
+        "songs": enriched_songs,
         "month_chronicle": month_chronicle,
     }
 
