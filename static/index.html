@@ -1095,9 +1095,25 @@
     50%      { transform: rotate(10deg); }
   }
   .walker-figure {
-    width: 108px; height: 108px;
+    width: 112px; height: 112px;
     animation: figureBob 3.8s ease-in-out infinite;
-    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.52));
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.48));
+  }
+  .walker-figure.ensemble {
+    width: 186px; height: 116px;
+  }
+  @keyframes haloShimmer {
+    0%, 100% { opacity: 0.78; transform: scale(1) translateY(0); filter: drop-shadow(0 0 4px rgba(255,229,136,0.55)); }
+    50%      { opacity: 1; transform: scale(1.09) translateY(-2px); filter: drop-shadow(0 0 11px rgba(255,235,150,0.95)); }
+  }
+  @keyframes haloOrbit {
+    from { stroke-dashoffset: 0; }
+    to   { stroke-dashoffset: -42; }
+  }
+  @keyframes kidHop {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    45%      { transform: translateY(-7px) rotate(-2deg); }
+    70%      { transform: translateY(-2px) rotate(1.5deg); }
   }
   .walker-aware-pill {
     display: inline-flex; align-items: center; gap: 4px;
@@ -1351,6 +1367,92 @@
     border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px;
     color: #f4efe6; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.82rem; line-height: 1.48; white-space: pre-wrap; overflow: auto;
+  }
+
+  /* ===== COMPLETE PARCHMENT (LIGHT ILLUMINATED MANUSCRIPT) THEME POLISH ===== */
+  [data-theme="parchment"] .quiz-q { color: #1b2230; }
+  [data-theme="parchment"] .quiz-opt { background: #f8f2e6; border-color: rgba(138,90,12,0.28); color: #1f1810; }
+  [data-theme="parchment"] .quiz-opt:hover { background: #efe4ce; border-color: #8a5a0c; }
+  [data-theme="parchment"] .quiz-opt.correct { background: rgba(22,163,74,0.16); border-color: #15803d; color: #0f2e1a; }
+  [data-theme="parchment"] .quiz-reveal-box { background: rgba(22,163,74,0.12); border-color: rgba(21,128,61,0.45); color: #143620; }
+  [data-theme="parchment"] .shoresh-tile {
+    background: linear-gradient(145deg, #fbf3df, #f1e1bc);
+    color: #6b4308; border-color: #9a6918;
+    box-shadow: 0 4px 12px rgba(122,86,30,0.16);
+  }
+  [data-theme="parchment"] .v-cast-pill { background: rgba(154,105,24,0.12); border-color: rgba(154,105,24,0.4); color: #6e4509; }
+  [data-theme="parchment"] .v-cast-pill.role-angel { background: rgba(29,95,138,0.12); border-color: rgba(29,95,138,0.42); color: #14496e; }
+  [data-theme="parchment"] .v-cast-pill.role-antagonist { background: rgba(180,83,9,0.12); border-color: rgba(180,83,9,0.42); color: #8c3709; }
+  [data-theme="parchment"] .v-cast-pill.role-ally { background: rgba(21,128,61,0.12); border-color: rgba(21,128,61,0.4); color: #14532d; }
+  [data-theme="parchment"] .sanctuary-rail {
+    background: linear-gradient(180deg, rgba(154,105,24,0.08) 0%, rgba(246,240,228,0.0) 40%, rgba(154,105,24,0.05) 100%);
+    border-top-color: rgba(138,90,12,0.34);
+  }
+  [data-theme="parchment"] .bg-vignette { filter: drop-shadow(0 2px 10px rgba(138,90,12,0.22)) brightness(0.76) saturate(1.15); }
+  [data-theme="parchment"] .bg-hebrew-spark { color: rgba(138,90,12,0.14); text-shadow: none; }
+  [data-theme="parchment"] .walker-card {
+    background: linear-gradient(145deg, #fffcf5, #f6ecd8);
+    border-color: rgba(154,105,24,0.52);
+    box-shadow: 0 8px 22px rgba(92,64,20,0.14);
+  }
+  [data-theme="parchment"] .walker-card.role-angel { border-color: rgba(29,95,138,0.55); box-shadow: 0 8px 22px rgba(29,95,138,0.12); }
+  [data-theme="parchment"] .walker-card.role-antagonist { border-color: rgba(180,83,9,0.55); }
+  [data-theme="parchment"] .walker-card.role-ally { border-color: rgba(21,128,61,0.5); }
+  [data-theme="parchment"] .walker-card.role-angel .walker-role-tag { color: #15517a; }
+  [data-theme="parchment"] .walker-card.role-antagonist .walker-role-tag { color: #9a3412; }
+  [data-theme="parchment"] .walker-card.role-ally .walker-role-tag { color: #166534; }
+  [data-theme="parchment"] .walker-name { color: #1f1810; }
+  [data-theme="parchment"] .walker-speech { color: #3c3428; }
+  [data-theme="parchment"] .walker-aware-pill { background: #fbf1d8; border-color: #9a6918; color: #6e4509; box-shadow: 0 3px 10px rgba(92,64,20,0.15); }
+  [data-theme="parchment"] #sanctuaryToast {
+    background: linear-gradient(135deg, #fffdf7, #f5ead4);
+    border-color: #9a6918; box-shadow: 0 10px 26px rgba(92,64,20,0.18);
+  }
+  [data-theme="parchment"] #sanctuaryToast .t-msg { color: #2b2319; }
+  [data-theme="parchment"] .lobby-give-cta {
+    background: linear-gradient(135deg, #fbf3df, #f1e6cf);
+    border-color: rgba(154,105,24,0.45);
+  }
+  [data-theme="parchment"] .lobby-give-cta div { color: #2b2319 !important; }
+  [data-theme="parchment"] .b-tr { color: #1a547d; }
+  [data-theme="parchment"] .syn-code { background: #f4ecdc; color: #1f1810; border-color: rgba(138,90,12,0.3); }
+  [data-theme="parchment"] .kids-corner { background: linear-gradient(135deg, #fcf5e3, #eef4fa); border-color: rgba(154,105,24,0.45); }
+  [data-theme="parchment"] .kids-riddle-box { background: #fffdf8; border-color: rgba(154,105,24,0.4); color: #1f1810; }
+  [data-theme="parchment"] .tl-node { background: #fffcf5; border-color: rgba(138,90,12,0.28); color: #1f1810; }
+  [data-theme="parchment"] .tl-node.active { background: linear-gradient(145deg, #f8ebd0, #fffaf0); border-color: #9a6918; }
+  [data-theme="parchment"] .tl-showcase { background: linear-gradient(145deg, #fffdf7, #f4ebda); border-color: rgba(154,105,24,0.45); color: #1f1810; }
+  [data-theme="parchment"] .anatomy-card { background: #fffcf6; border-color: rgba(138,90,12,0.3); color: #1f1810; }
+  [data-theme="parchment"] .give-modal-card { background: linear-gradient(145deg, #fffdf8, #f4e9d3); color: #1f1810; border-color: #9a6918; }
+  [data-theme="parchment"] .char-bubble { background: #fffcf5; border-color: rgba(138,90,12,0.32); color: #1f1810; }
+  [data-theme="parchment"] .char-bubble.spark { background: #f8eed8; border-color: #9a6918; }
+  [data-theme="parchment"] .prominent-item { background: rgba(154,105,24,0.09); color: #261e14; }
+  [data-theme="parchment"] .today-box { background: rgba(154,105,24,0.08); border-color: rgba(154,105,24,0.35); color: #221c14; }
+  [data-theme="parchment"] .celestial-ribbon { background: linear-gradient(90deg, #f4ead6, #fbf6eb, #f4ead6); border-bottom-color: rgba(138,90,12,0.28); color: #231c12; }
+  /* Rescue any inline white text on light Parchment cards (while leaving dark photo captions crisp white!) */
+  [data-theme="parchment"] .card h2,
+  [data-theme="parchment"] .card h3,
+  [data-theme="parchment"] .card h4,
+  [data-theme="parchment"] .anatomy-card [style*="color:#fff"],
+  [data-theme="parchment"] .anatomy-card [style*="color: #fff"],
+  [data-theme="parchment"] .kids-corner [style*="color:#fff"],
+  [data-theme="parchment"] .kids-riddle-box [style*="color:#fff"],
+  [data-theme="parchment"] .tl-node [style*="color:#fff"],
+  [data-theme="parchment"] .tl-showcase [style*="color:#fff"],
+  [data-theme="parchment"] .blessing-card [style*="color:#fff"],
+  [data-theme="parchment"] .prayer-step [style*="color:#fff"],
+  [data-theme="parchment"] .song-card [style*="color:#fff"],
+  [data-theme="parchment"] .holiday-card [style*="color:#fff"],
+  [data-theme="parchment"] .give-modal-card [style*="color:#fff"],
+  [data-theme="parchment"] #sponsorshipItemsAdmin [style*="color:#fff"],
+  [data-theme="parchment"] #ltab-psalms [style*="color:#fff"],
+  [data-theme="parchment"] #ltab-tefillin [style*="color:#fff"],
+  [data-theme="parchment"] #ltab-holidays [style*="color:#fff"] {
+    color: #1d1710 !important;
+  }
+  [data-theme="parchment"] .prayer-step [style*="color:#f3d796"],
+  [data-theme="parchment"] .song-card [style*="color:#f3d796"],
+  [data-theme="parchment"] .tl-node [style*="color:#c9d6ea"] {
+    color: #6b460a !important;
   }
 </style>
 </head>
@@ -2622,65 +2724,180 @@ let marginLeftIdx = 0;
 let marginRightIdx = 0;
 let marginStageTimer = null;
 
+function _svgAnimatedHalo(cx, cy, rx = 18, ry = 5, delay = 0) {
+  return `<g style="transform-origin:${cx}px ${cy}px;animation:haloShimmer 3.1s ease-in-out ${delay}s infinite">
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx + 4}" ry="${ry + 2.5}" fill="rgba(255,229,136,0.16)"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" stroke="#ffe588" stroke-width="2.2" fill="none"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${Math.max(8, rx - 3)}" ry="${Math.max(2.5, ry - 1.5)}" stroke="#fff9db" stroke-width="1.2" stroke-dasharray="4 3" fill="none" style="animation:haloOrbit 6s linear infinite"/>
+    <circle cx="${cx - rx}" cy="${cy}" r="2.1" fill="#ffffff" style="animation:starTwinkle 2.1s ${delay}s infinite"/>
+    <circle cx="${cx + rx}" cy="${cy}" r="2.1" fill="#ffe588" style="animation:starTwinkle 2.5s ${(delay + 0.7).toFixed(1)}s infinite"/>
+    <circle cx="${cx}" cy="${cy - ry - 1}" r="1.8" fill="#fff7cc" style="animation:starTwinkle 2.3s ${(delay + 1.2).toFixed(1)}s infinite"/>
+  </g>`;
+}
+
+function _svgAngelBody(cx, cy, scale = 1, uid = 'a1', delay = 0) {
+  const d1 = (delay).toFixed(1);
+  const d2 = (delay + 0.4).toFixed(1);
+  return `<g transform="translate(${cx},${cy}) scale(${scale})">
+    <circle cx="0" cy="-2" r="48" fill="url(#angAura_${uid})"/>
+    <path d="M-6 -8 C-34 -38, -58 -24, -50 6 C-42 24, -22 16, -8 6 Z" fill="rgba(186,230,253,0.46)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:-6px -2px;animation:wingFlapL 3.1s ease-in-out ${d1}s infinite"/>
+    <path d="M6 -8 C34 -38, 58 -24, 50 6 C42 24, 22 16, 8 6 Z" fill="rgba(186,230,253,0.46)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:6px -2px;animation:wingFlapR 3.1s ease-in-out ${d2}s infinite"/>
+    ${_svgAnimatedHalo(0, -47, 17, 4.8, delay)}
+    <circle cx="0" cy="-28" r="11.5" fill="#fff7d6" stroke="#e4bc69" stroke-width="1.8"/>
+    <path d="M-15 -14 Q0 -20 15 -14 L24 44 Q0 52 -24 44 Z" fill="url(#angRobe_${uid})" opacity="0.93" stroke="#e0f2fe" stroke-width="1.4"/>
+    <circle cx="0" cy="8" r="4.6" fill="#ffe588" style="animation:starTwinkle 2.6s ${d1}s infinite"/>
+  </g>`;
+}
+
+function _svgHeroBody(cx, cy, scale = 1, cloakTop = '#1e40af', cloakBot = '#172554', staff = true) {
+  return `<g transform="translate(${cx},${cy}) scale(${scale})">
+    <ellipse cx="0" cy="54" rx="28" ry="6" fill="rgba(0,0,0,0.34)"/>
+    ${staff ? `<path d="M31 52 L31 -32 Q31 -46 43 -46 Q52 -46 52 -37" stroke="#e4bc69" stroke-width="3.4" stroke-linecap="round" fill="none"/><circle cx="31" cy="-30" r="9" fill="rgba(255,229,136,0.22)" style="animation:rayPulse 3.4s infinite"/>` : ''}
+    <path d="M-24 -16 Q0 -26 24 -16 L31 48 Q0 56 -31 48 Z" fill="${cloakTop}" stroke="#e4bc69" stroke-width="2"/>
+    <path d="M-16 -16 L-10 48 M16 -16 L10 48" stroke="#f3d796" stroke-width="2" opacity="0.72"/>
+    <circle cx="0" cy="-31" r="13" fill="#f3cfa6" stroke="#e4bc69" stroke-width="1.8"/>
+    <path d="M-15 -35 Q0 -50 15 -35 Q0 -41 -15 -35 Z" fill="#fef3c7" stroke="#e4bc69" stroke-width="1.2"/>
+  </g>`;
+}
+
+function _svgMatriarchBody(cx, cy, scale = 1, robe = '#0f766e', trim = '#4ade80', lantern = true) {
+  return `<g transform="translate(${cx},${cy}) scale(${scale})">
+    <ellipse cx="0" cy="54" rx="28" ry="6" fill="rgba(0,0,0,0.32)"/>
+    <path d="M-24 -18 Q0 -30 24 -18 L32 48 Q0 56 -32 48 Z" fill="${robe}" stroke="${trim}" stroke-width="1.8"/>
+    <path d="M-18 -29 Q0 -45 18 -29 L25 5 Q0 -2 -25 5 Z" fill="rgba(228,188,105,0.3)" stroke="#e4bc69" stroke-width="1.5"/>
+    <circle cx="0" cy="-30" r="11.5" fill="#f5d0a9" stroke="#e4bc69" stroke-width="1.6"/>
+    ${lantern ? `<circle cx="31" cy="12" r="12" fill="rgba(255,229,136,0.26)" style="animation:rayPulse 3s infinite"/><circle cx="31" cy="12" r="4.5" fill="#ffe588"/>` : ''}
+  </g>`;
+}
+
+function _svgAntagonistBody(cx, cy, scale = 1) {
+  return `<g transform="translate(${cx},${cy}) scale(${scale})">
+    <ellipse cx="0" cy="54" rx="28" ry="6" fill="rgba(0,0,0,0.36)"/>
+    <path d="M26 -38 Q48 0 26 36" stroke="#fbbf24" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <line x1="26" y1="-38" x2="26" y2="36" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+    <path d="M-22 -14 Q0 -24 22 -14 L30 48 Q0 56 -30 48 Z" fill="#9a3412" stroke="#f59e0b" stroke-width="1.8"/>
+    <path d="M-12 -10 L0 26 L12 -10" stroke="#fde68a" stroke-width="1.5" fill="none" opacity="0.65"/>
+    <circle cx="0" cy="-31" r="13" fill="#d97706" stroke="#fde68a" stroke-width="1.8"/>
+    <path d="M-15 -36 Q0 -49 15 -36 Q0 -40 -15 -36 Z" fill="#fef3c7"/>
+  </g>`;
+}
+
+function _svgKidBody(cx, cy, scale = 1, tunic = '#2563eb', accent = '#fde047', delay = 0) {
+  return `<g transform="translate(${cx},${cy}) scale(${scale})">
+    <g style="animation:kidHop 2.7s ease-in-out ${delay}s infinite">
+      <ellipse cx="0" cy="36" rx="16" ry="4" fill="rgba(0,0,0,0.28)"/>
+      <path d="M-14 -4 Q0 -11 14 -4 L18 32 Q0 37 -18 32 Z" fill="${tunic}" stroke="${accent}" stroke-width="1.8"/>
+      <circle cx="0" cy="-16" r="10.5" fill="#f7d5b2" stroke="#e4bc69" stroke-width="1.5"/>
+      <!-- Little kippah / cap -->
+      <path d="M-9 -22 Q0 -30 9 -22 Z" fill="${accent}" stroke="#e4bc69" stroke-width="1"/>
+      <!-- Friendly smiling eyes & tiny golden star -->
+      <circle cx="-3.5" cy="-16" r="1.3" fill="#1e293b"/>
+      <circle cx="3.5" cy="-16" r="1.3" fill="#1e293b"/>
+      <path d="M-3.5 -11.5 Q0 -8.5 3.5 -11.5" stroke="#7c2d12" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <circle cx="15" cy="6" r="3.6" fill="#ffe588" style="animation:starTwinkle 2.2s ${delay}s infinite"/>
+    </g>
+  </g>`;
+}
+
 function renderIllustratedFigureSvg(role, name) {
   const n = String(name || '').toLowerCase();
+  const isPluralAngels = (role === 'angel' || n.includes('angel') || n.includes('malach') || n.includes('cherub')) && (n.includes('angels') || n.includes('three') || n.includes('mahanaim') || n.includes('ladder') || n.includes('cherubim') || n.includes('host'));
+  const hasKids = n.includes('children') || n.includes('child') || n.includes('12') || n.includes('tribes') || n.includes('family') || n.includes('kids') || n.includes('benjamin') || n.includes('isaac');
+  const isEsauAndAngel = n.includes('esau') && n.includes('angel');
+  const isDuo = n.includes('&') || n.includes(' and ') || n.includes('five') || n.includes('two') || n.includes(',');
+
+  // 1. Choir of Multiple Celestial Angels with Animated Shimmering Halos!
+  if (isPluralAngels) {
+    return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+      <defs>
+        <radialGradient id="angAura_m" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.82"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.25"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="angRobe_m" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
+      </defs>
+      ${_svgAngelBody(46, 80, 0.68, 'm', 0.5)}
+      ${_svgAngelBody(174, 80, 0.68, 'm', 1.1)}
+      ${_svgAngelBody(110, 74, 0.94, 'm', 0)}
+    </svg>`;
+  }
+
+  // 2. Esau & the Night Angel standing face-to-face!
+  if (isEsauAndAngel) {
+    return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+      <defs>
+        <radialGradient id="angAura_ea" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.8"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.24"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="angRobe_ea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
+      </defs>
+      ${_svgAntagonistBody(66, 78, 0.88)}
+      ${_svgAngelBody(154, 74, 0.84, 'ea', 0.3)}
+    </svg>`;
+  }
+
+  // 3. Family & Little Kid Characters (e.g. Rachel, Leah & 12 Children / Questioning Child / Abraham, Sarah & Isaac)
+  if (hasKids) {
+    if (n.includes('questioning child') || n === 'child') {
+      return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+        ${_svgKidBody(70, 82, 1.35, '#2563eb', '#fde047', 0)}
+        <text x="104" y="42" fill="#ffe588" font-size="22" font-weight="700" style="animation:starTwinkle 2.2s infinite">?</text>
+      </svg>`;
+    }
+    const leftAdult = (n.includes('abraham') || n.includes('noah') || n.includes('judah'))
+      ? _svgHeroBody(52, 76, 0.82, '#1e40af', '#172554', false)
+      : _svgMatriarchBody(50, 76, 0.82, '#0f766e', '#4ade80', false);
+    const rightAdult = _svgMatriarchBody(168, 76, 0.82, '#6d28d9', '#e4bc69', false);
+    return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+      ${leftAdult}
+      ${rightAdult}
+      ${_svgKidBody(94, 96, 0.88, '#2563eb', '#fde047', 0)}
+      ${_svgKidBody(128, 98, 0.82, '#0d9488', '#fda4af', 0.6)}
+    </svg>`;
+  }
+
+  // 4. Solo Angel with Radiant Animated Halo
   if (role === 'angel' || n.includes('angel') || n.includes('malach') || n.includes('messenger')) {
-    // Luminous Orthodox-respectful celestial angel-light figure with shimmering wings & radiant star halo
     return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
       <defs>
-        <radialGradient id="angAura" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.85"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.28"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
-        <linearGradient id="angRobe" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
+        <radialGradient id="angAura_s" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.85"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.28"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="angRobe_s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
       </defs>
-      <circle cx="70" cy="68" r="56" fill="url(#angAura)"/>
-      <!-- Shimmering geometric wings -->
-      <path d="M64 62 C36 32, 10 44, 18 76 C26 94, 48 86, 62 76 Z" fill="rgba(186,230,253,0.45)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:64px 68px;animation:wingFlapL 3.2s ease-in-out infinite"/>
-      <path d="M76 62 C104 32, 130 44, 122 76 C114 94, 92 86, 78 76 Z" fill="rgba(186,230,253,0.45)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:76px 68px;animation:wingFlapR 3.2s ease-in-out infinite"/>
-      <!-- Radiant halo ring & flowing robe -->
-      <ellipse cx="70" cy="24" rx="18" ry="5" stroke="#ffe588" stroke-width="2.2" fill="none"/>
-      <circle cx="70" cy="42" r="12" fill="#fff7d6" stroke="#e4bc69" stroke-width="1.8"/>
-      <path d="M54 56 Q70 50 86 56 L96 116 Q70 124 44 116 Z" fill="url(#angRobe)" opacity="0.92" stroke="#e0f2fe" stroke-width="1.4"/>
-      <circle cx="70" cy="78" r="5" fill="#ffe588"/>
-      <circle cx="28" cy="36" r="2.5" fill="#fff" style="animation:starTwinkle 2.2s infinite"/>
-      <circle cx="114" cy="38" r="2.8" fill="#ffe588" style="animation:starTwinkle 2.7s 0.8s infinite"/>
+      ${_svgAngelBody(70, 74, 0.96, 's', 0)}
     </svg>`;
   }
+
+  // 5. Multiple Human Characters / Duos / Trios (e.g. Rachel & Leah, Abraham & Sarah, Joshua & Caleb, Five Heroines, Judah & Joseph)
+  if (isDuo && role !== 'setting') {
+    const isFemaleGroup = n.includes('rachel') || n.includes('leah') || n.includes('women') || n.includes('heroines') || n.includes('miriam') || n.includes('ruth');
+    const isMixedPair = (n.includes('abraham') && n.includes('sarah')) || (n.includes('adam') && n.includes('eve')) || (n.includes('esther') && n.includes('mordechai')) || (n.includes('moses') && n.includes('miriam'));
+    if (isFemaleGroup && !isMixedPair) {
+      return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+        ${_svgMatriarchBody(68, 76, 0.86, '#0f766e', '#4ade80', false)}
+        ${_svgMatriarchBody(148, 76, 0.86, '#7e22ce', '#e4bc69', true)}
+        ${n.includes('five') ? _svgKidBody(108, 96, 0.78, '#be185d', '#fde047', 0.4) : ''}
+      </svg>`;
+    }
+    if (isMixedPair) {
+      return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+        ${_svgHeroBody(68, 76, 0.86, '#1e40af', '#172554', true)}
+        ${_svgMatriarchBody(152, 76, 0.86, '#0f766e', '#e4bc69', true)}
+      </svg>`;
+    }
+    return `<svg class="walker-figure ensemble" viewBox="0 0 220 140" fill="none">
+      ${_svgHeroBody(66, 76, 0.86, '#1e40af', '#172554', true)}
+      ${_svgHeroBody(150, 78, 0.84, '#0f766e', '#064e3b', false)}
+    </svg>`;
+  }
+
+  // 6. Solo Antagonist / Foil
   if (role === 'antagonist' || n.includes('esau') || n.includes('laban') || n.includes('pharaoh')) {
-    // Stylized Biblical Antagonist / Foil in warm crimson-amber cloak with traveler shield/bow silhouette
-    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
-      <defs>
-        <linearGradient id="antCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b45309"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
-      </defs>
-      <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.45)"/>
-      <!-- Bow / crescent emblem on back -->
-      <path d="M98 30 Q122 68 98 106" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <line x1="98" y1="30" x2="98" y2="106" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
-      <!-- Flowing crimson-amber mantle & turban -->
-      <path d="M46 56 Q70 46 94 56 L104 120 Q70 128 36 120 Z" fill="url(#antCloak)" stroke="#f59e0b" stroke-width="1.8"/>
-      <path d="M56 60 L70 98 L84 60" stroke="#fde68a" stroke-width="1.5" fill="none" opacity="0.65"/>
-      <circle cx="70" cy="39" r="14" fill="#d97706" stroke="#fde68a" stroke-width="1.8"/>
-      <path d="M54 34 Q70 20 86 34 Q70 30 54 34 Z" fill="#fef3c7"/>
-    </svg>`;
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">${_svgAntagonistBody(70, 76, 0.96)}</svg>`;
   }
+  // 7. Solo Matriarch / Ally
   if (role === 'ally' || n.includes('rachel') || n.includes('leah') || n.includes('ruth') || n.includes('miriam') || n.includes('esther')) {
-    // Warm Illustrated Biblical Matriarch / Ally with emerald-gold woven shawl & lantern/sheaf
-    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
-      <defs>
-        <linearGradient id="allyCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f766e"/><stop offset="100%" stop-color="#064e3b"/></linearGradient>
-      </defs>
-      <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.42)"/>
-      <path d="M44 52 Q70 38 96 52 L106 120 Q70 128 34 120 Z" fill="url(#allyCloak)" stroke="#4ade80" stroke-width="1.8"/>
-      <path d="M50 40 Q70 22 90 40 L98 76 Q70 68 42 76 Z" fill="rgba(228,188,105,0.28)" stroke="#e4bc69" stroke-width="1.6"/>
-      <circle cx="70" cy="40" r="12" fill="#f5d0a9" stroke="#e4bc69" stroke-width="1.6"/>
-      <!-- Warm lantern glow -->
-      <circle cx="104" cy="84" r="14" fill="rgba(255,229,136,0.28)" style="animation:rayPulse 3s infinite"/>
-      <circle cx="104" cy="84" r="5" fill="#ffe588"/>
-    </svg>`;
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">${_svgMatriarchBody(70, 76, 0.96, '#0f766e', '#4ade80', true)}</svg>`;
   }
+  // 8. Setting / Compass Rose
   if (role === 'setting') {
-    // Illustrated Ancient Map Scroll & Compass Rose
     return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
       <circle cx="70" cy="70" r="50" fill="rgba(22,38,70,0.85)" stroke="#e4bc69" stroke-width="2.2"/>
-      <circle cx="70" cy="70" r="40" stroke="rgba(92,182,229,0.45)" stroke-dasharray="4 4" stroke-width="1.4"/>
+      <circle cx="70" cy="70" r="40" stroke="rgba(92,182,229,0.45)" stroke-dasharray="4 4" stroke-width="1.4" style="animation:haloOrbit 12s linear infinite"/>
       <polygon points="70,26 78,66 70,58 62,66" fill="#ffe588"/>
       <polygon points="70,114 78,74 70,82 62,74" fill="#5cb6e5"/>
       <polygon points="26,70 66,62 58,70 66,78" fill="#5cb6e5"/>
@@ -2688,21 +2905,8 @@ function renderIllustratedFigureSvg(role, name) {
       <circle cx="70" cy="70" r="6" fill="#fff"/>
     </svg>`;
   }
-  // Protagonist — Illustrated Patriarch / Hero (Jacob, Moses, Abraham, David) in royal sapphire-gold tallit cloak & shepherd staff!
-  return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
-    <defs>
-      <linearGradient id="heroCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e40af"/><stop offset="100%" stop-color="#172554"/></linearGradient>
-    </defs>
-    <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.45)"/>
-    <!-- Glowing Shepherd's Staff -->
-    <path d="M104 124 L104 34 Q104 18 118 18 Q128 18 128 28" stroke="#e4bc69" stroke-width="3.6" stroke-linecap="round" fill="none"/>
-    <circle cx="104" cy="36" r="10" fill="rgba(255,229,136,0.22)" style="animation:rayPulse 3.4s infinite"/>
-    <!-- Flowing Royal Blue & Gold Tallit Mantle -->
-    <path d="M44 54 Q70 44 96 54 L104 120 Q70 128 36 120 Z" fill="url(#heroCloak)" stroke="#e4bc69" stroke-width="2"/>
-    <path d="M52 54 L60 120 M88 54 L80 120" stroke="#f3d796" stroke-width="2.2" opacity="0.72"/>
-    <circle cx="70" cy="39" r="13.5" fill="#f3cfa6" stroke="#e4bc69" stroke-width="1.8"/>
-    <path d="M54 35 Q70 18 86 35 Q70 28 54 35 Z" fill="#fef3c7" stroke="#e4bc69" stroke-width="1.2"/>
-  </svg>`;
+  // 9. Solo Protagonist / Patriarch
+  return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">${_svgHeroBody(70, 76, 0.96, '#1e40af', '#172554', true)}</svg>`;
 }
 
 function renderRightCastStrip(anatomy) {
