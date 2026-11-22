@@ -904,20 +904,23 @@
     animation: sanctuaryReveal 0.55s ease both;
   }
 
-  /* Timely Animated Pop-Up Toast (Hands-Free Energy & Curiosity!) */
+  /* Timely Animated Pop-Up Toast (Integrated into Left Rail — Zero Overlap!) */
   #sanctuaryToast {
-    position: fixed; left: 22px; bottom: 58px; z-index: 90;
-    max-width: 310px;
+    position: relative; width: 100%; flex: 0 0 auto;
     background: linear-gradient(135deg, rgba(16,28,54,0.96), rgba(26,40,72,0.96));
     border: 1.5px solid var(--gold);
-    border-radius: 16px; padding: 12px 16px;
-    box-shadow: 0 14px 36px rgba(0,0,0,0.55), 0 0 24px rgba(228,188,105,0.22);
-    transform: translateY(28px) scale(0.94); opacity: 0; pointer-events: none;
-    transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+    border-radius: 15px; padding: 10px 13px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(228,188,105,0.2);
+    transform: translateY(18px) scale(0.95); opacity: 0; pointer-events: none;
+    max-height: 0; overflow: hidden; margin-top: 0; padding-top: 0; padding-bottom: 0; border-width: 0;
+    transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease, max-height 0.5s ease, padding 0.4s ease;
   }
-  #sanctuaryToast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
-  #sanctuaryToast .t-tag { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold); font-weight: 800; margin-bottom: 4px; }
-  #sanctuaryToast .t-msg { font-size: 0.9rem; color: #f3ead8; line-height: 1.44; }
+  #sanctuaryToast.show {
+    transform: translateY(0) scale(1); opacity: 1; pointer-events: auto;
+    max-height: 190px; padding: 10px 13px; border-width: 1.5px;
+  }
+  #sanctuaryToast .t-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold); font-weight: 800; margin-bottom: 3px; }
+  #sanctuaryToast .t-msg { font-size: 0.82rem; color: #f3ead8; line-height: 1.38; }
 
   /* Animated Hebrew Root (Shoresh) Tiles */
   .shoresh-row { display: flex; align-items: center; gap: 10px; direction: rtl; margin: 10px 0; flex-wrap: wrap; }
@@ -949,30 +952,39 @@
     85%  { opacity: 0.9; }
     100% { transform: translateY(-108vh) rotate(10deg) scale(1.12); opacity: 0; }
   }
-  .bg-vignette {
-    position: fixed; z-index: 1; pointer-events: none;
-    width: 240px; height: 295px;
-    opacity: 0; transform: translateY(22px) scale(0.92);
-    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
-    filter: drop-shadow(0 0 22px rgba(228,188,105,0.22));
-  }
-  .bg-vignette.visible { opacity: 0.52; transform: translateY(0) scale(1); }
-  #bgSceneLeft  { left: 26px; top: 155px; }
-  #bgSceneRight { right: 26px; top: 138px; width: 205px; height: 210px; }
-  @media (max-width: 1480px) {
-    .bg-vignette { width: 155px; height: 200px; opacity: 0.36; }
-    #bgSceneRight { width: 140px; height: 155px; }
-  }
-
-  /* ===== WALKING ANIMATED CHARACTERS & ANGELS IN OPEN SIDE MARGINS ===== */
-  .margin-stage {
+  /* ===== DYNAMIC SPACE-AWARE SIDE RAILS (ZERO OVERLAP BETWEEN ARTIFACTS, CHARACTERS & PANELS!) ===== */
+  .sanctuary-rail {
     position: fixed; z-index: 6; pointer-events: none;
-    width: 290px; display: flex; flex-direction: column; align-items: center;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: space-between; gap: 14px;
+    width: 276px;
+    transition: opacity 0.45s ease, left 0.35s ease, right 0.35s ease, width 0.35s ease;
   }
-  #marginStageLeft  { left: 16px; top: 455px; }
-  #marginStageRight { right: 16px; top: 345px; }
-  @media (max-width: 1520px) {
-    .margin-stage { display: none; }
+  #railLeft  { left: 26px; top: 148px; bottom: 58px; }
+  #railRight { right: 26px; top: 148px; bottom: 268px; }
+  .sanctuary-rail.rail-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+
+  .bg-vignette {
+    position: relative; z-index: 1; pointer-events: none;
+    width: 175px; height: 158px; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateY(14px) scale(0.92);
+    transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.22,1,0.36,1);
+    filter: drop-shadow(0 0 20px rgba(228,188,105,0.22));
+  }
+  .bg-vignette svg { width: 100%; height: 100%; object-fit: contain; }
+  .bg-vignette.visible { opacity: 0.56; transform: translateY(0) scale(1); }
+  .bg-vignette.vignette-yielding { opacity: 0.24 !important; transform: scale(0.9); }
+  #bgSceneRight { width: 156px; height: 140px; }
+
+  /* ===== WALKING ANIMATED CHARACTERS & ANGELS IN THEIR OWN BREATHING SPACE ===== */
+  .margin-stage {
+    position: relative; z-index: 2; pointer-events: none;
+    width: 100%; flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  @media (max-width: 1540px) {
+    .sanctuary-rail { display: none !important; }
   }
   .walker-wrap {
     width: 100%; display: flex; flex-direction: column; align-items: center;
@@ -987,26 +999,34 @@
   .walker-wrap.glide-angel {
     animation: angelGlideIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
+  .walker-wrap.walker-cheer .walker-figure {
+    animation: walkerCheer 0.72s cubic-bezier(0.22, 1, 0.36, 1) 2 !important;
+  }
+  @keyframes walkerCheer {
+    0%, 100% { transform: translateY(0) scale(1); }
+    40%      { transform: translateY(-16px) scale(1.09) rotate(-3deg); }
+    70%      { transform: translateY(-4px) scale(1.03) rotate(2deg); }
+  }
   @keyframes walkInLeft {
-    0%   { opacity: 0; transform: translateX(-160px) translateY(8px); }
-    35%  { opacity: 0.9; transform: translateX(-65px) translateY(-5px); }
-    68%  { opacity: 1; transform: translateX(-16px) translateY(3px); }
+    0%   { opacity: 0; transform: translateX(-120px) translateY(8px); }
+    35%  { opacity: 0.9; transform: translateX(-48px) translateY(-5px); }
+    68%  { opacity: 1; transform: translateX(-12px) translateY(3px); }
     100% { opacity: 1; transform: translateX(0) translateY(0); }
   }
   @keyframes walkInRight {
-    0%   { opacity: 0; transform: translateX(160px) translateY(8px); }
-    35%  { opacity: 0.9; transform: translateX(65px) translateY(-5px); }
-    68%  { opacity: 1; transform: translateX(16px) translateY(3px); }
+    0%   { opacity: 0; transform: translateX(120px) translateY(8px); }
+    35%  { opacity: 0.9; transform: translateX(48px) translateY(-5px); }
+    68%  { opacity: 1; transform: translateX(12px) translateY(3px); }
     100% { opacity: 1; transform: translateX(0) translateY(0); }
   }
   @keyframes angelGlideIn {
-    0%   { opacity: 0; transform: translateY(-90px) scale(0.82); }
-    65%  { opacity: 1; transform: translateY(6px) scale(1.03); }
+    0%   { opacity: 0; transform: translateY(-54px) scale(0.84); }
+    65%  { opacity: 1; transform: translateY(5px) scale(1.03); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   @keyframes figureBob {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    50%      { transform: translateY(-7px) rotate(1.2deg); }
+    50%      { transform: translateY(-6px) rotate(1.2deg); }
   }
   @keyframes wingFlapL {
     0%, 100% { transform: rotate(0deg); }
@@ -1017,31 +1037,40 @@
     50%      { transform: rotate(10deg); }
   }
   .walker-figure {
-    width: 132px; height: 132px;
+    width: 108px; height: 108px;
     animation: figureBob 3.8s ease-in-out infinite;
-    filter: drop-shadow(0 10px 22px rgba(0,0,0,0.55));
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.52));
+  }
+  .walker-aware-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 9px; margin-bottom: 4px; border-radius: 999px;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em;
+    background: rgba(228,188,105,0.18); border: 1px solid rgba(228,188,105,0.65);
+    color: #ffe89c; text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    animation: sanctuaryReveal 0.45s ease both;
   }
   .walker-card {
-    width: 100%; margin-top: 4px;
+    width: 100%; margin-top: 2px;
     background: linear-gradient(145deg, rgba(14,24,46,0.92), rgba(20,34,62,0.92));
-    border: 1.5px solid rgba(228,188,105,0.55);
-    border-radius: 15px; padding: 10px 13px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    border: 1.5px solid rgba(228,188,105,0.52);
+    border-radius: 14px; padding: 9px 12px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.48);
     text-align: left;
   }
-  .walker-card.role-angel { border-color: rgba(92,182,229,0.72); box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 22px rgba(92,182,229,0.22); }
-  .walker-card.role-antagonist { border-color: rgba(245,158,11,0.72); box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245,158,11,0.18); }
+  .walker-card.role-angel { border-color: rgba(92,182,229,0.72); box-shadow: 0 10px 26px rgba(0,0,0,0.48), 0 0 18px rgba(92,182,229,0.2); }
+  .walker-card.role-antagonist { border-color: rgba(245,158,11,0.72); box-shadow: 0 10px 26px rgba(0,0,0,0.48), 0 0 18px rgba(245,158,11,0.18); }
   .walker-card.role-ally { border-color: rgba(74,222,128,0.65); }
   .walker-role-tag {
-    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em;
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em;
     font-weight: 800; color: var(--gold);
     display: flex; justify-content: space-between; align-items: center;
   }
   .walker-card.role-angel .walker-role-tag { color: #7dd3fc; }
   .walker-card.role-antagonist .walker-role-tag { color: #fbbf24; }
   .walker-card.role-ally .walker-role-tag { color: #86efac; }
-  .walker-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: #fff; margin: 2px 0 4px; }
-  .walker-speech { font-size: 0.8rem; line-height: 1.4; color: #e8dfd0; }
+  .walker-name { font-family: var(--serif); font-size: 0.98rem; font-weight: 700; color: #fff; margin: 2px 0 3px; }
+  .walker-speech { font-size: 0.76rem; line-height: 1.38; color: #e8dfd0; }
 
   /* Mid-Slide Animated Pop-In Pill inside Spotlight Art Stage */
   .mid-popin {
@@ -1194,12 +1223,20 @@
 </style>
 </head>
 <body>
-<!-- AMBIENT LIVING STORYBOOK BACKGROUND & FLANKING ANIMATED ILLUSTRATIONS -->
+<!-- AMBIENT LIVING STORYBOOK BACKGROUND & SPACE-AWARE SIDE RAILS -->
 <div id="sanctuaryBackdrop"></div>
-<div id="bgSceneLeft" class="bg-vignette"></div>
-<div id="bgSceneRight" class="bg-vignette"></div>
-<div id="marginStageLeft" class="margin-stage"></div>
-<div id="marginStageRight" class="margin-stage"></div>
+<aside id="railLeft" class="sanctuary-rail" aria-hidden="true">
+  <div id="bgSceneLeft" class="bg-vignette"></div>
+  <div id="marginStageLeft" class="margin-stage"></div>
+  <div id="sanctuaryToast" onclick="this.classList.remove('show')">
+    <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
+    <div class="t-msg" id="toastMsg"></div>
+  </div>
+</aside>
+<aside id="railRight" class="sanctuary-rail" aria-hidden="true">
+  <div id="bgSceneRight" class="bg-vignette"></div>
+  <div id="marginStageRight" class="margin-stage"></div>
+</aside>
 <div id="sparkBurstLayer" class="spark-burst-layer"></div>
 
 <div class="app">
@@ -1609,12 +1646,6 @@
     </div>
     <button class="tool-btn" id="tickerPauseBtn" onclick="toggleTickerPause()" title="Pause/Resume scrolling ticker">⏸</button>
   </footer>
-</div>
-
-<!-- TIMELY ANIMATED SANCTUARY POP-UP INSIGHT TOAST -->
-<div id="sanctuaryToast" onclick="this.classList.remove('show')">
-  <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
-  <div class="t-msg" id="toastMsg"></div>
 </div>
 
 <!-- FULL-SCREEN CINEMATIC SYNAGOGUE PRESENTATION OVERLAY -->
@@ -2419,7 +2450,121 @@ function renderRightCastStrip(anatomy) {
   }, 9500);
 }
 
+let marginAwareLeft = '';
+let marginAwareRight = '';
+
+function layoutSanctuaryRails() {
+  const railL = document.getElementById('railLeft');
+  const railR = document.getElementById('railRight');
+  if (!railL || !railR) return;
+  const activeView = document.querySelector('.view.active') || document.getElementById('view-today');
+  const headerEl = document.querySelector('header');
+  const ribbonEl = document.getElementById('celestialRibbon');
+  const footerEl = document.querySelector('footer');
+  const show = (currentViewName === 'today') && !document.getElementById('presModal').classList.contains('open');
+  if (!show || !activeView) {
+    railL.classList.add('rail-hidden');
+    railR.classList.add('rail-hidden');
+    return;
+  }
+  const rect = activeView.getBoundingClientRect();
+  const leftGutter = Math.floor(rect.left);
+  const rightGutter = Math.floor(window.innerWidth - rect.right);
+  const minGutter = Math.min(leftGutter, rightGutter);
+  if (minGutter < 236) {
+    railL.classList.add('rail-hidden');
+    railR.classList.add('rail-hidden');
+    return;
+  }
+  const railW = Math.max(210, Math.min(278, minGutter - 38));
+  const leftX = Math.max(14, Math.floor((leftGutter - railW) / 2));
+  const rightX = Math.max(14, Math.floor((rightGutter - railW) / 2));
+  const topY = Math.max(138, Math.ceil(((ribbonEl && ribbonEl.getBoundingClientRect().bottom) || (headerEl && headerEl.getBoundingClientRect().bottom) || 138) + 12));
+  const footerH = (footerEl && footerEl.getBoundingClientRect().height) || 44;
+
+  railL.style.width = railW + 'px';
+  railL.style.left = leftX + 'px';
+  railL.style.top = topY + 'px';
+  railL.style.bottom = (footerH + 14) + 'px';
+
+  railR.style.width = railW + 'px';
+  railR.style.right = rightX + 'px';
+  railR.style.top = topY + 'px';
+  // Leave generous bottom-right breathing zone so right character NEVER collides with bottom-right docks/widgets!
+  railR.style.bottom = Math.max(footerH + 225, Math.round(window.innerHeight * 0.25)) + 'px';
+
+  railL.classList.remove('rail-hidden');
+  railR.classList.remove('rail-hidden');
+}
+window.addEventListener('resize', layoutSanctuaryRails, { passive: true });
+
+function syncMarginCastToSlide(slide) {
+  const bgL = document.getElementById('bgSceneLeft');
+  const bgR = document.getElementById('bgSceneRight');
+  const kind = (slide && slide.kind) || 'verse';
+  // Let background artifacts softly yield opacity when a busy theatrical scene or quiz is center stage
+  const yieldBg = (kind === 'character_scene' || kind === 'cast_spotlight');
+  if (bgL) bgL.classList.toggle('vignette-yielding', yieldBg);
+  if (bgR) bgR.classList.toggle('vignette-yielding', yieldBg);
+
+  if (!marginLeftCast.length && !marginRightCast.length) return;
+  const txt = `${(slide && slide.title) || ''} ${(slide && slide.en_text) || ''}`.toLowerCase();
+  let newL = marginLeftIdx;
+  let newR = marginRightIdx;
+  marginAwareLeft = '';
+  marginAwareRight = '';
+
+  if (kind === 'quiz') {
+    marginAwareLeft = '❓ Can You Guess?';
+    marginAwareRight = '⏳ 8s Reveal!';
+  } else if (kind === 'character_scene') {
+    marginAwareLeft = '🎭 Watching Scene';
+    marginAwareRight = '✨ Listen Closely';
+  } else if (kind === 'setting_patterns') {
+    const idxSet = marginRightCast.findIndex(m => m.role === 'setting');
+    if (idxSet >= 0) newR = idxSet;
+    marginAwareRight = '🗺 Active Right Now';
+  } else if (kind === 'verse') {
+    // React directly to who appears in THIS exact verse!
+    if (txt.includes('angel') || txt.includes('messenger') || txt.includes('mahanaim')) {
+      const iAng = marginLeftCast.findIndex(m => m.role === 'angel');
+      if (iAng >= 0) newL = iAng;
+      marginAwareLeft = '✨ In This Verse!';
+    } else if (txt.includes('rachel') || txt.includes('leah') || txt.includes('miriam') || txt.includes('aaron') || txt.includes('judah')) {
+      const iAlly = marginLeftCast.findIndex(m => m.role === 'ally');
+      if (iAlly >= 0) newL = iAlly;
+      marginAwareLeft = '💛 In This Verse!';
+    } else if (txt.includes('jacob') || txt.includes('israel') || txt.includes('moses') || txt.includes('joseph') || txt.includes('abraham')) {
+      newL = 0;
+      marginAwareLeft = '⭐ Speaking Now';
+    }
+    if (txt.includes('esau') || txt.includes('seir') || txt.includes('laban') || txt.includes('pharaoh') || txt.includes('goliath')) {
+      const iAnt = marginRightCast.findIndex(m => m.role === 'antagonist');
+      if (iAnt >= 0) newR = iAnt;
+      marginAwareRight = '👀 Mentioned Here!';
+    }
+  }
+  const changed = (newL !== marginLeftIdx || newR !== marginRightIdx || marginAwareLeft || marginAwareRight);
+  marginLeftIdx = newL;
+  marginRightIdx = newR;
+  if (changed) drawMarginStages();
+}
+
+function cheerMarginCharacters() {
+  marginAwareLeft = '🎉 Mazal Tov!';
+  marginAwareRight = '✨ Great Reveal!';
+  document.querySelectorAll('.walker-wrap').forEach(w => {
+    w.classList.remove('walker-cheer');
+    void w.offsetWidth;
+    w.classList.add('walker-cheer');
+  });
+  document.querySelectorAll('.walker-aware-pill').forEach((p, idx) => {
+    p.textContent = idx === 0 ? '🎉 Mazal Tov!' : '✨ Great Reveal!';
+  });
+}
+
 function drawMarginStages() {
+  layoutSanctuaryRails();
   const leftHost = document.getElementById('marginStageLeft');
   const rightHost = document.getElementById('marginStageRight');
   if (!leftHost || !rightHost) return;
@@ -2431,26 +2576,30 @@ function drawMarginStages() {
   const lm = marginLeftCast[marginLeftIdx];
   if (lm) {
     const enterCls = lm.role === 'angel' ? 'glide-angel' : 'enter-left';
+    const introShort = (lm.intro || '').length > 125 ? lm.intro.slice(0, 122).trim() + '...' : (lm.intro || '');
     leftHost.innerHTML = `
       <div class="walker-wrap ${enterCls}">
+        ${marginAwareLeft ? `<div class="walker-aware-pill">${esc(marginAwareLeft)}</div>` : ''}
         ${renderIllustratedFigureSvg(lm.role, lm.name)}
         <div class="walker-card role-${esc(lm.role)}">
-          <div class="walker-role-tag"><span>${esc(lm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.88rem;">${esc(lm.he || '')}</span></div>
+          <div class="walker-role-tag"><span>${esc(lm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(lm.he || '')}</span></div>
           <div class="walker-name">👋 ${esc(lm.name)}</div>
-          <div class="walker-speech">${esc(lm.intro || '')}</div>
+          <div class="walker-speech">${esc(introShort)}</div>
         </div>
       </div>`;
   }
   const rm = marginRightCast[marginRightIdx];
   if (rm) {
     const enterCls = rm.role === 'angel' ? 'glide-angel' : 'enter-right';
+    const introShort = (rm.intro || '').length > 125 ? rm.intro.slice(0, 122).trim() + '...' : (rm.intro || '');
     rightHost.innerHTML = `
       <div class="walker-wrap ${enterCls}">
+        ${marginAwareRight ? `<div class="walker-aware-pill">${esc(marginAwareRight)}</div>` : ''}
         ${renderIllustratedFigureSvg(rm.role, rm.name)}
         <div class="walker-card role-${esc(rm.role)}">
-          <div class="walker-role-tag"><span>${esc(rm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.88rem;">${esc(rm.he || '')}</span></div>
+          <div class="walker-role-tag"><span>${esc(rm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.84rem;">${esc(rm.he || '')}</span></div>
           <div class="walker-name">${esc(rm.name)}</div>
-          <div class="walker-speech">${esc(rm.intro || '')}</div>
+          <div class="walker-speech">${esc(introShort)}</div>
         </div>
       </div>`;
   }
@@ -2478,6 +2627,7 @@ function revealCurrentQuiz(pickedIdx = null) {
   const rev = document.getElementById('quizRevealBox');
   if (rev) rev.style.display = 'block';
   celebrateQuizReveal();
+  cheerMarginCharacters();
 }
 
 function getVerseMicroEmblem(slide) {
@@ -2511,6 +2661,7 @@ function renderSpotlight() {
 
   const s = dailyData.slides[spotIdx] || dailyData.slides[0];
   updateBackgroundIllustrations(s);
+  syncMarginCastToSlide(s);
   const rich = dailyData.rich || {};
   const slideArt = s.art || rich.art || '/art/jacobs-ladder.jpg';
   currentSpotDurationMs = (s.kind === 'quiz' || s.kind === 'character_scene') ? 15500 : 12500;
@@ -3684,6 +3835,7 @@ async function openPresentation(kind = 'parasha', slug = '') {
   presDeck = await r.json();
   presIdx = 0;
   document.getElementById('presModal').classList.add('open');
+  layoutSanctuaryRails();
   document.getElementById('presDeckTitle').textContent = presDeck.deck_title || 'Torah Presentation';
   document.getElementById('presDeckSub').textContent = presDeck.subtitle || '';
   await populatePresPicker(`${kind}:${slug}`);
@@ -3696,6 +3848,7 @@ function closePresentation() {
   clearPresAuto();
   if (broadcastLive) toggleBroadcastLive();
   document.getElementById('presModal').classList.remove('open');
+  layoutSanctuaryRails();
 }
 
 function clearPresAuto() {
