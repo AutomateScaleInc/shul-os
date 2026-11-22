@@ -910,23 +910,28 @@
     animation: sanctuaryReveal 0.55s ease both;
   }
 
-  /* Timely Animated Pop-Up Toast (Integrated into Left Rail — Zero Overlap!) */
+  /* Timely Animated Pop-Up Toast (Spatially-Aware Flex Slot — Zero Phantom Gap, Zero Overlap!) */
+  @keyframes toastFloatIn {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
   #sanctuaryToast {
-    position: relative; width: 100%; flex: 0 0 auto;
+    display: none;
+    position: relative; width: 100%; flex: 0 0 auto; pointer-events: auto; cursor: pointer;
     background: linear-gradient(135deg, rgba(16,28,54,0.96), rgba(26,40,72,0.96));
     border: 1.5px solid var(--gold);
-    border-radius: 15px; padding: 10px 13px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(228,188,105,0.2);
-    transform: translateY(18px) scale(0.95); opacity: 0; pointer-events: none;
-    max-height: 0; overflow: hidden; margin-top: 0; padding-top: 0; padding-bottom: 0; border-width: 0;
-    transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease, max-height 0.5s ease, padding 0.4s ease;
+    border-radius: 14px; padding: 9px 12px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.46), 0 0 18px rgba(228,188,105,0.2);
   }
   #sanctuaryToast.show {
-    transform: translateY(0) scale(1); opacity: 1; pointer-events: auto;
-    max-height: 190px; padding: 10px 13px; border-width: 1.5px;
+    display: block;
+    animation: toastFloatIn 0.48s cubic-bezier(0.22,1,0.36,1) both;
   }
-  #sanctuaryToast .t-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--gold); font-weight: 800; margin-bottom: 3px; }
-  #sanctuaryToast .t-msg { font-size: 0.82rem; color: #f3ead8; line-height: 1.38; }
+  #sanctuaryToast .t-tag { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 800; margin-bottom: 3px; }
+  #sanctuaryToast .t-msg {
+    font-size: 0.78rem; color: #f3ead8; line-height: 1.35;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
 
   /* Animated Hebrew Root (Shoresh) Tiles */
   .shoresh-row { display: flex; align-items: center; gap: 10px; direction: rtl; margin: 10px 0; flex-wrap: wrap; }
@@ -962,14 +967,29 @@
   .sanctuary-rail {
     position: fixed; z-index: 6; pointer-events: none;
     display: flex; flex-direction: column; align-items: center;
-    justify-content: space-evenly; gap: 12px;
+    justify-content: space-between; gap: 10px;
     width: 276px;
-    padding: 20px 10px 10px;
+    padding: 16px 10px 10px;
     border-radius: 22px;
     background: linear-gradient(180deg, rgba(228,188,105,0.045) 0%, rgba(14,24,46,0.0) 38%, rgba(228,188,105,0.03) 100%);
     border-top: 1px solid rgba(228,188,105,0.22);
     transition: opacity 0.55s ease, left 0.35s ease, right 0.35s ease, width 0.35s ease, box-shadow 0.7s ease, border-color 0.7s ease;
   }
+  .sanctuary-rail.rail-qr-only {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 10px 10px !important;
+    justify-content: flex-end !important;
+  }
+  /* Spatial-awareness compact states: automatically balance height so ZERO elements overlap! */
+  .sanctuary-rail.rail-compact .rail-filament { display: none !important; }
+  .sanctuary-rail.rail-compact .bg-vignette { width: 112px; height: 96px; transition: width 0.35s ease, height 0.35s ease; }
+  .sanctuary-rail.rail-compact .walker-avatar { width: 64px !important; height: 64px !important; }
+  .sanctuary-rail.rail-compact .walker-card { padding: 7px 10px !important; }
+  .sanctuary-rail.rail-compact .walker-bio { -webkit-line-clamp: 2 !important; font-size: 0.71rem !important; }
+  .sanctuary-rail.rail-ultra-compact .bg-vignette { display: none !important; }
+  .sanctuary-rail.rail-ultra-compact .rail-arch-crest { display: none !important; }
   #railLeft  { left: 26px; top: 170px; bottom: 58px; }
   #railRight { right: 26px; top: 170px; bottom: 268px; }
   .sanctuary-rail.rail-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
@@ -1021,7 +1041,7 @@
   /* ===== 5 VARIED SYNAGOGUE-ELEGANT CHOREOGRAPHIES (FLY, POOF, ASCEND, UNVEIL, ARC) ===== */
   .margin-stage {
     position: relative; z-index: 2; pointer-events: none;
-    width: 100%; flex: 1 1 auto; min-height: 0;
+    width: 100%; flex: 0 0 auto;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   @media (max-width: 1540px) {
@@ -1629,16 +1649,17 @@
   <div id="bgSceneLeft" class="bg-vignette"></div>
   <div class="rail-filament"></div>
   <div id="marginStageLeft" class="margin-stage"></div>
-  <div id="sanctuaryToast" onclick="this.classList.remove('show')">
+  <div id="sanctuaryToast" onclick="dismissSanctuaryToast()">
     <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
     <div class="t-msg" id="toastMsg"></div>
   </div>
   <div id="alwaysOnQrDock" class="qr-sanctuary-dock" onclick="openGiveModal()" title="Scan with your phone to connect to this screen, message Rabbi Michoel, or sponsor The Shul">
-    <img src="/api/give/qr.svg" alt="Scan QR to Connect &amp; Sponsor">
+    <img id="alwaysOnQrImg" src="/api/give/qr.svg" alt="Scan QR to Connect &amp; Sponsor">
     <div style="min-width:0;">
       <div class="qr-dock-kicker">📱 SCAN WITH PHONE</div>
       <div class="qr-dock-title">Connect &amp; Sponsor The Shul</div>
-      <div class="qr-dock-sub">Mirror screen · Message Rabbi · Sponsor Kiddush &amp; Kids Shul</div>
+      <div class="qr-dock-sub">Mirror screen · Message Rabbi · Sponsor Kiddush</div>
+      <div id="qrLiveBadge" style="font-size:0.64rem;font-weight:800;color:#4ade80;margin-top:3px;">● Connecting Live QR...</div>
     </div>
   </div>
 </aside>
@@ -2633,6 +2654,7 @@ function showTimelyPopup() {
       text: `${mch.theme} — ${mch.events[0]}`,
     });
   }
+  if (currentViewName !== 'today') return;
   if (!popups.length) return;
   const item = popups[toastIdx % popups.length];
   toastIdx++;
@@ -2641,8 +2663,14 @@ function showTimelyPopup() {
   document.getElementById('toastTag').textContent = item.tag;
   document.getElementById('toastMsg').textContent = item.text;
   el.classList.add('show');
+  balanceSanctuaryRails();
   if (toastHideTimer) clearTimeout(toastHideTimer);
-  toastHideTimer = setTimeout(() => el.classList.remove('show'), 7500);
+  toastHideTimer = setTimeout(() => dismissSanctuaryToast(), 7500);
+}
+function dismissSanctuaryToast() {
+  const el = document.getElementById('sanctuaryToast');
+  if (el) el.classList.remove('show');
+  balanceSanctuaryRails();
 }
 setInterval(showTimelyPopup, 14000);
 setTimeout(showTimelyPopup, 5000);
@@ -3380,13 +3408,15 @@ function layoutSanctuaryRails() {
   railL.style.left = leftX + 'px';
   railL.style.top = topY + 'px';
   railL.style.bottom = (footerH + 14) + 'px';
-  // Keep the Always-On Scannable QR Dock visible on ALL screens; hide Torah story actors when outside Today's Reading!
+  // Keep the Always-On Scannable QR Dock visible on ALL screens; hide Torah story actors & empty pillar frame outside Today's Reading!
   const bgL = document.getElementById('bgSceneLeft');
   const msL = document.getElementById('marginStageLeft');
+  const toastL = document.getElementById('sanctuaryToast');
   const crestL = railL.querySelector('.rail-arch-crest');
   const filL = railL.querySelector('.rail-filament');
   [bgL, msL, crestL, filL].forEach(el => { if (el) el.style.display = isToday ? '' : 'none'; });
-  railL.style.justifyContent = isToday ? 'space-evenly' : 'flex-end';
+  if (!isToday && toastL) toastL.classList.remove('show');
+  railL.classList.toggle('rail-qr-only', !isToday);
   railL.classList.remove('rail-hidden');
 
   if (isToday) {
@@ -3398,6 +3428,37 @@ function layoutSanctuaryRails() {
   } else {
     railR.classList.add('rail-hidden');
   }
+  balanceSanctuaryRails();
+}
+
+function balanceSanctuaryRails() {
+  const railL = document.getElementById('railLeft');
+  const railR = document.getElementById('railRight');
+  const measureAndBalance = (rail) => {
+    if (!rail || rail.classList.contains('rail-hidden') || rail.classList.contains('rail-qr-only')) {
+      if (rail) rail.classList.remove('rail-compact', 'rail-ultra-compact');
+      return;
+    }
+    rail.classList.remove('rail-compact', 'rail-ultra-compact');
+    const availH = rail.clientHeight - 26;
+    if (availH <= 0) return;
+    const sumVisible = () => {
+      const vis = Array.from(rail.children).filter(ch => getComputedStyle(ch).display !== 'none');
+      const h = vis.reduce((acc, ch) => acc + Math.ceil(ch.getBoundingClientRect().height), 0);
+      return h + Math.max(0, vis.length - 1) * 14;
+    };
+    const toastOpen = !!(rail.id === 'railLeft' && document.getElementById('sanctuaryToast')?.classList.contains('show'));
+    if (toastOpen || sumVisible() > availH) {
+      rail.classList.add('rail-compact');
+      if (sumVisible() > availH) {
+        rail.classList.add('rail-ultra-compact');
+      }
+    }
+  };
+  requestAnimationFrame(() => {
+    measureAndBalance(railL);
+    measureAndBalance(railR);
+  });
 }
 window.addEventListener('resize', layoutSanctuaryRails, { passive: true });
 
@@ -3568,6 +3629,8 @@ function drawMarginStages(force = false) {
   if (marginAwareLeft && marginAwareRight) pulseGazeFocus('both');
   else if (marginAwareLeft) pulseGazeFocus('left');
   else if (marginAwareRight) pulseGazeFocus('right');
+  setTimeout(balanceSanctuaryRails, 120);
+  setTimeout(balanceSanctuaryRails, 620);
 }
 
 function revealCurrentQuiz(pickedIdx = null) {
@@ -6155,7 +6218,7 @@ async function loadShulMesh(probe = false) {
               <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;"></span>
               <strong style="color:#fff;font-size:0.94rem;">${esc(n.type_icon || '🏛️')} ${esc(n.name)}</strong>${selfTag}${liveTag}
             </div>
-            <div class="muted" style="font-size:0.78rem;margin-top:4px;word-break:break-all;">
+            <div class="muted" style="font-size:0.78rem;margin-top:4px;overflow-wrap:anywhere;">
               ${esc(n.type_label || n.node_type)}${n.city ? ' · ' + esc(n.city) : ''}${n.rabbi_host ? ' · ' + esc(n.rabbi_host) : ''} · <code>${esc(n.endpoint_url)}</code>${n.last_latency_ms ? ' (' + n.last_latency_ms + 'ms)' : ''}
             </div>
           </div>
@@ -6357,10 +6420,37 @@ async function dismissMeshIncoming() {
   if (bar) bar.classList.remove('show');
 }
 
+let _lastQrGiveUrl = '';
+async function syncAlwaysOnQr() {
+  try {
+    const r = await fetch('/api/give/items');
+    const d = await r.json();
+    const u = d.give_url || '';
+    const img = document.getElementById('alwaysOnQrImg');
+    const badge = document.getElementById('qrLiveBadge');
+    if (u && u !== _lastQrGiveUrl) {
+      _lastQrGiveUrl = u;
+      if (img) img.src = '/api/give/qr.svg?t=' + Date.now();
+    }
+    if (badge) {
+      if (d.tunnel_live || u.startsWith('https://')) {
+        badge.style.color = '#4ade80';
+        badge.textContent = '● Live Public HTTPS · Any Phone';
+      } else {
+        badge.style.color = '#e4bc69';
+        badge.textContent = '● Local Wi-Fi QR Ready';
+      }
+    }
+  } catch (e) {}
+}
+
 loadHealth();
 loadCelestial();
 loadToday();
 pollMeshIncoming();
+syncAlwaysOnQr();
+setTimeout(syncAlwaysOnQr, 5000);
+setTimeout(syncAlwaysOnQr, 14000);
 try {
   const _initView = new URLSearchParams(location.search).get('view');
   if (_initView && document.getElementById('view-' + _initView)) switchView(_initView);
@@ -6371,6 +6461,7 @@ fetch('/api/config').then(r => r.json()).then(d => {
 setInterval(loadHealth, 30000);
 setInterval(loadCelestial, 60000);
 setInterval(pollMeshIncoming, 15000);
+setInterval(syncAlwaysOnQr, 60000);
 </script>
 </body>
 </html>

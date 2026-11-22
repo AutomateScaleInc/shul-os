@@ -178,6 +178,7 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 "synagogue_name": cfg.get("synagogue_name", shul_events.SHUL_INFO["name"]),
                 "give_url": base_u + "/give",
                 "watch_url": base_u + "/watch",
+                "tunnel_live": base_u.startswith("https://"),
                 "checkout_url": cfg.get("donation_checkout_url", shul_events.SHUL_INFO["website"]),
                 "items": community_hub.list_sponsorship_items(),
             })
@@ -794,6 +795,7 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
 
 def main():
+    broadcast_hub.start_tunnel_watchdog(port=PORT)
     srv = ThreadedHTTPServer((HOST, PORT), TorahHandler)
     print(f"Torah Sanctuary listening on http://{HOST}:{PORT}", flush=True)
     try:

@@ -180,12 +180,15 @@ def init_tables():
 
 
 def get_public_base_url(request_host: str = "") -> str:
-    """Resolve the best scannable base URL: configured public URL > active Cloudflare broadcast tunnel > LAN IP."""
+    """Resolve the best scannable base URL: configured public URL > always-on Cloudflare HTTPS tunnel > LAN IP."""
     cfg = ai_engine.load_config()
     for key in ("public_sanctuary_url", "broadcast_public_base_url"):
         val = (cfg.get(key) or "").strip().rstrip("/")
         if val:
             return val
+    pub_tunnel = broadcast_hub.get_public_base_url()
+    if pub_tunnel:
+        return pub_tunnel.rstrip("/")
     bstate = broadcast_hub.get_state(include_deck=False)
     if bstate.get("public_url"):
         # Strip /watch suffix if present
@@ -193,7 +196,7 @@ def get_public_base_url(request_host: str = "") -> str:
         if pub.endswith("/watch"):
             pub = pub[:-6]
         return pub
-    if request_host and not request_host.startswith(("127.0.0.1", "localhost")):
+    if request_host and not request_host.startswith(("127.0.0.1", "localhost", "::1")):
         return f"http://{request_host}"
     lan = broadcast_hub._detect_lan_ip()
     return f"http://{lan}:8080"

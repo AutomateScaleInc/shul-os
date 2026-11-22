@@ -8,6 +8,7 @@ to phones, tablets, TVs, and companion Torah Sanctuary nodes at home or in the l
 Zero external Python dependencies. Optionally uses `cloudflared` for instant zero-config
 public HTTPS URLs and `qrencode` for crisp inline SVG QR codes.
 """
+import atexit
 import datetime
 import json
 import queue
@@ -24,6 +25,9 @@ import sanctuary_rich_data
 _LOCK = threading.Lock()
 _SUBSCRIBERS: set[queue.Queue] = set()
 _TUNNEL_PROC = None
+_SANCTUARY_TUNNEL_PROC = None
+_SANCTUARY_PUBLIC_BASE = ""
+_WATCHDOG_STARTED = False
 _STATE = {
     "active": False,
     "started_at": "",
@@ -87,13 +91,105 @@ def _tunnel_reader(proc):
         pass
 
 
+def _cleanup_tunnels():
+    global _TUNNEL_PROC, _SANCTUARY_TUNNEL_PROC
+    for proc in (_TUNNEL_PROC, _SANCTUARY_TUNNEL_PROC):
+        if proc is not None:
+            try:
+                proc.terminate()
+            except Exception:
+                pass
+
+
+atexit.register(_cleanup_tunnels)
+
+
+def get_public_base_url() -> str:
+    """Return the active persistent HTTPS tunnel base URL (e.g. https://xyz.trycloudflare.com) if live."""
+    with _LOCK:
+        return _SANCTUARY_PUBLIC_BASE or ""
+
+
+def _sanctuary_tunnel_reader(proc):
+    global _SANCTUARY_PUBLIC_BASE
+    url_re = re.compile(r"https://[a-zA-Z0-9-]+\.trycloudflare\.com")
+    try:
+        for raw in proc.stderr:
+            line = raw.decode("utf-8", "ignore")
+            m = url_re.search(line)
+            if m:
+                base = m.group(0).rstrip("/")
+                with _LOCK:
+                    if _SANCTUARY_TUNNEL_PROC is proc:
+                        _SANCTUARY_PUBLIC_BASE = base
+                        if _STATE["active"] and not _STATE["public_url"]:
+                            _STATE["public_url"] = base + "/watch"
+                            _STATE["tunnel_status"] = "live"
+                            _STATE["seq"] += 1
+                            _fanout_locked()
+    except Exception:
+        pass
+    finally:
+        with _LOCK:
+            if _SANCTUARY_TUNNEL_PROC is proc:
+                _SANCTUARY_PUBLIC_BASE = ""
+
+
+def ensure_sanctuary_tunnel(port: int = 8080) -> str:
+    """Start (if needed) a single persistent Cloudflare quick tunnel so QR codes work on 4G/5G phones."""
+    global _SANCTUARY_TUNNEL_PROC
+    cfg = ai_engine.load_config()
+    custom = (cfg.get("public_sanctuary_url") or cfg.get("broadcast_public_base_url") or "").strip().rstrip("/")
+    if custom:
+        return custom
+    if not shutil.which("cloudflared"):
+        return ""
+    with _LOCK:
+        if _SANCTUARY_TUNNEL_PROC is not None and _SANCTUARY_TUNNEL_PROC.poll() is None:
+            return _SANCTUARY_PUBLIC_BASE
+        try:
+            proc = subprocess.Popen(
+                ["cloudflared", "tunnel", "--no-autoupdate", "--url", f"http://127.0.0.1:{port}"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+            )
+            _SANCTUARY_TUNNEL_PROC = proc
+            threading.Thread(target=_sanctuary_tunnel_reader, args=(proc,), daemon=True).start()
+        except Exception:
+            pass
+        return _SANCTUARY_PUBLIC_BASE
+
+
+def start_tunnel_watchdog(port: int = 8080):
+    """Background daemon that maintains the scannable HTTPS quick tunnel whenever internet is available."""
+    global _WATCHDOG_STARTED
+    with _LOCK:
+        if _WATCHDOG_STARTED:
+            return
+        _WATCHDOG_STARTED = True
+
+    def _loop():
+        while True:
+            try:
+                ensure_sanctuary_tunnel(port=port)
+            except Exception:
+                pass
+            time.sleep(30)
+
+    threading.Thread(target=_loop, daemon=True).start()
+
+
 def _start_tunnel_locked(port: int = 8080):
     global _TUNNEL_PROC
     cfg = ai_engine.load_config()
-    custom_base = (cfg.get("broadcast_public_base_url") or "").strip().rstrip("/")
+    custom_base = (cfg.get("broadcast_public_base_url") or cfg.get("public_sanctuary_url") or "").strip().rstrip("/")
     if custom_base:
         _STATE["public_url"] = custom_base + "/watch"
         _STATE["tunnel_status"] = "custom"
+        return
+    if _SANCTUARY_PUBLIC_BASE:
+        _STATE["public_url"] = _SANCTUARY_PUBLIC_BASE.rstrip("/") + "/watch"
+        _STATE["tunnel_status"] = "live"
         return
     if not shutil.which("cloudflared"):
         _STATE["tunnel_status"] = "lan_only"
