@@ -35,6 +35,8 @@ _STATE = {
     "deck": None,
     "public_url": "",
     "lan_url": "",
+    "camera_feed_url": "",
+    "network_scope": "local",
     "tunnel_status": "idle",
 }
 
@@ -120,6 +122,8 @@ def _snapshot_locked(include_deck: bool = True) -> dict:
         "public_url": _STATE["public_url"],
         "lan_url": _STATE["lan_url"],
         "watch_url": _STATE["public_url"] or _STATE["lan_url"],
+        "camera_feed_url": _STATE["camera_feed_url"],
+        "network_scope": _STATE["network_scope"],
         "tunnel_status": _STATE["tunnel_status"],
         "viewer_count": len(_SUBSCRIBERS),
         "cloudflared_available": bool(shutil.which("cloudflared")),
@@ -146,7 +150,7 @@ def get_state(include_deck: bool = True) -> dict:
         return _snapshot_locked(include_deck=include_deck)
 
 
-def start_broadcast(deck_kind: str = "parasha", deck_slug: str = "", slide_idx: int = 0, public_tunnel: bool = True, port: int = 8080) -> dict:
+def start_broadcast(deck_kind: str = "parasha", deck_slug: str = "", slide_idx: int = 0, public_tunnel: bool = True, port: int = 8080, camera_feed_url: str = "", network_scope: str = "local") -> dict:
     cfg = ai_engine.load_config()
     deck = sanctuary_rich_data.build_presentation(deck_kind, deck_slug)
     lan_ip = _detect_lan_ip()
@@ -159,6 +163,8 @@ def start_broadcast(deck_kind: str = "parasha", deck_slug: str = "", slide_idx: 
         _STATE["slide_idx"] = max(0, min(int(slide_idx), max(0, len(deck.get("slides") or []) - 1)))
         _STATE["deck"] = deck
         _STATE["lan_url"] = f"http://{lan_ip}:{port}/watch"
+        _STATE["camera_feed_url"] = (camera_feed_url or "").strip()
+        _STATE["network_scope"] = (network_scope or "local").strip()
         _STATE["seq"] += 1
         if public_tunnel:
             _start_tunnel_locked(port=port)

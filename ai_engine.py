@@ -38,6 +38,9 @@ DEFAULT_CONFIG = {
     "public_sanctuary_url": "",
     "donation_checkout_url": "https://www.theshul.eu",
     "syndication_webhook_url": "",
+    "mesh_node_type": "synagogue",
+    "mesh_camera_url": "",
+    "mesh_auto_receive": True,
     "location": {
         "city": "Brussels, Belgium",
         "lat": 50.8503,

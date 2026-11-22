@@ -110,6 +110,18 @@ class TestRichVisualAtlas(unittest.TestCase):
 
 
 class TestBroadcastHub(unittest.TestCase):
+    def test_omarchy_shul_mesh(self):
+        import shul_mesh
+        caps = shul_mesh.detect_omarchy_capabilities(force=True)
+        self.assertIn("hostname", caps)
+        self.assertIn("tailscale", caps)
+        beacon = shul_mesh.build_beacon()
+        self.assertTrue(beacon.get("ok"))
+        self.assertTrue(beacon.get("protocol", "").startswith("torah-sanctuary"))
+        jp = shul_mesh.build_join_pack()
+        self.assertIn("/watch", jp.get("watch_url", ""))
+        self.assertIn("broadcast_follow_url", jp.get("join_command", ""))
+
     def test_broadcast_lifecycle(self):
         st0 = broadcast_hub.get_state(include_deck=False)
         self.assertIn("active", st0)
@@ -245,6 +257,10 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/shul/mailing",
             "/api/scribe/status",
             "/api/broadcast/state",
+            "/api/mesh/overview",
+            "/api/mesh/beacon",
+            "/api/mesh/incoming",
+            "/api/mesh/join-qr.svg",
             "/art/esther-shushan.jpg",
             "/art/elijah-horeb.jpg",
             "/art/solomon-temple.jpg",

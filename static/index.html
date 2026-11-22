@@ -156,6 +156,7 @@
     border-radius: 14px;
     padding: 20px;
     margin-bottom: 16px;
+    min-width: 0;
   }
   .card h2, .card h3 {
     font-family: var(--serif);
@@ -366,7 +367,12 @@
   .search-bar input, select, .form-input {
     background: var(--bg-card); color: var(--text);
     border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px 14px; font-size: 0.95rem;
+    padding: 10px 14px; font-size: 0.93rem;
+    max-width: 100%; min-width: 0;
+  }
+  select {
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .search-bar input { flex: 1; }
   .chapter-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
@@ -1472,6 +1478,144 @@
   [data-theme="parchment"] .tl-node [style*="color:#c9d6ea"] {
     color: #6b460a !important;
   }
+
+  /* CLEAN SETTINGS LAYOUT (ZERO OVERFLOW) */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.45fr);
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 1040px) { .settings-grid { grid-template-columns: minmax(0, 1fr); } }
+  .settings-stack { display: grid; gap: 14px; min-width: 0; }
+  .settings-section {
+    background: rgba(8, 15, 30, 0.52);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .settings-section-title {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+  }
+  .settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: var(--text);
+    min-width: 0;
+    width: 100%;
+  }
+  .settings-field input.form-input,
+  .settings-field select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 8px 11px;
+    font-size: 0.88rem;
+  }
+  .settings-row-2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+  }
+  .settings-row-4 {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr) minmax(0, 0.75fr) minmax(0, 1.15fr);
+    gap: 8px;
+    min-width: 0;
+  }
+  @media (max-width: 680px) {
+    .settings-row-2, .settings-row-4 { grid-template-columns: minmax(0, 1fr); }
+  }
+  .settings-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1.38;
+    min-width: 0;
+  }
+  .settings-check input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
+
+  /* OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH */
+  .mesh-cap-strip {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+  }
+  .mesh-cap-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px; font-size: 0.79rem; font-weight: 700;
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+  }
+  .mesh-cap-pill.ok { border-color: rgba(74,222,128,0.52); color: #86efac; }
+  .mesh-cap-pill.gold { border-color: rgba(228,188,105,0.55); color: var(--gold); }
+  .mesh-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 1020px) { .mesh-grid { grid-template-columns: minmax(0, 1fr); } }
+  .mesh-node-card {
+    background: rgba(10, 18, 36, 0.62);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 13px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .mesh-node-card.self-node {
+    border-color: rgba(228, 188, 105, 0.62);
+    background: linear-gradient(135deg, rgba(228,188,105,0.11), rgba(10,18,36,0.7));
+  }
+  .mesh-incoming-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 22px;
+    background: linear-gradient(90deg, rgba(228,188,105,0.22), rgba(92,182,229,0.2), rgba(228,188,105,0.18));
+    border-bottom: 1.5px solid var(--gold);
+    color: var(--text);
+  }
+  .mesh-incoming-bar.show { display: flex; }
+  [data-theme="parchment"] .settings-section,
+  [data-theme="parchment"] .mesh-node-card {
+    background: rgba(255, 251, 242, 0.92);
+    border-color: rgba(165, 118, 34, 0.34);
+  }
+  [data-theme="parchment"] .mesh-node-card.self-node {
+    background: linear-gradient(135deg, rgba(246,232,199,0.95), rgba(255,251,242,0.96));
+    border-color: rgba(154, 104, 18, 0.62);
+  }
+  [data-theme="parchment"] .mesh-cap-pill.ok { color: #166534; border-color: rgba(22,101,52,0.45); background: #f0fdf4; }
+  [data-theme="parchment"] .mesh-cap-pill.gold { color: #7a520c; border-color: rgba(154,104,18,0.48); background: #fff9e8; }
+  [data-theme="parchment"] .mesh-incoming-bar {
+    background: linear-gradient(90deg, #fbf0d3, #eaf4fa, #fbf0d3);
+    color: #1d1710;
+  }
+  [data-theme="parchment"] #view-mesh [style*="color:#fff"],
+  [data-theme="parchment"] #view-settings [style*="color:#fff"] {
+    color: #1d1710 !important;
+  }
 </style>
 </head>
 <body>
@@ -1529,6 +1673,7 @@
       <button data-view="parasha">Parashah</button>
       <button data-view="reader">Tanakh</button>
       <button data-view="shul">Shul &amp; Mailings</button>
+      <button data-view="mesh">🌐 Shul Mesh</button>
       <button data-view="history">History</button>
       <button data-view="settings">Settings</button>
     </nav>
@@ -1547,6 +1692,20 @@
   <div class="celestial-ribbon" id="celestialRibbon" onclick="switchView('sky')" title="Click to open the Sacred Celestial, Sun, Moon & Jewish Calendar Observatory">
     <div class="cel-group" id="celRibbonLeft"><span class="muted">Calculating live Sun, Moon &amp; Hebrew Calendar...</span></div>
     <div class="cel-group" id="celRibbonRight"></div>
+  </div>
+
+  <div class="mesh-incoming-bar" id="meshIncomingBar">
+    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+      <span style="font-size:1.15rem;">📡</span>
+      <div style="min-width:0;">
+        <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);" id="meshInFrom">OMARCHY SHUL MESH LIVE</div>
+        <div style="font-size:0.92rem;font-weight:700;" id="meshInText"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <a class="btn-primary" id="meshInWatchBtn" href="/watch" target="_blank" style="padding:5px 12px;font-size:0.82rem;text-decoration:none;display:none;">📺 Tune In Live</a>
+      <button class="tool-btn" onclick="dismissMeshIncoming()">✕ Dismiss</button>
+    </div>
   </div>
 
   <main>
@@ -1912,84 +2071,299 @@
       <div class="cards-grid" id="historyGrid"></div>
     </section>
 
+    <!-- 5B. OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH -->
+    <section id="view-mesh" class="view">
+      <div class="card" style="padding:18px 22px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);">OMARCHY OS · ENCRYPTED WIREGUARD TAILNET + STUDIO CAMERA + SHABBAT GUARD</div>
+            <h2 style="margin:3px 0 4px;">🌐 Synagogue, Chabad House &amp; Residence Broadcast Mesh</h2>
+            <p class="muted" style="font-size:0.86rem;margin:0;max-width:780px;">Link sister synagogues, Chabad Houses, and family residences directly through Omarchy's encrypted Tailscale mesh &amp; Studio virtual camera. Broadcast live Torah slides, Rabbi video feeds, and community announcements in one click—automatically respecting each building's local Shabbat Zmanim.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-secondary" onclick="loadShulMesh(true)">🔄 Ping All Nodes</button>
+            <button class="btn-primary" onclick="scanTailscaleMesh()">🔍 Scan Tailscale Mesh</button>
+          </div>
+        </div>
+        <div class="mesh-cap-strip" id="meshCapStrip">
+          <span class="mesh-cap-pill">Detecting Omarchy OS &amp; Tailscale Mesh...</span>
+        </div>
+      </div>
+
+      <div class="mesh-grid">
+        <!-- LEFT COLUMN: LINKED NODES & TAILSCALE DISCOVERY -->
+        <div class="settings-stack">
+          <div class="card" style="margin-bottom:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+              <h3 style="margin:0;">🏛️ Linked Synagogues, Chabad Houses &amp; Homes</h3>
+              <span class="comm-badge" id="meshNodeCountBadge">Loading...</span>
+            </div>
+            <div id="meshNodesList" class="settings-stack" style="gap:10px;"></div>
+            <div id="meshDiscoveryBox" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <h3 style="margin-top:0;">➕ Link a Synagogue, Chabad House or Residence</h3>
+            <div class="settings-stack" style="gap:10px;">
+              <div class="settings-row-2">
+                <label class="settings-field">Location / Shul Name
+                  <input class="form-input" id="mNodeName" placeholder="e.g. Chabad House Brussels">
+                </label>
+                <label class="settings-field">Node Role
+                  <select id="mNodeType">
+                    <option value="synagogue">🏛️ Main Synagogue</option>
+                    <option value="chabad" selected>🕯️ Chabad House</option>
+                    <option value="residence">🏠 Family Residence</option>
+                    <option value="mobile">📡 Mobile / Outreach Kiosk</option>
+                  </select>
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Tailscale / LAN / Public URL
+                  <input class="form-input" id="mNodeUrl" placeholder="http://100.x.y.z:8080 or https://...">
+                </label>
+                <label class="settings-field">City
+                  <input class="form-input" id="mNodeCity" placeholder="e.g. Antwerp, Belgium">
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Rabbi / Host Contact (optional)
+                  <input class="form-input" id="mNodeHost" placeholder="e.g. Rabbi &amp; Rebbetzin">
+                </label>
+                <label class="settings-field">Omarchy Studio Camera URL (optional)
+                  <input class="form-input" id="mNodeCam" placeholder="http://100.x.y.z:53317/program.mjpg">
+                </label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                <label class="settings-check"><input type="checkbox" id="mNodeShabbat" checked> Respect node's local Shabbat Stillness</label>
+                <button class="btn-primary" onclick="addMeshNodeUi()">🔗 Link Node to Mesh</button>
+              </div>
+              <div id="mNodeMsg" class="muted" style="font-size:0.83rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: ONE-CLICK NETWORK BROADCAST + ZERO-TOUCH JOIN PACK -->
+        <div class="settings-stack">
+          <div class="card" style="margin-bottom:0;border-color:rgba(228,188,105,0.48);">
+            <h3 style="margin-top:0;">📡 Broadcast Live Across the Shul Mesh</h3>
+            <p class="muted" style="font-size:0.84rem;margin:0 0 12px;">Push a live synchronized Torah Shiur (+ Omarchy Studio camera feed) or an instant community banner to every linked Synagogue, Chabad House &amp; Residence.</p>
+            <div class="settings-section" style="margin-bottom:12px;">
+              <div class="settings-section-title">1 · Live Torah Shiur + Omarchy Camera Broadcast</div>
+              <div class="settings-row-2">
+                <label class="settings-field">Presentation Topic
+                  <select id="mCastKind">
+                    <option value="parasha">Weekly Parashah Deck</option>
+                    <option value="story">Torah Story Deck</option>
+                  </select>
+                </label>
+                <label class="settings-field">Broadcast Title (optional)
+                  <input class="form-input" id="mCastTitle" placeholder="e.g. Rabbi Michoel Live Shiur">
+                </label>
+              </div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.82rem;">
+                <label class="settings-check"><input type="checkbox" class="mTargetType" value="synagogue" checked> 🏛️ Synagogues</label>
+                <label class="settings-check"><input type="checkbox" class="mTargetType" value="chabad" checked> 🕯️ Chabad</label>
+                <label class="settings-check"><input type="checkbox" class="mTargetType" value="residence" checked> 🏠 Residences</label>
+                <label class="settings-check"><input type="checkbox" id="mCastCam" checked> 🎥 Include Omarchy Studio Cam</label>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-primary" onclick="broadcastMeshShiur()">📡 Start Mesh Live Broadcast</button>
+                <a class="btn-secondary" href="/watch" target="_blank" style="text-decoration:none;">📺 Open /watch Preview</a>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">2 · Instant Sanctuary Network Announcement</div>
+              <label class="settings-field">Headline
+                <input class="form-input" id="mAnnTitle" placeholder="e.g. Mincha &amp; Arvit in 15 Minutes · Mazal Tov!">
+              </label>
+              <label class="settings-field">Message
+                <input class="form-input" id="mAnnMsg" placeholder="Short note displayed cleanly on all linked non-Shabbat screens...">
+              </label>
+              <button class="btn-secondary" onclick="broadcastMeshAnnouncement()">📢 Push Banner to All Linked Screens</button>
+            </div>
+            <div id="meshCastStatus" class="muted" style="font-size:0.84rem;margin-top:10px;"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <h3 style="margin-top:0;">🤝 Zero-Touch Omarchy Node Join Pack</h3>
+            <div style="display:grid;grid-template-columns:116px minmax(0,1fr);gap:14px;align-items:center;">
+              <div style="background:#fffdf7;padding:6px;border-radius:12px;border:1.5px solid var(--gold);text-align:center;">
+                <img id="meshJoinQr" src="/api/mesh/join-qr.svg" alt="Join Shul Mesh QR" style="width:100px;height:100px;display:block;margin:0 auto;">
+              </div>
+              <div style="min-width:0;">
+                <div style="font-size:0.78rem;color:var(--accent);font-weight:700;">THIS HUB'S OMARCHY MESH ADDRESS</div>
+                <div id="meshJoinHubUrl" style="font-family:monospace;font-size:0.82rem;color:var(--gold);word-break:break-all;margin:3px 0 8px;">Loading...</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="copyMeshJoinCmd()">📋 Copy Omarchy Join Cmd</button>
+                  <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="switchView('settings')">⚙ Mesh Settings</button>
+                </div>
+              </div>
+            </div>
+            <pre id="meshJoinCmdPre" style="margin:10px 0 0;padding:10px;border-radius:10px;background:rgba(6,11,24,0.75);border:1px solid var(--border);color:#cbd5e1;font-size:0.74rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;"></pre>
+            <div id="meshHistoryBox" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:0.8rem;" class="muted"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 6. LIBRARY & SETTINGS -->
     <section id="view-settings" class="view">
-      <div class="cards-grid">
-        <div class="card">
-          <h2>Local Offline Library Status</h2>
-          <div id="healthDetails" class="muted">Loading...</div>
-          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-            <h2 style="margin:0;">🧠 Mini-Orca · Living Torah Scribe</h2>
-            <span class="comm-badge" id="scribeBadge">Loading...</span>
+      <div class="settings-grid">
+        <div class="settings-stack">
+          <div class="card" style="margin-bottom:0;">
+            <h2>Local Offline Library Status</h2>
+            <div id="healthDetails" class="muted">Loading...</div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+              <h2 style="margin:0;">🧠 Mini-Orca · Living Torah Scribe</h2>
+              <span class="comm-badge" id="scribeBadge">Loading...</span>
+            </div>
+            <p class="muted" style="font-size:0.85rem;margin-top:0;">Autonomously strengthens this node every 30 minutes (pauses automatically for Shabbat Stillness): expands classical commentaries (<em>Or HaChaim, Kli Yakar, Chizkuni, Rashbam, Metzudat David</em>) and authors grounded Parashah &amp; Tanakh study sheets indexed directly into the local AI brain.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">
+              <button class="btn-primary" onclick="triggerScribe('')">⚡ Run Mini-Orca Cycle Now</button>
+              <button class="btn-secondary" onclick="triggerScribe('ingest_commentary')">📚 Expand Commentaries</button>
+              <button class="btn-secondary" onclick="triggerScribe('enrich_parasha')">✍️ Author Parashah Guide</button>
+            </div>
+            <div id="scribeDetails" class="muted" style="font-size:0.85rem;">Loading Mini-Orca activity journal...</div>
           </div>
-          <p class="muted" style="font-size:0.85rem;margin-top:0;">Autonomously strengthens this node every 30 minutes (pauses automatically for Shabbat Stillness): expands classical commentaries (<em>Or HaChaim, Kli Yakar, Chizkuni, Rashbam, Metzudat David</em>) and authors grounded Parashah &amp; Tanakh study sheets indexed directly into the local AI brain.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">
-            <button class="btn-primary" onclick="triggerScribe('')">⚡ Run Mini-Orca Cycle Now</button>
-            <button class="btn-secondary" onclick="triggerScribe('ingest_commentary')">📚 Expand Commentaries</button>
-            <button class="btn-secondary" onclick="triggerScribe('enrich_parasha')">✍️ Author Parashah Guide</button>
+
+          <div class="card" style="margin-bottom:0;border-color:rgba(92,182,229,0.4);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+              <h3 style="margin:0;">🌐 Omarchy Shul Mesh Ready</h3>
+              <button class="btn-secondary" style="padding:5px 11px;font-size:0.8rem;" onclick="switchView('mesh')">Open Mesh Console →</button>
+            </div>
+            <p class="muted" style="font-size:0.84rem;margin:0;">Link Synagogues, Chabad Houses &amp; Family Residences over encrypted Tailscale WireGuard + Omarchy Studio Camera (`OmarchyStudioProgram`) with automatic per-city Shabbat Stillness protection.</p>
           </div>
-          <div id="scribeDetails" class="muted" style="font-size:0.85rem;">Loading Mini-Orca activity journal...</div>
         </div>
-        <div class="card">
-          <h2>Synagogue &amp; Hybrid AI Settings</h2>
-          <p class="muted" style="font-size:0.86rem;margin-bottom:12px;">Works 100% offline using local Ollama. Optionally add an OpenAI, Anthropic, or Gemini key for cloud-enhanced scholarly depth when connected to Wi-Fi.</p>
-          <div style="display:grid;gap:10px;">
-            <label>Synagogue / Station Name<br><input class="form-input" style="width:100%" id="cfgSynName"></label>
-            <label>Sacred Sky Location Preset (Sun, Moon &amp; Exact Halachic Zmanim)<br>
-              <select id="cfgCityPreset" style="width:100%" onchange="applyCityPreset(this.value)">
-                <option value="">Custom Coordinates Below</option>
-                <option value="brussels">Brussels, Belgium (50.85°N, 4.35°E · Europe/Brussels)</option>
-                <option value="antwerp">Antwerp, Belgium (51.22°N, 4.40°E · Europe/Brussels)</option>
-                <option value="jerusalem">Jerusalem, Israel (31.77°N, 35.21°E · Asia/Jerusalem)</option>
-                <option value="tel_aviv">Tel Aviv, Israel (32.09°N, 34.78°E · Asia/Jerusalem)</option>
-                <option value="london">London, UK (51.51°N, -0.13°E · Europe/London)</option>
-                <option value="paris">Paris, France (48.86°N, 2.35°E · Europe/Paris)</option>
-                <option value="new_york">New York, NY (40.71°N, -74.01°W · America/New_York)</option>
-                <option value="miami">Miami, FL (25.76°N, -80.19°W · America/New_York)</option>
-                <option value="los_angeles">Los Angeles, CA (34.05°N, -118.24°W · America/Los_Angeles)</option>
-              </select>
-            </label>
-            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:8px;">
-              <input class="form-input" id="cfgLocCity" placeholder="City Name">
-              <input class="form-input" id="cfgLocLat" placeholder="Lat" type="number" step="0.0001">
-              <input class="form-input" id="cfgLocLon" placeholder="Lon" type="number" step="0.0001">
-              <input class="form-input" id="cfgLocTz" placeholder="Timezone">
+
+        <div class="card" style="margin-bottom:0;">
+          <h2>Synagogue, Omarchy Mesh &amp; Hybrid AI Settings</h2>
+          <p class="muted" style="font-size:0.85rem;margin-bottom:14px;">Works 100% offline using local Ollama. Optionally connect cloud AI, Omarchy Studio camera streams, or external calendar &amp; syndication webhooks.</p>
+          <div class="settings-stack">
+
+            <div class="settings-section">
+              <div class="settings-section-title">🏛️ Synagogue Identity &amp; Sacred Sky Location</div>
+              <div class="settings-row-2">
+                <label class="settings-field">Synagogue / Station Name
+                  <input class="form-input" id="cfgSynName">
+                </label>
+                <label class="settings-field">Omarchy Mesh Node Role
+                  <select id="cfgMeshType">
+                    <option value="synagogue">🏛️ Main Synagogue Hub</option>
+                    <option value="chabad">🕯️ Chabad House</option>
+                    <option value="residence">🏠 Family Residence</option>
+                    <option value="mobile">📡 Mobile / Outreach Kiosk</option>
+                  </select>
+                </label>
+              </div>
+              <label class="settings-field">Sacred Sky Location Preset (Sun, Moon &amp; Exact Halachic Zmanim)
+                <select id="cfgCityPreset" onchange="applyCityPreset(this.value)">
+                  <option value="">Custom Coordinates Below</option>
+                  <option value="brussels">Brussels, Belgium (50.85°N, 4.35°E · Europe/Brussels)</option>
+                  <option value="antwerp">Antwerp, Belgium (51.22°N, 4.40°E · Europe/Brussels)</option>
+                  <option value="jerusalem">Jerusalem, Israel (31.77°N, 35.21°E · Asia/Jerusalem)</option>
+                  <option value="tel_aviv">Tel Aviv, Israel (32.09°N, 34.78°E · Asia/Jerusalem)</option>
+                  <option value="london">London, UK (51.51°N, -0.13°E · Europe/London)</option>
+                  <option value="paris">Paris, France (48.86°N, 2.35°E · Europe/Paris)</option>
+                  <option value="new_york">New York, NY (40.71°N, -74.01°W · America/New_York)</option>
+                  <option value="miami">Miami, FL (25.76°N, -80.19°W · America/New_York)</option>
+                  <option value="los_angeles">Los Angeles, CA (34.05°N, -118.24°W · America/Los_Angeles)</option>
+                </select>
+              </label>
+              <div class="settings-row-4">
+                <label class="settings-field">City<input class="form-input" id="cfgLocCity" placeholder="City Name"></label>
+                <label class="settings-field">Lat<input class="form-input" id="cfgLocLat" placeholder="Lat" type="number" step="0.0001"></label>
+                <label class="settings-field">Lon<input class="form-input" id="cfgLocLon" placeholder="Lon" type="number" step="0.0001"></label>
+                <label class="settings-field">Timezone<input class="form-input" id="cfgLocTz" placeholder="Timezone"></label>
+              </div>
             </div>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam When Online</label>
-            <label>Local Ollama Model<br><input class="form-input" style="width:100%" id="cfgOllamaModel" value="qwen2.5:3b"></label>
-            <label>Optional Cloud AI Provider<br>
-              <select id="cfgCloudProv" style="width:100%">
-                <option value="none">Offline Only (Local Ollama)</option>
-                <option value="gemini">Google Gemini</option>
-                <option value="anthropic">Anthropic Claude</option>
-                <option value="openai">OpenAI</option>
-              </select>
-            </label>
-            <label>Cloud Model (optional override)<br><input class="form-input" style="width:100%" id="cfgCloudModel" placeholder="Leave blank for recommended default"></label>
-            <label>Cloud API Key (stored locally with 0600 perms)<br><input class="form-input" style="width:100%" type="password" id="cfgCloudKey" placeholder="Optional API key"></label>
-            <label>Local Neural Voice Profile (100% Offline Piper + Bass Mastering)<br>
-              <select id="cfgVoiceProf" style="width:100%">
-                <option value="grand_narrator">Grand Torah Narrator (Deep Bass-Baritone · James Earl Jones Style)</option>
-                <option value="warm_baritone">Warm Scholar Baritone (Studio Crisp)</option>
-                <option value="storyteller">Gentle Family Storyteller</option>
-              </select>
-            </label>
-            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="cfgAutoSpeak" checked> Auto-Speak AI Replies Aloud</label>
-              <button type="button" class="btn-secondary" onclick="testNarratorVoice()">🔊 Test Voice (Genesis 1:1–3)</button>
+
+            <div class="settings-section">
+              <div class="settings-section-title">🧠 Local &amp; Hybrid AI · Voice · Living OS</div>
+              <div class="settings-row-2">
+                <label class="settings-field">Local Ollama Model
+                  <input class="form-input" id="cfgOllamaModel" value="qwen2.5:1.5b">
+                </label>
+                <label class="settings-field">Optional Cloud AI Provider
+                  <select id="cfgCloudProv">
+                    <option value="none">Offline Only (Local Ollama)</option>
+                    <option value="gemini">Google Gemini</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="openai">OpenAI</option>
+                  </select>
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Cloud Model (optional override)
+                  <input class="form-input" id="cfgCloudModel" placeholder="Leave blank for default">
+                </label>
+                <label class="settings-field">Cloud API Key (0600 local only)
+                  <input class="form-input" type="password" id="cfgCloudKey" placeholder="Optional API key">
+                </label>
+              </div>
+              <label class="settings-field">Local Neural Voice Profile (100% Offline Piper + Bass Mastering)
+                <select id="cfgVoiceProf">
+                  <option value="grand_narrator">Grand Torah Narrator (Deep Bass-Baritone)</option>
+                  <option value="warm_baritone">Warm Scholar Baritone (Studio Crisp)</option>
+                  <option value="storyteller">Gentle Family Storyteller</option>
+                </select>
+              </label>
+              <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <label class="settings-check"><input type="checkbox" id="cfgAutoSpeak" checked> Auto-Speak AI Replies Aloud</label>
+                <button type="button" class="btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="testNarratorVoice()">🔊 Test Voice (Gen 1:1–3)</button>
+              </div>
+              <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
+              <label class="settings-check"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
+              <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam</label>
             </div>
-            <label>Shul Calendar ICS Feed URL (Google Calendar / Chabad iCal .ics)<br><input class="form-input" style="width:100%" id="cfgIcsUrl" placeholder="https://.../calendar.ics (syncs Rabbi Michoel's events automatically)"></label>
-            <label>Mailing / Newsletter Webhook URL (Mailchimp / Brevo / Zapier / CRM)<br><input class="form-input" style="width:100%" id="cfgMailHook" placeholder="https://... (receives signups & weekly newsletter pushes)"></label>
-            <label>Custom Public Broadcast Domain (optional, e.g. https://live.theshul.eu)<br><input class="form-input" style="width:100%" id="cfgBroadcastBase" placeholder="Leave blank for automatic Cloudflare quick tunnel or LAN /watch"></label>
-            <label>Companion House-Node: Follow Master Synagogue Broadcast URL (optional)<br><input class="form-input" style="width:100%" id="cfgBroadcastFollow" placeholder="e.g. https://live.theshul.eu or http://100.94.73.72:8080"></label>
-            <label>Public Sanctuary Base URL for QR Codes &amp; RSS (optional)<br><input class="form-input" style="width:100%" id="cfgPublicSanctuary" placeholder="e.g. https://sanctuary.theshul.eu (auto-detects Cloudflare or LAN if blank)"></label>
-            <label>Synagogue Donation Checkout URL (Stripe / PayPal / Bancontact / theshul.eu)<br><input class="form-input" style="width:100%" id="cfgDonateUrl" placeholder="https://www.theshul.eu"></label>
-            <label>Multi-Channel Syndication Webhook URL (Zapier / Make / n8n / Twilio / Eventbrite)<br><input class="form-input" style="width:100%" id="cfgSynHook" placeholder="https://... (auto-transmits RSS, Email, WhatsApp, SMS, Eventbrite & PR)"></label>
-            <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
-            <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">📡 Omarchy Broadcast Mesh, Camera &amp; Companion Sync</div>
+              <div class="settings-row-2">
+                <label class="settings-field">Omarchy Studio Camera Feed URL
+                  <input class="form-input" id="cfgMeshCam" placeholder="http://127.0.0.1:53317/program.mjpg">
+                </label>
+                <label class="settings-field">Public Broadcast Domain (optional)
+                  <input class="form-input" id="cfgBroadcastBase" placeholder="https://live.theshul.eu">
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Follow Master Synagogue Broadcast URL
+                  <input class="form-input" id="cfgBroadcastFollow" placeholder="http://100.94.73.72:8080">
+                </label>
+                <label class="settings-field">Public Sanctuary Base URL (QR &amp; RSS)
+                  <input class="form-input" id="cfgPublicSanctuary" placeholder="https://sanctuary.theshul.eu">
+                </label>
+              </div>
+              <label class="settings-check"><input type="checkbox" id="cfgMeshAutoRecv" checked> Auto-Receive Live Broadcast &amp; Announcement Banners from Linked Shuls (Skips Shabbat)</label>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">📨 Calendar, Donations &amp; Multi-Channel Syndication</div>
+              <div class="settings-row-2">
+                <label class="settings-field">Shul Calendar ICS Feed (.ics)
+                  <input class="form-input" id="cfgIcsUrl" placeholder="https://.../calendar.ics">
+                </label>
+                <label class="settings-field">Synagogue Donation Checkout URL
+                  <input class="form-input" id="cfgDonateUrl" placeholder="https://www.theshul.eu">
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Mailing / Newsletter Webhook URL
+                  <input class="form-input" id="cfgMailHook" placeholder="https://... (Mailchimp / Brevo)">
+                </label>
+                <label class="settings-field">Multi-Channel Syndication Webhook
+                  <input class="form-input" id="cfgSynHook" placeholder="https://... (Zapier / n8n / Twilio)">
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <button class="btn-primary" onclick="saveSettings()">💾 Save All Settings</button>
+              <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -2491,6 +2865,7 @@ function switchView(name) {
   if (name === 'sky') loadCelestial();
   if (name === 'liturgy' && !window._liturgyLoaded) loadLiturgy(false);
   if (name === 'shul' && !window._shulLoaded) { loadShul(false); loadSyndicationHub(); loadSponsorshipManager(); }
+  if (name === 'mesh') loadShulMesh(false);
   if (name === 'parasha' && !window._parashaLoaded) loadParasha('');
   if (name === 'reader' && !booksCache.length) loadBooks();
   if (name === 'stories' && !window._storiesLoaded) loadStories();
@@ -5467,6 +5842,9 @@ async function loadSettings() {
   const r = await fetch('/api/config');
   const c = (await r.json()).config || {};
   document.getElementById('cfgSynName').value = c.synagogue_name || 'The European Synagogue · Torah Sanctuary';
+  if (document.getElementById('cfgMeshType')) document.getElementById('cfgMeshType').value = c.mesh_node_type || 'synagogue';
+  if (document.getElementById('cfgMeshCam')) document.getElementById('cfgMeshCam').value = c.mesh_camera_url || '';
+  if (document.getElementById('cfgMeshAutoRecv')) document.getElementById('cfgMeshAutoRecv').checked = c.mesh_auto_receive !== false;
   const loc = c.location || { city: 'Brussels, Belgium', lat: 50.8503, lon: 4.3517, tz: 'Europe/Brussels' };
   document.getElementById('cfgLocCity').value = loc.city || 'Brussels, Belgium';
   document.getElementById('cfgLocLat').value = loc.lat ?? 50.8503;
@@ -5522,6 +5900,9 @@ async function saveSettings() {
     public_sanctuary_url: document.getElementById('cfgPublicSanctuary').value.trim(),
     donation_checkout_url: document.getElementById('cfgDonateUrl').value.trim() || 'https://www.theshul.eu',
     syndication_webhook_url: document.getElementById('cfgSynHook').value.trim(),
+    mesh_node_type: document.getElementById('cfgMeshType') ? document.getElementById('cfgMeshType').value : 'synagogue',
+    mesh_camera_url: document.getElementById('cfgMeshCam') ? document.getElementById('cfgMeshCam').value.trim() : '',
+    mesh_auto_receive: document.getElementById('cfgMeshAutoRecv') ? document.getElementById('cfgMeshAutoRecv').checked : true,
   };
   initCompanionFollow(payload.broadcast_follow_url);
   currentVoiceProfile = payload.voice_profile;
@@ -5732,14 +6113,264 @@ async function deleteSponsorshipItemUi(id) {
   loadSponsorshipManager();
 }
 
+// =============================================================================
+// OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH
+// =============================================================================
+let meshJoinCmdCache = '';
+
+async function loadShulMesh(probe = false) {
+  try {
+    const r = await fetch('/api/mesh/overview' + (probe ? '?probe=1' : ''));
+    const d = await r.json();
+    const caps = d.capabilities || {};
+    const ts = caps.tailscale || {};
+
+    const pills = [];
+    pills.push(`<span class="mesh-cap-pill ${caps.is_omarchy ? 'gold' : ''}">${caps.is_omarchy ? '✦ Omarchy OS Native' : '🖥 Linux Sanctuary OS'} · ${esc(caps.hostname || '')}</span>`);
+    pills.push(`<span class="mesh-cap-pill ${ts.active ? 'ok' : ''}">${ts.active ? '🔒 Tailscale WireGuard LIVE · ' + esc(ts.self_ip) + ' (' + (caps.online_tailscale_peers || 0) + ' peers)' : '🔒 Tailscale Standby · LAN ' + esc(caps.lan_ip || '')}</span>`);
+    pills.push(`<span class="mesh-cap-pill ${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? 'ok' : ''}">${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? '🎥 Omarchy Studio Cam READY' : '🎥 Studio Cam Optional'}</span>`);
+    if (caps.hyprsunset_available) pills.push(`<span class="mesh-cap-pill gold">🌅 Hyprland + hyprsunset Warmth</span>`);
+    if (caps.ble_lighting_live) pills.push(`<span class="mesh-cap-pill ok">💡 BLE Sanctuary RGB Sync</span>`);
+    if (caps.cloudflared_available) pills.push(`<span class="mesh-cap-pill ok">☁ Cloudflare Zero-Config Tunnel</span>`);
+    const strip = document.getElementById('meshCapStrip');
+    if (strip) strip.innerHTML = pills.join('');
+
+    const nodes = d.nodes || [];
+    const badge = document.getElementById('meshNodeCountBadge');
+    if (badge) {
+      const onlineCnt = nodes.filter(n => n.status === 'online').length;
+      badge.textContent = `${onlineCnt} / ${nodes.length} Online`;
+    }
+    const list = document.getElementById('meshNodesList');
+    if (list) {
+      list.innerHTML = nodes.map(n => {
+        const dotColor = n.status === 'online' ? '#4ade80' : (n.status === 'standby' ? '#e4bc69' : '#94a3b8');
+        const liveTag = n.active_broadcast ? ` <span class="trait-pill" style="background:rgba(239,68,68,0.2);border-color:#f87171;color:#fecaca;">🔴 LIVE NOW</span>` : '';
+        const selfTag = n.is_self ? ` <span class="trait-pill" style="color:var(--gold);border-color:var(--gold);">THIS HUB</span>` : '';
+        const camBtn = n.camera_feed_url ? `<a class="btn-secondary" style="padding:4px 9px;font-size:0.75rem;text-decoration:none;" href="${esc(n.camera_feed_url)}" target="_blank">🎥 Cam</a>` : '';
+        const delBtn = n.is_self ? '' : `<button class="tool-btn" style="padding:4px 8px;font-size:0.75rem;" onclick="deleteMeshNodeUi(${n.id})" title="Unlink node">✕</button>`;
+        return `<div class="mesh-node-card ${n.is_self ? 'self-node' : ''}">
+          <div style="min-width:0;flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};display:inline-block;flex-shrink:0;"></span>
+              <strong style="color:#fff;font-size:0.94rem;">${esc(n.type_icon || '🏛️')} ${esc(n.name)}</strong>${selfTag}${liveTag}
+            </div>
+            <div class="muted" style="font-size:0.78rem;margin-top:4px;word-break:break-all;">
+              ${esc(n.type_label || n.node_type)}${n.city ? ' · ' + esc(n.city) : ''}${n.rabbi_host ? ' · ' + esc(n.rabbi_host) : ''} · <code>${esc(n.endpoint_url)}</code>${n.last_latency_ms ? ' (' + n.last_latency_ms + 'ms)' : ''}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0;">
+            <a class="btn-secondary" style="padding:4px 9px;font-size:0.75rem;text-decoration:none;" href="${esc(n.endpoint_url)}/watch" target="_blank">📺 Tune In</a>
+            ${camBtn}${delBtn}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    const jp = d.join_pack || {};
+    meshJoinCmdCache = jp.join_command || '';
+    const hubEl = document.getElementById('meshJoinHubUrl');
+    if (hubEl) hubEl.textContent = jp.hub_url || '';
+    const preEl = document.getElementById('meshJoinCmdPre');
+    if (preEl) preEl.textContent = meshJoinCmdCache;
+    const qrEl = document.getElementById('meshJoinQr');
+    if (qrEl) qrEl.src = '/api/mesh/join-qr.svg?t=' + Date.now();
+
+    const hist = d.history || [];
+    const hBox = document.getElementById('meshHistoryBox');
+    if (hBox) {
+      hBox.innerHTML = hist.length
+        ? `<strong style="color:var(--gold);">Recent Mesh Broadcasts (${hist.length}):</strong>` + hist.slice(0, 5).map(h =>
+            `<div style="margin-top:4px;">${h.direction === 'inbound' ? '📥' : '📡'} <strong>${esc(h.title)}</strong> (${esc(h.kind)}) · delivered ${h.delivered_count}${h.skipped_shabbat ? ` · 🕯 ${h.skipped_shabbat} Shabbat-protected` : ''}</div>`
+          ).join('')
+        : 'No network broadcasts sent yet — link a sister Shul, Chabad House, or residence to broadcast together.';
+    }
+  } catch (e) {}
+}
+
+async function scanTailscaleMesh() {
+  const box = document.getElementById('meshDiscoveryBox');
+  if (!box) return;
+  box.style.display = 'block';
+  box.innerHTML = '<div class="muted" style="font-size:0.84rem;">🔍 Scanning encrypted Tailscale WireGuard peers on port 8080...</div>';
+  try {
+    const r = await fetch('/api/mesh/discover');
+    const d = await r.json();
+    const peers = d.peers || [];
+    if (!d.tailscale_active) {
+      box.innerHTML = '<div class="muted" style="font-size:0.84rem;">Tailscale is not active on this machine yet. Connect Tailscale or add a peer URL manually below.</div>';
+      return;
+    }
+    box.innerHTML = `
+      <div style="font-size:0.8rem;font-weight:800;color:var(--accent);margin-bottom:8px;">
+        🔍 TAILSCALE MESH SCAN (${d.scanned_count} online peers · ${d.sanctuaries_found} Torah Sanctuary OS detected)
+      </div>
+      <div style="display:grid;gap:6px;">
+        ${peers.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;border-radius:9px;background:rgba(12,20,38,0.55);border:1px solid ${p.sanctuary_running ? 'rgba(74,222,128,0.5)' : 'var(--border)'};font-size:0.8rem;">
+            <div>
+              <strong>${esc(p.host)}</strong> <code>${esc(p.ip)}</code> (${esc(p.os)})
+              ${p.sanctuary_running ? ` <span style="color:#4ade80;font-weight:700;">✦ Torah Sanctuary Ready (${p.latency_ms}ms)</span>` : ` <span class="muted">· Omarchy / Tailnet peer</span>`}
+            </div>
+            <button class="btn-secondary" style="padding:3px 9px;font-size:0.75rem;" onclick="linkDiscoveredPeer('${esc(p.beacon && p.beacon.name ? p.beacon.name : p.host)}','${esc(p.endpoint_url)}','${esc(p.beacon && p.beacon.city ? p.beacon.city : '')}','${esc(p.beacon && p.beacon.node_type ? p.beacon.node_type : 'chabad')}')">+ Link</button>
+          </div>`).join('')}
+      </div>`;
+  } catch (e) {
+    box.innerHTML = '<div class="muted">Could not scan Tailscale peers.</div>';
+  }
+}
+
+async function linkDiscoveredPeer(name, endpointUrl, city, nodeType) {
+  await fetch('/api/mesh/nodes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, endpoint_url: endpointUrl, city, node_type: nodeType, shabbat_respect: true }),
+  });
+  loadShulMesh(true);
+}
+
+async function addMeshNodeUi() {
+  const st = document.getElementById('mNodeMsg');
+  const name = document.getElementById('mNodeName').value.trim();
+  const endpoint_url = document.getElementById('mNodeUrl').value.trim();
+  if (!name || !endpoint_url) {
+    if (st) st.textContent = 'Enter both a name and a Tailscale / LAN / web URL.';
+    return;
+  }
+  const r = await fetch('/api/mesh/nodes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      node_type: document.getElementById('mNodeType').value,
+      endpoint_url,
+      city: document.getElementById('mNodeCity').value.trim(),
+      rabbi_host: document.getElementById('mNodeHost').value.trim(),
+      camera_feed_url: document.getElementById('mNodeCam').value.trim(),
+      shabbat_respect: document.getElementById('mNodeShabbat').checked,
+    }),
+  });
+  const d = await r.json();
+  if (st) st.textContent = d.ok ? `✅ Linked "${name}" (${d.probed_online ? 'Online now!' : 'Saved in standby'}).` : (d.error || 'Error linking node');
+  if (d.ok) {
+    document.getElementById('mNodeName').value = '';
+    document.getElementById('mNodeUrl').value = '';
+    document.getElementById('mNodeCity').value = '';
+    document.getElementById('mNodeHost').value = '';
+    document.getElementById('mNodeCam').value = '';
+    loadShulMesh(false);
+  }
+}
+
+async function deleteMeshNodeUi(id) {
+  await fetch('/api/mesh/nodes/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  loadShulMesh(false);
+}
+
+async function broadcastMeshShiur() {
+  const st = document.getElementById('meshCastStatus');
+  if (st) st.textContent = '📡 Launching synchronized Torah Shiur & notifying all linked nodes...';
+  const target_types = Array.from(document.querySelectorAll('.mTargetType:checked')).map(el => el.value);
+  try {
+    const r = await fetch('/api/mesh/broadcast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: 'shiur',
+        deck_kind: document.getElementById('mCastKind').value,
+        title: document.getElementById('mCastTitle').value.trim(),
+        include_camera: document.getElementById('mCastCam').checked,
+        target_types,
+      }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      if (st) st.innerHTML = `🔴 <strong>LIVE ACROSS MESH!</strong> Watch URL: <code>${esc((d.signal && d.signal.watch_url) || '/watch')}</code> · Delivered to ${d.delivered}/${d.peers_targeted} linked peer(s)${d.skipped_shabbat ? ` · 🕯 ${d.skipped_shabbat} protected for local Shabbat` : ''}.`;
+      loadShulMesh(false);
+    } else if (st) {
+      st.textContent = d.error || 'Broadcast error';
+    }
+  } catch (e) {
+    if (st) st.textContent = 'Network error starting broadcast.';
+  }
+}
+
+async function broadcastMeshAnnouncement() {
+  const st = document.getElementById('meshCastStatus');
+  const title = document.getElementById('mAnnTitle').value.trim();
+  const message = document.getElementById('mAnnMsg').value.trim();
+  if (!title && !message) {
+    if (st) st.textContent = 'Enter a headline or message to push across linked screens.';
+    return;
+  }
+  const target_types = Array.from(document.querySelectorAll('.mTargetType:checked')).map(el => el.value);
+  const r = await fetch('/api/mesh/broadcast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ kind: 'announcement', title, message, target_types }),
+  });
+  const d = await r.json();
+  if (st) st.textContent = d.ok ? `📢 Sent "${title || 'Announcement'}" — delivered to ${d.delivered}/${d.peers_targeted} linked node(s)${d.skipped_shabbat ? ` (🕯 ${d.skipped_shabbat} Shabbat-protected)` : ''}.` : (d.error || 'Error');
+  if (d.ok) {
+    document.getElementById('mAnnTitle').value = '';
+    document.getElementById('mAnnMsg').value = '';
+    loadShulMesh(false);
+  }
+}
+
+function copyMeshJoinCmd() {
+  if (!meshJoinCmdCache) return;
+  navigator.clipboard.writeText(meshJoinCmdCache).catch(() => {});
+  const st = document.getElementById('meshCastStatus');
+  if (st) st.textContent = '📋 Copied Omarchy Mesh Join Command — paste on any sister Shul, Chabad House, or family residence node!';
+}
+
+async function pollMeshIncoming() {
+  try {
+    const r = await fetch('/api/mesh/incoming');
+    const d = await r.json();
+    const bar = document.getElementById('meshIncomingBar');
+    if (!bar) return;
+    if (d.active && d.signal) {
+      const s = d.signal;
+      document.getElementById('meshInFrom').textContent = `📡 ${s.kind === 'shiur' ? 'LIVE SHUL MESH BROADCAST' : 'SHUL MESH ANNOUNCEMENT'} · ${s.from_name}${s.city ? ' (' + s.city + ')' : ''}`;
+      document.getElementById('meshInText').textContent = `${s.title}${s.message ? ' — ' + s.message : ''}`;
+      const btn = document.getElementById('meshInWatchBtn');
+      if (btn) {
+        if (s.watch_url) { btn.href = s.watch_url; btn.style.display = 'inline-flex'; }
+        else { btn.style.display = 'none'; }
+      }
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+    }
+  } catch (e) {}
+}
+
+async function dismissMeshIncoming() {
+  await fetch('/api/mesh/incoming/dismiss', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
+  const bar = document.getElementById('meshIncomingBar');
+  if (bar) bar.classList.remove('show');
+}
+
 loadHealth();
 loadCelestial();
 loadToday();
+pollMeshIncoming();
+try {
+  const _initView = new URLSearchParams(location.search).get('view');
+  if (_initView && document.getElementById('view-' + _initView)) switchView(_initView);
+} catch (e) {}
 fetch('/api/config').then(r => r.json()).then(d => {
   if (d && d.config && d.config.broadcast_follow_url) initCompanionFollow(d.config.broadcast_follow_url);
 }).catch(() => {});
 setInterval(loadHealth, 30000);
 setInterval(loadCelestial, 60000);
+setInterval(pollMeshIncoming, 15000);
 </script>
 </body>
 </html>

@@ -21,6 +21,7 @@ import sacred_astronomy
 import sacred_liturgy
 import sanctuary_rich_data
 import shul_events
+import shul_mesh
 import torah_db
 import torah_scribe
 import voice_engine
@@ -197,6 +198,35 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
         if path == "/api/broadcast/state":
             self._send_json(broadcast_hub.get_state(include_deck=True))
+            return
+
+        if path == "/api/mesh/overview":
+            probe = qs.get("probe", ["0"])[0] in ("1", "true", "yes")
+            self._send_json(shul_mesh.get_mesh_overview(probe=probe, request_host=self.headers.get("Host", "")))
+            return
+
+        if path == "/api/mesh/beacon":
+            self._send_json(shul_mesh.build_beacon())
+            return
+
+        if path == "/api/mesh/discover":
+            self._send_json(shul_mesh.discover_tailscale_sanctuaries())
+            return
+
+        if path == "/api/mesh/incoming":
+            self._send_json(shul_mesh.get_active_incoming())
+            return
+
+        if path == "/api/mesh/join-qr.svg":
+            pack = shul_mesh.build_join_pack(self.headers.get("Host", ""))
+            svg_bytes = broadcast_hub.generate_qr_svg(pack["watch_url"])
+            self.send_response(200)
+            self.send_header("Content-Type", "image/svg+xml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(svg_bytes)))
+            self.end_headers()
+            self.wfile.write(svg_bytes)
             return
 
         if path == "/api/broadcast/qr.svg":
@@ -588,14 +618,58 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
         if path == "/api/broadcast/start":
             body = self._read_json_body()
+            cfg = ai_engine.load_config()
+            cam_u = (body.get("camera_feed_url") or cfg.get("mesh_camera_url") or "").strip()
             st = broadcast_hub.start_broadcast(
                 deck_kind=(body.get("kind") or "parasha").strip(),
                 deck_slug=(body.get("slug") or "").strip(),
                 slide_idx=int(body.get("slide_idx") or 0),
                 public_tunnel=bool(body.get("public_tunnel", True)),
                 port=PORT,
+                camera_feed_url=cam_u,
+                network_scope=(body.get("network_scope") or "local").strip(),
             )
             self._send_json({"ok": True, "broadcast": st})
+            return
+
+        if path == "/api/mesh/nodes":
+            body = self._read_json_body()
+            try:
+                res = shul_mesh.add_or_update_node(body)
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/mesh/nodes/delete":
+            body = self._read_json_body()
+            try:
+                res = shul_mesh.delete_node(int(body.get("id") or 0))
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/mesh/broadcast":
+            body = self._read_json_body()
+            try:
+                res = shul_mesh.broadcast_to_mesh(body)
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/mesh/receive":
+            body = self._read_json_body()
+            try:
+                res = shul_mesh.receive_mesh_signal(body)
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/mesh/incoming/dismiss":
+            self._send_json(shul_mesh.dismiss_incoming())
             return
 
         if path == "/api/broadcast/sync":
@@ -629,6 +703,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             if "cloud_api_key" in body and ("..." in str(body["cloud_api_key"]) or body["cloud_api_key"] == "***"):
                 body.pop("cloud_api_key", None)
             cfg = ai_engine.save_config(body)
+            try:
+                shul_mesh.ensure_self_node(port=PORT)
+            except Exception:
+                pass
             # Trigger OS celestial rhythm sync cleanly in background
             try:
                 daemon_py = BASE_DIR / "sacred-os-daemon.py"

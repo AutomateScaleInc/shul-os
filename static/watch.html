@@ -82,10 +82,31 @@
     background: rgba(7, 12, 24, 0.84); border-top: 1px solid rgba(228,188,105,0.22);
     font-size: 0.82rem; color: var(--muted);
   }
+  #studioCamPip {
+    display: none; position: fixed; right: 20px; bottom: 56px; z-index: 25;
+    width: 280px; border-radius: 16px; overflow: hidden;
+    background: rgba(8, 14, 28, 0.94); border: 1.5px solid rgba(228,188,105,0.68);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.72);
+  }
+  #studioCamPip .pip-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    padding: 5px 10px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+    color: var(--gold); background: rgba(14,22,42,0.95);
+  }
+  #studioCamPip img {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: #050914;
+  }
 </style>
 </head>
 <body>
 <div id="bgLayer"></div>
+<div id="studioCamPip">
+  <div class="pip-head">
+    <span>🎥 OMARCHY STUDIO CAM</span>
+    <button style="background:none;border:none;color:#b7c2d6;cursor:pointer;font-size:0.85rem;" onclick="document.getElementById('studioCamPip').style.display='none'">✕</button>
+  </div>
+  <img id="studioCamImg" alt="Live Omarchy Studio Feed" onerror="document.getElementById('studioCamPip').style.display='none'">
+</div>
 <header>
   <div>
     <div style="font-family:var(--serif);color:var(--gold);font-size:1.15rem;font-weight:700;" id="hostTitle">✡ Torah Sanctuary · Live Broadcast</div>
@@ -141,7 +162,20 @@ function renderState(st) {
   }
 
   badge.className = 'live-pill';
-  ltxt.textContent = `LIVE · 👁 ${st.viewer_count || 1}`;
+  ltxt.textContent = `LIVE · 👁 ${st.viewer_count || 1}${st.network_scope === 'mesh' ? ' · MESH' : ''}`;
+  const pip = document.getElementById('studioCamPip');
+  const pipImg = document.getElementById('studioCamImg');
+  if (pip && pipImg) {
+    if (st.camera_feed_url) {
+      if (pipImg.dataset.src !== st.camera_feed_url) {
+        pipImg.dataset.src = st.camera_feed_url;
+        pipImg.src = st.camera_feed_url;
+      }
+      pip.style.display = 'block';
+    } else {
+      pip.style.display = 'none';
+    }
+  }
   const deck = st.deck;
   const idx = Math.max(0, Math.min(st.slide_idx || 0, deck.slides.length - 1));
   const s = deck.slides[idx];
