@@ -346,13 +346,14 @@ def get_parasha_verses(parasha: dict, max_verses: int = 80) -> list:
 
 
 def get_weekly_parasha() -> dict:
-    """Fetch live weekly Parashat Hashavua from Sefaria (cached 12h), with offline calendar fallback."""
+    """Fetch live weekly Parashat Hashavua from Sefaria (cached per local calendar day), with offline calendar fallback."""
     now = time.time()
+    today_iso = time.strftime("%Y-%m-%d")
     cached = None
     if PARASHA_CACHE.exists():
         try:
             cached = json.loads(PARASHA_CACHE.read_text(encoding="utf-8"))
-            if now - float(cached.get("fetched_at", 0)) < 43200:
+            if cached.get("cache_date") == today_iso and (now - float(cached.get("fetched_at", 0))) < 43200:
                 return cached["data"]
         except Exception:
             pass
@@ -418,7 +419,7 @@ def get_weekly_parasha() -> dict:
         "verses_preview": get_parasha_verses(row, max_verses=45),
     }
     try:
-        PARASHA_CACHE.write_text(json.dumps({"fetched_at": now, "data": result}, ensure_ascii=False), encoding="utf-8")
+        PARASHA_CACHE.write_text(json.dumps({"fetched_at": now, "cache_date": today_iso, "data": result}, ensure_ascii=False), encoding="utf-8")
     except Exception:
         pass
     return result
