@@ -547,7 +547,11 @@ def build_presentation(kind: str = "story", slug: str = "") -> dict:
         daily = torah_db.get_daily_portion()
         p = daily["parasha"]
         ms = daily.get("matching_story")
-        en = get_story_enrichment(ms["slug"]) if ms else get_story_enrichment("05-jacobs-ladder-and-israel")
+        p_slug = (p.get("slug") or p.get("en_name") or "").lower()
+        story_key = ms["slug"] if ms else "05-jacobs-ladder-and-israel"
+        if "vayishlach" in p_slug or "vayetzei" in p_slug:
+            story_key = "05-jacobs-ladder-and-israel"
+        en = get_story_enrichment(story_key)
         # Grab top 3 verses + commentaries from today's Aliyah
         v_slides = [s for s in daily.get("slides", []) if s.get("kind") == "verse"]
         anchor_v = v_slides[0] if v_slides else {}
