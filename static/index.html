@@ -1121,6 +1121,76 @@
   .anatomy-card.antag  { border-top: 3px solid #f59e0b; }
   .anatomy-card.angel  { border-top: 3px solid #5cb6e5; }
   .anatomy-card.ally   { border-top: 3px solid #4ade80; }
+  /* Interactive Horizontal Torah & Jewish History Timeline */
+  .timeline-ribbon {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 14px 4px 16px;
+    margin-bottom: 14px;
+    scrollbar-width: thin;
+  }
+  .timeline-ribbon::before {
+    content: "";
+    position: absolute;
+    left: 16px; right: 16px; top: 38px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(228,188,105,0.25), rgba(228,188,105,0.8), rgba(92,182,229,0.75));
+    z-index: 0;
+  }
+  .tl-node {
+    position: relative; z-index: 1;
+    min-width: 148px; flex: 0 0 auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tl-node:hover { transform: translateY(-3px); border-color: var(--gold); }
+  .tl-node.active {
+    background: linear-gradient(145deg, rgba(228,188,105,0.18), rgba(16,28,52,0.96));
+    border-color: var(--gold);
+    box-shadow: 0 8px 22px rgba(228,188,105,0.2);
+  }
+  .tl-dot {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bg-card); border: 2px solid var(--gold);
+    font-size: 1.05rem; margin-bottom: 6px;
+  }
+  .tl-node.active .tl-dot { background: var(--gold); color: #0b1120; box-shadow: 0 0 14px rgba(228,188,105,0.65); }
+  .tl-showcase {
+    display: grid;
+    grid-template-columns: minmax(260px, 390px) 1fr;
+    gap: 20px;
+    align-items: start;
+    background: linear-gradient(145deg, rgba(16,28,52,0.92), rgba(11,17,32,0.96));
+    border: 1px solid rgba(228,188,105,0.34);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  @media (max-width: 900px) { .tl-showcase { grid-template-columns: 1fr; } }
+
+  /* Kids & Family Sanctuary Corner */
+  .kids-corner {
+    background: linear-gradient(135deg, rgba(228,188,105,0.12), rgba(92,182,229,0.1));
+    border: 1px solid rgba(228,188,105,0.4);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .kids-riddle-box {
+    margin-top: 12px;
+    background: rgba(11,17,32,0.88);
+    border: 1px solid rgba(228,188,105,0.38);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
 </style>
 </head>
 <body>
@@ -1387,6 +1457,21 @@
         </div>
         <button class="btn-primary" onclick="openPresentation('parasha','')">🎬 Present This Week's Parashah</button>
       </div>
+      <!-- 🌟 KIDS & FAMILY SANCTUARY CORNER -->
+      <div class="kids-corner">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;">🌟 KIDS &amp; FAMILY SANCTUARY CORNER · SHABBAT KIDS SHUL (Kids@theshul.eu)</div>
+            <h3 style="margin:4px 0 2px;font-family:var(--serif);color:#fff;">Interactive Stories, Riddles &amp; Shabbat Table Fun for All Ages</h3>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-primary" onclick="openRandomKidsStory()">🎲 Surprise Family Story</button>
+            <button class="btn-secondary" onclick="toggleFamilyRiddle()">❓ Play a Family Torah Riddle</button>
+            <button class="btn-secondary" id="kidsModeToggleBtn" onclick="toggleKidsFocusMode()">🧸 Family Story Mode: OFF</button>
+          </div>
+        </div>
+        <div id="kidsRiddleHost" style="display:none;"></div>
+      </div>
       <div id="storyDetail" style="display:none;" class="card"></div>
       <div class="cards-grid" id="storiesGrid"></div>
     </section>
@@ -1417,6 +1502,17 @@
 
     <!-- 5. HISTORY & GUIDES -->
     <section id="view-history" class="view">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+          <div>
+            <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;">⏳ INTERACTIVE 3,300+ YEAR JOURNEY · CREATION TO LIVING SYNAGOGUE 5787</div>
+            <h2 style="margin:3px 0 0;">Torah &amp; Jewish History Timeline Explorer</h2>
+          </div>
+          <span class="muted" style="font-size:0.84rem;">Tap any era below to explore artwork, books, figures &amp; living meaning</span>
+        </div>
+        <div class="timeline-ribbon" id="timelineRibbon"></div>
+        <div id="timelineShowcase"></div>
+      </div>
       <div class="card">
         <h2 style="margin:0;">Historical, Archaeological &amp; Interpretive Library</h2>
         <p class="muted">Second Temple Judaism, Dead Sea Scrolls, Biblical Archaeology, Tanakh vs. Old Testament Canon, Festivals, PaRDeS &amp; Classical Commentators.</p>
@@ -3142,10 +3238,128 @@ async function runGlobalSearch() {
   box.innerHTML = html;
 }
 
-// Stories, Characters, Symbols & Full-Screen Rabbi Presentations
+// Stories, Characters, Symbols, Timeline & Kids Corner
 let storiesCache = [];
 let charactersCache = [];
 let symbolsCache = [];
+let timelineCache = [];
+let timelineActiveIdx = 0;
+let familyQuizzesCache = [];
+let familyRiddleIdx = 0;
+let kidsFocusMode = false;
+
+function toggleKidsFocusMode() {
+  kidsFocusMode = !kidsFocusMode;
+  const btn = document.getElementById('kidsModeToggleBtn');
+  if (btn) btn.textContent = kidsFocusMode ? '🧸 Family Story Mode: ON ✨' : '🧸 Family Story Mode: OFF';
+}
+
+function openRandomKidsStory() {
+  if (!storiesCache.length) return;
+  kidsFocusMode = true;
+  const btn = document.getElementById('kidsModeToggleBtn');
+  if (btn) btn.textContent = '🧸 Family Story Mode: ON ✨';
+  const pick = storiesCache[Math.floor(Math.random() * storiesCache.length)];
+  openDoc('storyDetail', pick.slug);
+}
+
+async function toggleFamilyRiddle(forceNext = false) {
+  const host = document.getElementById('kidsRiddleHost');
+  if (!host) return;
+  if (!forceNext && host.style.display === 'block') {
+    host.style.display = 'none';
+    return;
+  }
+  if (!familyQuizzesCache.length) {
+    try {
+      const r = await fetch('/api/quizzes');
+      familyQuizzesCache = (await r.json()).quizzes || [];
+    } catch (e) {
+      return;
+    }
+  }
+  if (!familyQuizzesCache.length) return;
+  if (forceNext) {
+    familyRiddleIdx = (familyRiddleIdx + 1) % familyQuizzesCache.length;
+  }
+  const q = familyQuizzesCache[familyRiddleIdx];
+  const letters = ['A', 'B', 'C', 'D'];
+  host.style.display = 'block';
+  host.innerHTML = `
+    <div class="kids-riddle-box sanctuary-reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <span style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:#4ade80;font-weight:800;">❓ ${esc(q.badge)} · Riddle ${familyRiddleIdx + 1} / ${familyQuizzesCache.length}</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="toggleFamilyRiddle(true)">Next Riddle →</button>
+          <button class="tool-btn" style="padding:4px 8px;font-size:0.76rem;" onclick="document.getElementById('kidsRiddleHost').style.display='none'">Close</button>
+        </div>
+      </div>
+      <div style="font-family:var(--serif);font-size:1.15rem;color:#fff;font-weight:700;margin-bottom:10px;">${esc(q.question)}</div>
+      <div class="quiz-opts" id="famQuizOpts">
+        ${(q.options || []).map((opt, i) => `
+          <div class="quiz-opt" onclick="answerFamilyRiddle(${i})">
+            <span class="q-let">${letters[i] || (i+1)}</span>
+            <span>${esc(opt)}</span>
+          </div>`).join('')}
+      </div>
+      <div id="famQuizReveal" class="quiz-reveal-box" style="display:none;margin-top:10px;">
+        <strong style="color:#4ade80;">✨ Answer &amp; Sages Insight:</strong> ${esc(q.reveal_fact)} <span class="muted">(${esc(q.source_ref)})</span>
+      </div>
+    </div>`;
+}
+
+function answerFamilyRiddle(pickedIdx) {
+  const q = familyQuizzesCache[familyRiddleIdx];
+  if (!q) return;
+  document.querySelectorAll('#famQuizOpts .quiz-opt').forEach((el, i) => {
+    el.classList.remove('correct', 'dimmed');
+    if (i === q.correct_idx) {
+      el.classList.add('correct');
+      el.querySelector('.q-let').textContent = '✓';
+    } else if (i !== pickedIdx) {
+      el.classList.add('dimmed');
+    }
+  });
+  const rev = document.getElementById('famQuizReveal');
+  if (rev) rev.style.display = 'block';
+  if (pickedIdx === q.correct_idx) celebrateQuizReveal();
+}
+
+function renderTimelineShowcase(idx) {
+  timelineActiveIdx = idx;
+  const era = timelineCache[idx];
+  if (!era) return;
+  document.querySelectorAll('#timelineRibbon .tl-node').forEach((el, i) => el.classList.toggle('active', i === idx));
+  const box = document.getElementById('timelineShowcase');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="tl-showcase sanctuary-reveal">
+      <div>
+        ${renderLivingScene(era.art, '220px', '', '', 'margin-bottom:10px;')}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="openPresentation('story','${esc(era.story_slug)}')">🎬 Present Story</button>
+          <button class="btn-secondary" onclick="quickAsk('Explain the historical era of ${esc(era.era)} (${esc(era.dates)}, ${esc(era.books)}) — key archaeological context and meaning today.', 'history')">🤖 Ask AI Historian</button>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:800;">ERA ${esc(era.num)} · ${esc(era.dates)}</span>
+          <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.35rem;">${esc(era.he_era)}</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-size:1.55rem;color:#fff;margin:4px 0 8px;">${esc(era.emoji)} ${esc(era.era)}</h3>
+        <p style="font-size:0.96rem;line-height:1.58;margin:0 0 10px;">${esc(era.summary)}</p>
+        <div style="margin-bottom:10px;">
+          <span class="muted" style="font-size:0.8rem;">Key Figures: </span>
+          ${(era.figures || []).map(f => `<span class="trait-pill">${esc(f)}</span>`).join('')}
+        </div>
+        <div style="font-size:0.84rem;color:var(--gold);margin-bottom:10px;"><strong>📖 Primary Books &amp; Sources:</strong> ${esc(era.books)}</div>
+        <div class="today-box" style="padding:10px 14px;margin:0;">
+          <h4 style="margin-bottom:4px;font-size:0.88rem;">✦ Why This Era Matters Today</h4>
+          <div style="font-size:0.9rem;">${esc(era.today)}</div>
+        </div>
+      </div>
+    </div>`;
+}
 
 async function loadStories() {
   window._storiesLoaded = true;
@@ -3248,8 +3462,24 @@ async function loadSymbols() {
 
 async function loadHistory() {
   window._historyLoaded = true;
-  const [r1, r2] = await Promise.all([fetch('/api/documents?category=history'), fetch('/api/documents?category=guide')]);
+  const [r1, r2, r3] = await Promise.all([
+    fetch('/api/documents?category=history'),
+    fetch('/api/documents?category=guide'),
+    fetch('/api/timeline'),
+  ]);
   const docs = [...((await r1.json()).documents || []), ...((await r2.json()).documents || [])];
+  timelineCache = (await r3.json()).timeline || [];
+  const rib = document.getElementById('timelineRibbon');
+  if (rib && timelineCache.length) {
+    rib.innerHTML = timelineCache.map((era, i) => `
+      <button class="tl-node ${i === 0 ? 'active' : ''}" onclick="renderTimelineShowcase(${i})">
+        <div class="tl-dot">${esc(era.emoji)}</div>
+        <div style="font-size:0.7rem;color:var(--gold);font-weight:800;">${esc(era.num)} · ${esc(era.dates.split('·')[0].trim())}</div>
+        <div style="font-family:var(--serif);font-size:0.92rem;font-weight:700;color:#fff;margin-top:2px;">${esc(era.era)}</div>
+        <div style="font-family:var(--hebrew);font-size:0.88rem;color:#c9d6ea;margin-top:2px;">${esc(era.he_era)}</div>
+      </button>`).join('');
+    renderTimelineShowcase(0);
+  }
   const grid = document.getElementById('historyGrid');
   grid.innerHTML = docs.map(doc => `
     <div class="story-card" onclick="openDoc('historyDetail', '${esc(doc.slug)}')">
@@ -3271,6 +3501,15 @@ async function openDoc(targetId, slug) {
   const charsHtml = en && (en.characters || []).length ? `<div style="margin:10px 0;"><strong>Main Characters:</strong> ${en.characters.map(c => `<span class="trait-pill">${esc(c.name)}</span>`).join('')}</div>` : '';
   const symsHtml = en && (en.symbols || []).length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0;">${en.symbols.map(s => `<div style="display:flex;align-items:center;gap:8px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:6px 10px;"><div style="width:28px;height:28px;color:var(--gold);">${s.svg}</div><span style="font-size:0.84rem;font-weight:600;">${esc(s.name)}</span></div>`).join('')}</div>` : '';
   const todayHtml = en && (en.today_points || []).length ? `<div class="today-box"><h4>✦ Applying It in Today's Terms — ${esc(en.today_title)}</h4><ul style="margin:6px 0 0 20px;">${en.today_points.map(pt => `<li style="margin-bottom:5px;">${esc(pt)}</li>`).join('')}</ul></div>` : '';
+  const kidsSpotlightHtml = (d.category === 'story' && kidsFocusMode && d.kid_story) ? `
+    <div class="kids-corner" style="margin:12px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;">🧸 FAMILY &amp; KIDS STORYTELLER EDITION</div>
+        <button class="btn-primary" style="padding:5px 12px;font-size:0.82rem;" onclick="speakText(this.dataset.txt)" data-txt="${esc(d.title + '. ' + d.kid_story)}">🔊 Read Story Out Loud</button>
+      </div>
+      <div style="font-family:var(--serif);font-size:1.12rem;line-height:1.68;color:#fff;">${renderMarkdown(d.kid_story)}</div>
+      ${d.discussion_questions ? `<div class="spot-comm" style="margin-top:10px;margin-bottom:0;"><div class="c-label">🕯 Shabbat Table Family Questions</div><div>${renderMarkdown(d.discussion_questions)}</div></div>` : ''}
+    </div>` : '';
   box.innerHTML = `
     <div class="sanctuary-reveal">
     ${artHtml}
@@ -3287,6 +3526,7 @@ async function openDoc(targetId, slug) {
         <button class="tool-btn" onclick="document.getElementById('${targetId}').style.display='none'">Close</button>
       </div>
     </div>
+    ${kidsSpotlightHtml}
     ${sbHtml}
     ${charsHtml}
     ${symsHtml}

@@ -174,6 +174,14 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json({"characters": sanctuary_rich_data.list_characters()})
             return
 
+        if path == "/api/timeline":
+            self._send_json({"timeline": sanctuary_rich_data.list_timeline()})
+            return
+
+        if path == "/api/quizzes":
+            self._send_json({"quizzes": sanctuary_rich_data.list_quizzes()})
+            return
+
         if path == "/api/presentation":
             kind = qs.get("kind", ["parasha"])[0].strip().lower()
             slug = qs.get("slug", [""])[0].strip()
