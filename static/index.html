@@ -1638,7 +1638,7 @@
 
   /* ===== MOBILE-FIRST POLISHED SANCTUARY LAYOUT (PHONES & TABLETS <= 820px) ===== */
   @media (max-width: 820px) {
-    html, body { height: auto; overflow-x: hidden; }
+    html, body { height: auto; overflow-x: clip; }
     .app {
       display: flex;
       flex-direction: column;
@@ -4087,10 +4087,14 @@ function renderSpotlight() {
   }
   acts.innerHTML = actHtml;
 
-  // Highlight and smoothly scroll active item into view in right-hand daily stream
+  // Highlight and smoothly scroll active item into view ONLY inside desktop's right-hand daily stream (never hijack phone scroll!)
   document.querySelectorAll('.stream-item').forEach((el, i) => el.classList.toggle('active', i === spotIdx));
   const activeEl = document.getElementById('stream-item-' + spotIdx);
-  if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const streamBox = document.querySelector('.daily-stream');
+  if (activeEl && streamBox && window.innerWidth > 820) {
+    const topPos = activeEl.offsetTop - streamBox.offsetTop - 90;
+    streamBox.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+  }
 }
 
 function jumpSlide(i) {
