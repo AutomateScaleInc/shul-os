@@ -682,8 +682,12 @@ def get_daily_portion(day_index: int = None) -> dict:
             d_dict = dict(d)
             refs_txt = d_dict["refs"] or ""
             if parasha["book_slug"].replace("_", " ").lower() in refs_txt.lower():
-                # Extract real chapter numbers: e.g. "Genesis 12:1-3; 18:1-33" -> [12, 18], "Genesis 28-33" -> [28..33]
+                # Extract real chapter ranges: e.g. "Genesis 12:1-18:33" -> 12..18, "Genesis 28:10-33:11" -> 28..33
                 chapters = set()
+                for m_cr in re.finditer(r"(\d+):\d+\s*[-–]\s*(\d+):\d+", refs_txt):
+                    c1, c2 = int(m_cr.group(1)), int(m_cr.group(2))
+                    if c1 <= c2 <= 150:
+                        chapters.update(range(c1, c2 + 1))
                 for m_ch in re.finditer(r"(?:^|[\s;,])(\d+)(?=:)", refs_txt):
                     chapters.add(int(m_ch.group(1)))
                 for m_rng in re.finditer(r"[A-Za-z]\s+(\d+)\s*[-–]\s*(\d+)(?!\s*:)", refs_txt):
