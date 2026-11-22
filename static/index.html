@@ -4714,7 +4714,7 @@ function renderSpotlight() {
         ${rich.characters.map(c => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('characters'); openCharacter('${esc(c.slug)}')">👤 ${esc(c.name)}</button>`).join('')}
         ${(rich.symbols || []).map(sym => `<button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="switchView('symbols')">✡ ${esc(sym.name)}</button>`).join('')}
       </div>` : '';
-    const todayHint = (rich.today_points && rich.today_points.length) ? `
+    const todayHint = (s.kind !== 'verse' && rich.today_points && rich.today_points.length) ? `
       <div class="today-box" style="margin-top:10px;padding:10px 14px;">
         <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying Today's Portion in Today's Terms</h4>
         <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">${rich.today_points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
@@ -4777,7 +4777,7 @@ function renderSpotlight() {
   if (s.kind === 'quiz' && !quizRevealed) {
     actHtml += `<button class="btn-primary" onclick="revealCurrentQuiz(null)">✨ Reveal Answer Now</button>`;
   } else if (s.kind === 'verse') {
-    actHtml += `<button class="btn-primary" onclick="quickAsk('Explain ${esc(s.ref)} from today\\'s Aliyah of Parashat ${esc(dailyData.parasha.en_name)} with Rashi, Ramban, and how to apply it in today\\'s terms.', 'all')">📖 Interpret &amp; Apply Today</button>`;
+    actHtml += `<button class="btn-primary" onclick="quickAsk('Explain ${esc(s.ref)} from today\\'s Aliyah of Parashat ${esc(dailyData.parasha.en_name)} with Rashi, Ramban, and how to apply it in today\\'s terms.', 'all')">📖 Interpret &amp; Apply</button>`;
   } else {
     actHtml += `<button class="btn-primary" onclick="quickAsk('Tell the story of today\\'s Torah reading (${esc(dailyData.parasha.en_name)}, ${esc(dailyData.aliyah_ref)}) warmly for families and apply it in today\\'s terms.', 'storyteller')">✨ Tell Today's Story</button>`;
   }
@@ -5252,7 +5252,7 @@ function formatClassicalCommentary(rawText, opts = {}) {
     lemmaHe = heM[1].trim().replace(/[,—–\-:]+$/, '');
     text = text.slice(heM[0].length).trim();
   }
-  const enM = text.match(/^([A-Z][A-Z\s,'’.\[\]\-]{4,85}?)(?:\s*\((?:Heb\.|Lit\.)[^)]{1,60}\))?\s*(?:[—–\-]+|\.\s+)/);
+  const enM = text.match(/^([A-Z][A-Z\s,'’.;:\[\]\-]{4,110}?)(?:\s*\((?:Heb\.|Lit\.)[^)]{1,60}\))?\s*(?:[—–\-]+|\.\s+)/);
   if (enM && /[A-Z]{3}/.test(enM[1])) {
     lemmaEn = _titleCaseLemma(enM[1].trim().replace(/[—–\-:.]+$/, ''));
     text = text.slice(enM[0].length).trim();
