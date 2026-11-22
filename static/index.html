@@ -1661,9 +1661,9 @@
       background: rgba(246, 238, 222, 0.97);
     }
     .brand { order: 1; gap: 8px; flex: 1 1 100%; min-width: 0; max-width: 100%; overflow: hidden; }
-    .brand > div { min-width: 0; flex: 1; overflow: hidden; }
-    .brand-emblem { width: 30px; height: 30px; font-size: 1rem; flex-shrink: 0; }
-    .brand h1 { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand > div:not(.brand-emblem) { min-width: 0; flex: 1; overflow: hidden; }
+    .brand-emblem { flex: 0 0 30px !important; width: 30px !important; height: 30px !important; font-size: 1rem; }
+    .brand h1 { font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .brand .sub { display: none; }
     .hdr-tools { order: 2; gap: 5px; flex-shrink: 0; }
     .hdr-tools .btn-primary,
