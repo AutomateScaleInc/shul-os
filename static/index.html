@@ -910,21 +910,32 @@
     animation: sanctuaryReveal 0.55s ease both;
   }
 
-  /* Timely Animated Pop-Up Toast (Fixed-Height Calm Slot — ZERO Jostling, Silky Fade!) */
+  /* Timely Animated Pop-Up Toast (Gravity-Aware Stack Block — Slip Out & Blocks Above Fall Smoothly!) */
+  @keyframes toastSlipIn {
+    0%   { opacity: 0; transform: scale(0.93) translateX(-16px); }
+    100% { opacity: 1; transform: scale(1) translateX(0); }
+  }
   #sanctuaryToast {
+    display: none;
     position: relative; width: 100%; flex: 0 0 auto;
-    height: 98px;
-    display: flex; flex-direction: column; justify-content: center;
-    background: linear-gradient(135deg, rgba(16,28,54,0.94), rgba(26,40,72,0.94));
-    border: 1.5px solid rgba(228,188,105,0.68);
+    min-height: 82px;
+    flex-direction: column; justify-content: center;
+    background: linear-gradient(135deg, rgba(16,28,54,0.95), rgba(26,40,72,0.95));
+    border: 1.5px solid rgba(228,188,105,0.72);
     border-radius: 14px; padding: 9px 12px;
     box-shadow: 0 10px 26px rgba(0,0,0,0.44), 0 0 18px rgba(228,188,105,0.16);
-    opacity: 0; transform: translateY(6px); pointer-events: none;
-    transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
-    cursor: pointer;
+    pointer-events: auto; cursor: pointer;
+    will-change: transform, opacity;
   }
   #sanctuaryToast.show {
-    opacity: 1; transform: translateY(0); pointer-events: auto;
+    display: flex;
+    animation: toastSlipIn 0.44s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  #sanctuaryToast.exiting {
+    opacity: 0 !important;
+    transform: scale(0.92) translateX(-18px) !important;
+    transition: opacity 0.24s ease, transform 0.24s ease !important;
+    pointer-events: none;
   }
   #sanctuaryToast .t-tag { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 800; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #sanctuaryToast .t-msg {
@@ -2871,6 +2882,113 @@ function weaveLivingShow(d) {
 }
 function listCopy(arr) { return Array.isArray(arr) ? arr.slice() : []; }
 
+// =============================================================================
+// REAL 60FPS GRAVITY-SPRING STACK PHYSICS FOR SANCTUARY SIDE BLOCKS
+// When a block slips out beneath another, blocks above fall naturally under gravity
+// and land with a soft velvety cushioned settle; when a block arrives beneath,
+// blocks above lift buoyantly on a damped spring!
+// =============================================================================
+const _gravityAnimIds = new WeakMap();
+
+function animateBlockGravity(el, startDy) {
+  const prevId = _gravityAnimIds.get(el);
+  if (prevId) cancelAnimationFrame(prevId);
+  let y = startDy;
+  let v = 0;
+  let bounces = 0;
+  let squish = 0;
+  let lastTs = performance.now();
+  const isFalling = startDy < 0;
+
+  function tick(ts) {
+    const dt = Math.min(0.032, Math.max(0.004, (ts - lastTs) / 1000));
+    lastTs = ts;
+
+    if (isFalling) {
+      // Gentle physical gravity downward + velvety damped landing cushion
+      const G = 1650;
+      v += G * dt;
+      y += v * dt;
+      if (y >= 0) {
+        y = 0;
+        if (Math.abs(v) > 48 && bounces < 2) {
+          v = -v * 0.25;
+          bounces++;
+          if (bounces === 1) squish = 1;
+        } else {
+          v = 0;
+        }
+      }
+      if (squish > 0.01) squish *= Math.pow(0.001, dt);
+      else squish = 0;
+      const sy = 1 - 0.016 * squish;
+      const sx = 1 + 0.012 * squish;
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+      if (Math.abs(y) < 0.25 && Math.abs(v) < 6 && squish < 0.02) {
+        el.style.transform = '';
+        _gravityAnimIds.delete(el);
+        return;
+      }
+    } else {
+      // Smooth buoyant spring-damper lift when a new whisper block slides in underneath
+      const k = 165;
+      const c = 20;
+      const a = -k * y - c * v;
+      v += a * dt;
+      y += v * dt;
+      el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0)`;
+      if (Math.abs(y) < 0.25 && Math.abs(v) < 5) {
+        el.style.transform = '';
+        _gravityAnimIds.delete(el);
+        return;
+      }
+    }
+    _gravityAnimIds.set(el, requestAnimationFrame(tick));
+  }
+  el.style.transform = `translate3d(0, ${startDy.toFixed(2)}px, 0)`;
+  _gravityAnimIds.set(el, requestAnimationFrame(tick));
+}
+
+function applyRailGravityPhysics(railEl, mutateFn) {
+  if (!railEl) { mutateFn(); return; }
+  // Grounded blocks that obey gravity (top celestial crest & icons stay serene in heaven!)
+  const tracked = [
+    document.getElementById('marginStageLeft'),
+    document.getElementById('alwaysOnQrDock'),
+  ].filter(el => el && railEl.contains(el) && getComputedStyle(el).display !== 'none');
+
+  const firstRects = new Map();
+  tracked.forEach(el => {
+    const prevId = _gravityAnimIds.get(el);
+    if (prevId) cancelAnimationFrame(prevId);
+    el.style.transform = '';
+    firstRects.set(el, el.getBoundingClientRect().top);
+  });
+
+  mutateFn();
+
+  tracked.forEach(el => {
+    const oldTop = firstRects.get(el);
+    const newTop = el.getBoundingClientRect().top;
+    const dy = oldTop - newTop;
+    if (Math.abs(dy) > 2) {
+      animateBlockGravity(el, dy);
+    }
+  });
+}
+
+let _toastDismissBusy = false;
+
+function revealWithGravity(el, item) {
+  const railL = document.getElementById('railLeft');
+  applyRailGravityPhysics(railL, () => {
+    el.classList.remove('exiting');
+    document.getElementById('toastTag').textContent = item.tag;
+    document.getElementById('toastMsg').textContent = item.text;
+    el.classList.add('show');
+  });
+}
+
 function showTimelyPopup() {
   if (currentViewName !== 'today' || document.getElementById('presModal').classList.contains('open')) return;
   const popups = ((dailyData && dailyData.show_extras && dailyData.show_extras.popups) || []).slice();
@@ -2909,25 +3027,34 @@ function showTimelyPopup() {
   toastIdx++;
   const el = document.getElementById('sanctuaryToast');
   if (!el) return;
-  const reveal = () => {
-    document.getElementById('toastTag').textContent = item.tag;
-    document.getElementById('toastMsg').textContent = item.text;
-    el.classList.add('show');
-  };
   if (el.classList.contains('show')) {
-    el.classList.remove('show');
-    setTimeout(reveal, 550);
+    dismissSanctuaryToast(() => {
+      setTimeout(() => revealWithGravity(el, item), 780);
+    });
   } else {
-    reveal();
+    revealWithGravity(el, item);
   }
   if (toastHideTimer) clearTimeout(toastHideTimer);
-  toastHideTimer = setTimeout(() => dismissSanctuaryToast(), 11000);
+  toastHideTimer = setTimeout(() => dismissSanctuaryToast(), 9200);
 }
-function dismissSanctuaryToast() {
+function dismissSanctuaryToast(onDone = null) {
   const el = document.getElementById('sanctuaryToast');
-  if (el) el.classList.remove('show');
+  if (!el || !el.classList.contains('show') || _toastDismissBusy) {
+    if (onDone) onDone();
+    return;
+  }
+  _toastDismissBusy = true;
+  el.classList.add('exiting');
+  setTimeout(() => {
+    const railL = document.getElementById('railLeft');
+    applyRailGravityPhysics(railL, () => {
+      el.classList.remove('show', 'exiting');
+    });
+    _toastDismissBusy = false;
+    if (onDone) onDone();
+  }, 240);
 }
-setInterval(showTimelyPopup, 14000);
+setInterval(showTimelyPopup, 14500);
 setTimeout(showTimelyPopup, 3200);
 
 // Seed Ambient Drifting Golden Hebrew Wisdom Letters in the Background Canvas
