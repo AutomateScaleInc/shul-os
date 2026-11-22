@@ -230,6 +230,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/embed.js",
             "/api/give/qr.svg",
             "/api/give/items",
+            "/api/connect/messages",
             "/api/syndication/pack",
             "/api/today",
             "/api/celestial",

@@ -109,8 +109,8 @@
     <div class="live-bar" id="liveBar">Loading this week's Parashah &amp; Shabbat times...</div>
     <div class="quick-actions">
       <a class="btn-gold" href="#pledgeForm">💛 Sponsor Now</a>
-      <a class="btn-outline" href="/watch">📺 Connect to Live Screen</a>
-      <a class="btn-outline" href="/">📖 Full Torah Library</a>
+      <a class="btn-outline" href="#connectCard">💬 Connect &amp; Message</a>
+      <a class="btn-outline" href="/watch">📺 Live Screen</a>
     </div>
   </div>
 
@@ -153,6 +153,31 @@
       <a class="btn-gold" id="checkoutLink" href="https://www.theshul.eu" target="_blank" rel="noopener">Complete Online Payment →</a>
       <a class="btn-outline" href="/watch">📺 Open Live Screen</a>
     </div>
+  </div>
+
+  <!-- DIRECT CONNECT & MESSAGING WITH RABBI MICHOEL / THE SHUL -->
+  <div class="pledge-card" id="connectCard" style="border-color:rgba(92,182,229,0.58);">
+    <div class="kicker" style="color:var(--accent);">💬 DIRECT SHUL CONNECT · MESSAGING &amp; PRAYER REQUESTS</div>
+    <h2 style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Say Shalom &amp; Stay Connected Directly</h2>
+    <p class="sub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Leave your WhatsApp or email so Rabbi Michoel can message you directly—ask a Torah question, RSVP for Shabbat dinner, share a Simcha, or add a name for healing (<em>Mi Sheberach</em>).</p>
+    <label for="cName">Your Name *</label>
+    <input type="text" id="cName" placeholder="e.g. Miriam Levy">
+    <label for="cPhone">WhatsApp / Mobile Number</label>
+    <input type="tel" id="cPhone" placeholder="+32 ...">
+    <label for="cEmail">Email (optional)</label>
+    <input type="email" id="cEmail" placeholder="you@example.com">
+    <label for="cTopic">How Can We Connect?</label>
+    <select id="cTopic" style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(8,15,30,0.85);color:#fff;font-size:0.95rem;margin-bottom:11px;">
+      <option value="Connect & Direct Shul Messages">Say Shalom &amp; Join Direct Shul Updates</option>
+      <option value="Shabbat Dinner / Kiddush RSVP">RSVP for Friday Night / Shabbat Kiddush</option>
+      <option value="Ask Rabbi Michoel a Question">Ask Rabbi Michoel a Torah / Life Question</option>
+      <option value="Mi Sheberach (Healing Prayer)">Add a Name for Healing (Mi Sheberach)</option>
+      <option value="Yahrzeit / Kaddish Remembrance">Submit a Yahrzeit / Memorial Date</option>
+    </select>
+    <label for="cMsg">Message / Name for Prayer / Question (optional)</label>
+    <textarea id="cMsg" rows="2" placeholder="Write a quick note for Rabbi Michoel..."></textarea>
+    <button type="button" class="btn-outline" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitConnect()">💬 Send &amp; Connect With The Shul</button>
+    <div id="connectStatus" style="font-size:0.86rem;margin-top:9px;"></div>
   </div>
 
   <footer>
@@ -244,6 +269,41 @@ async function submitPledge() {
     document.getElementById('thanksBox').scrollIntoView({ behavior: 'smooth' });
   } catch (e) {
     errEl.textContent = 'Network error — please try again.';
+  }
+}
+
+async function submitConnect() {
+  const st = document.getElementById('connectStatus');
+  st.textContent = '';
+  const name = document.getElementById('cName').value.trim();
+  const phone = document.getElementById('cPhone').value.trim();
+  const email = document.getElementById('cEmail').value.trim();
+  if (!name && !phone && !email) {
+    st.style.color = '#fca5a5';
+    st.textContent = 'Please share your name and WhatsApp or email so we can reply!';
+    return;
+  }
+  try {
+    const r = await fetch('/api/connect/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        visitor_name: name,
+        phone,
+        email,
+        topic: document.getElementById('cTopic').value,
+        message: document.getElementById('cMsg').value.trim(),
+        opt_in_updates: true,
+      }),
+    });
+    const d = await r.json();
+    if (!d.ok) { st.style.color = '#fca5a5'; st.textContent = d.error || 'Could not send message.'; return; }
+    st.style.color = '#4ade80';
+    st.textContent = '✨ Shalom! Connected — your message has been received for Rabbi Michoel & The European Synagogue.';
+    document.getElementById('cMsg').value = '';
+  } catch (e) {
+    st.style.color = '#fca5a5';
+    st.textContent = 'Connection error — please try again.';
   }
 }
 

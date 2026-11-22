@@ -1337,19 +1337,37 @@
     font-size: 0.92rem; line-height: 1.55;
   }
 
-  /* Lobby Scannable QR Donation & Connect Call-to-Action Bar */
-  .lobby-give-cta {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    margin-top: 10px; padding: 8px 12px; border-radius: 13px;
-    background: linear-gradient(135deg, rgba(228,188,105,0.12), rgba(92,182,229,0.08));
-    border: 1px solid rgba(228,188,105,0.38);
-    cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Always-Visible Hands-Free Scannable QR Sanctuary Dock (Zero Mouse Required!) */
+  .qr-sanctuary-dock {
+    width: 100%; flex: 0 0 auto; pointer-events: auto; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 15px;
+    background: linear-gradient(145deg, rgba(14,24,46,0.95), rgba(22,36,68,0.95));
+    border: 1.5px solid rgba(228,188,105,0.68);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.48), 0 0 18px rgba(228,188,105,0.16);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
-  .lobby-give-cta:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(228,188,105,0.18); }
-  .lobby-give-qr {
-    width: 54px; height: 54px; flex-shrink: 0; border-radius: 8px;
-    background: #ffffff; padding: 3px; border: 1.5px solid var(--gold);
+  .qr-sanctuary-dock:hover { transform: translateY(-2px); border-color: #ffe588; }
+  .qr-sanctuary-dock img {
+    width: 86px; height: 86px; flex-shrink: 0; border-radius: 10px;
+    background: #ffffff; padding: 4px; border: 1.5px solid var(--gold);
   }
+  .qr-dock-kicker {
+    font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gold); font-weight: 800; line-height: 1.25;
+  }
+  .qr-dock-title {
+    font-family: var(--serif); font-size: 0.86rem; font-weight: 700;
+    color: #fff; margin: 2px 0; line-height: 1.22;
+  }
+  .qr-dock-sub { font-size: 0.7rem; color: #c9d6ea; line-height: 1.28; }
+  [data-theme="parchment"] .qr-sanctuary-dock {
+    background: linear-gradient(145deg, #fffdf7, #f5e9d0);
+    border-color: #9a6918; box-shadow: 0 8px 22px rgba(92,64,20,0.16);
+  }
+  [data-theme="parchment"] .qr-dock-title { color: #1f1810; }
+  [data-theme="parchment"] .qr-dock-sub { color: #4c4234; }
+
   .give-modal-backdrop {
     display: none; position: fixed; inset: 0; z-index: 260;
     background: rgba(5,10,22,0.86); backdrop-filter: blur(8px);
@@ -1471,6 +1489,14 @@
     <div class="t-tag" id="toastTag">💡 Rashi Whisper</div>
     <div class="t-msg" id="toastMsg"></div>
   </div>
+  <div id="alwaysOnQrDock" class="qr-sanctuary-dock" onclick="openGiveModal()" title="Scan with your phone to connect to this screen, message Rabbi Michoel, or sponsor The Shul">
+    <img src="/api/give/qr.svg" alt="Scan QR to Connect &amp; Sponsor">
+    <div style="min-width:0;">
+      <div class="qr-dock-kicker">📱 SCAN WITH PHONE</div>
+      <div class="qr-dock-title">Connect &amp; Sponsor The Shul</div>
+      <div class="qr-dock-sub">Mirror screen · Message Rabbi · Sponsor Kiddush &amp; Kids Shul</div>
+    </div>
+  </div>
 </aside>
 <aside id="railRight" class="sanctuary-rail" aria-hidden="true">
   <div class="rail-arch-crest">
@@ -1541,14 +1567,6 @@
               <span class="muted" id="spotCounter" style="font-size:0.84rem;margin-left:6px;"></span>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;" id="spotActions"></div>
-          </div>
-          <div class="lobby-give-cta" onclick="openGiveModal()" title="Scan with any phone camera to connect to this exact screen & sponsor The Shul">
-            <img class="lobby-give-qr" src="/api/give/qr.svg" alt="Scan QR to Connect & Sponsor">
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;">💛 SCAN TO CONNECT &amp; SPONSOR THE SHUL (theshul.eu)</div>
-              <div style="font-size:0.84rem;color:#f3ead8;line-height:1.35;">Point any phone camera to mirror this screen &amp; sponsor Shabbat Kiddush, Kids Shul, or a Day of Learning!</div>
-            </div>
-            <span class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;white-space:nowrap;">Enlarge QR →</span>
           </div>
         </div>
         <div class="daily-stream">
@@ -1686,6 +1704,7 @@
               </div>
             </details>
             <div id="pledgesAdmin" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.8rem;" class="muted"></div>
+            <div id="visitorMessagesAdmin" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.8rem;" class="muted"></div>
           </div>
 
           <div class="card">
@@ -2959,8 +2978,9 @@ function layoutSanctuaryRails() {
   const headerEl = document.querySelector('header');
   const ribbonEl = document.getElementById('celestialRibbon');
   const footerEl = document.querySelector('footer');
-  const show = (currentViewName === 'today') && !document.getElementById('presModal').classList.contains('open');
-  if (!show || !activeView) {
+  const presOpen = document.getElementById('presModal').classList.contains('open');
+  const isToday = (currentViewName === 'today');
+  if (presOpen || !activeView) {
     railL.classList.add('rail-hidden');
     railR.classList.add('rail-hidden');
     return;
@@ -2985,15 +3005,24 @@ function layoutSanctuaryRails() {
   railL.style.left = leftX + 'px';
   railL.style.top = topY + 'px';
   railL.style.bottom = (footerH + 14) + 'px';
-
-  railR.style.width = railW + 'px';
-  railR.style.right = rightX + 'px';
-  railR.style.top = topY + 'px';
-  // Leave generous bottom-right breathing zone so right character NEVER collides with bottom-right docks/widgets!
-  railR.style.bottom = Math.max(footerH + 225, Math.round(window.innerHeight * 0.25)) + 'px';
-
+  // Keep the Always-On Scannable QR Dock visible on ALL screens; hide Torah story actors when outside Today's Reading!
+  const bgL = document.getElementById('bgSceneLeft');
+  const msL = document.getElementById('marginStageLeft');
+  const crestL = railL.querySelector('.rail-arch-crest');
+  const filL = railL.querySelector('.rail-filament');
+  [bgL, msL, crestL, filL].forEach(el => { if (el) el.style.display = isToday ? '' : 'none'; });
+  railL.style.justifyContent = isToday ? 'space-evenly' : 'flex-end';
   railL.classList.remove('rail-hidden');
-  railR.classList.remove('rail-hidden');
+
+  if (isToday) {
+    railR.style.width = railW + 'px';
+    railR.style.right = rightX + 'px';
+    railR.style.top = topY + 'px';
+    railR.style.bottom = Math.max(footerH + 225, Math.round(window.innerHeight * 0.25)) + 'px';
+    railR.classList.remove('rail-hidden');
+  } else {
+    railR.classList.add('rail-hidden');
+  }
 }
 window.addEventListener('resize', layoutSanctuaryRails, { passive: true });
 
@@ -5644,9 +5673,10 @@ async function transmitAllChannels() {
 
 async function loadSponsorshipManager() {
   try {
-    const [rIt, rPl] = await Promise.all([fetch('/api/give/items'), fetch('/api/give/pledges')]);
+    const [rIt, rPl, rMsg] = await Promise.all([fetch('/api/give/items'), fetch('/api/give/pledges'), fetch('/api/connect/messages')]);
     const dIt = await rIt.json();
     const dPl = await rPl.json();
+    const dMsg = await rMsg.json();
     const box = document.getElementById('sponsorshipItemsAdmin');
     if (box) {
       box.innerHTML = (dIt.items || []).map(it => `
@@ -5663,7 +5693,18 @@ async function loadSponsorshipManager() {
     if (pBox) {
       pBox.innerHTML = pledges.length
         ? `<strong style="color:var(--gold);">Recent Pledges (${pledges.length}):</strong>` + pledges.slice(0, 5).map(p => `<div style="margin-top:4px;">💛 <strong>${esc(p.donor_name)}</strong> · €${esc(p.amount)} — ${esc(p.item_title)}${p.dedication ? ` <em>("${esc(p.dedication)}")</em>` : ''}</div>`).join('')
-        : 'No sponsorship pledges recorded yet — scan the QR above to test!';
+        : 'No sponsorship pledges recorded yet — scan the QR to test!';
+    }
+    const mBox = document.getElementById('visitorMessagesAdmin');
+    const msgs = dMsg.messages || [];
+    if (mBox) {
+      mBox.innerHTML = msgs.length
+        ? `<strong style="color:var(--accent);">💬 Connected Visitors &amp; Messages (${msgs.length}):</strong>` + msgs.slice(0, 5).map(m => {
+            const digits = String(m.phone || '').replace(/[^0-9]/g, '');
+            const waBtn = digits ? ` <a href="https://wa.me/${digits}" target="_blank" style="color:#4ade80;font-weight:700;text-decoration:none;">[💬 WhatsApp]</a>` : '';
+            return `<div style="margin-top:5px;">👤 <strong>${esc(m.visitor_name)}</strong> (${esc(m.topic)})${waBtn}${m.message ? ` — <em>"${esc(m.message)}"</em>` : ''}</div>`;
+          }).join('')
+        : '💬 Visitors who scan the QR & connect will appear here for 1-click WhatsApp / email reply.';
     }
   } catch (e) {}
 }

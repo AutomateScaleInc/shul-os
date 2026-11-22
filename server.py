@@ -186,6 +186,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json({"pledges": community_hub.list_pledges()})
             return
 
+        if path == "/api/connect/messages":
+            self._send_json({"messages": community_hub.list_visitor_messages()})
+            return
+
         if path == "/api/syndication/pack":
             self._send_json(community_hub.build_syndication_pack(self.headers.get("Host", "")))
             return
@@ -538,6 +542,15 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             body = self._read_json_body()
             try:
                 res = community_hub.record_pledge(body)
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/connect/message":
+            body = self._read_json_body()
+            try:
+                res = community_hub.record_visitor_message(body)
                 self._send_json(res)
             except Exception as e:
                 self._send_json({"error": str(e)}, status=400)

@@ -154,6 +154,17 @@ def init_tables():
             detail TEXT NOT NULL DEFAULT '',
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
+
+        CREATE TABLE IF NOT EXISTS community_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            visitor_name TEXT NOT NULL DEFAULT '',
+            phone TEXT NOT NULL DEFAULT '',
+            email TEXT NOT NULL DEFAULT '',
+            topic TEXT NOT NULL DEFAULT 'Connect & Say Shalom',
+            message TEXT NOT NULL DEFAULT '',
+            opt_in_updates INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
         """)
         cnt = conn.execute("SELECT COUNT(*) FROM sponsorship_items").fetchone()[0]
         if cnt == 0:
@@ -300,6 +311,63 @@ def list_pledges(limit: int = 30) -> list:
     init_tables()
     with get_conn() as conn:
         rows = conn.execute("SELECT * FROM donation_pledges ORDER BY id DESC LIMIT ?", (int(limit),)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def record_visitor_message(payload: dict) -> dict:
+    """Save a direct message / prayer request / opt-in from a phone that scanned the Sanctuary QR code."""
+    init_tables()
+    name = (payload.get("visitor_name") or payload.get("name") or "").strip()
+    phone = (payload.get("phone") or "").strip()
+    email_addr = (payload.get("email") or "").strip()
+    topic = (payload.get("topic") or "Connect & Say Shalom").strip()
+    message = (payload.get("message") or "").strip()
+    opt_in = 1 if payload.get("opt_in_updates", True) else 0
+    if not name and not phone and not email_addr:
+        raise ValueError("Please enter your name and phone or email so Rabbi Michoel can connect with you.")
+    with get_conn() as conn:
+        cur = conn.execute(
+            """
+            INSERT INTO community_messages (visitor_name, phone, email, topic, message, opt_in_updates)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (name or "Synagogue Guest", phone, email_addr, topic, message, opt_in),
+        )
+        conn.commit()
+        msg_row = dict(conn.execute("SELECT * FROM community_messages WHERE id = ?", (cur.lastrowid,)).fetchone())
+
+    # Also auto-subscribe to shul mailing list if email provided & opted in
+    if email_addr and opt_in:
+        try:
+            shul_events.add_subscriber(name or "Sanctuary Guest", email_addr, f"QR Connect · {topic}")
+        except Exception:
+            pass
+
+    cfg = ai_engine.load_config()
+    hook = (cfg.get("syndication_webhook_url") or cfg.get("mailing_webhook_url") or "").strip()
+    forwarded = False
+    if hook:
+        try:
+            req = urllib.request.Request(
+                hook,
+                data=json.dumps({
+                    "type": "synagogue_visitor_connect",
+                    "shul": shul_events.SHUL_INFO["name"],
+                    "visitor": msg_row,
+                }).encode("utf-8"),
+                headers={"Content-Type": "application/json", "User-Agent": "TorahSanctuary/1.0"},
+            )
+            urllib.request.urlopen(req, timeout=5).close()
+            forwarded = True
+        except Exception:
+            pass
+    return {"ok": True, "message": msg_row, "webhook_forwarded": forwarded}
+
+
+def list_visitor_messages(limit: int = 30) -> list:
+    init_tables()
+    with get_conn() as conn:
+        rows = conn.execute("SELECT * FROM community_messages ORDER BY id DESC LIMIT ?", (int(limit),)).fetchall()
         return [dict(r) for r in rows]
 
 
