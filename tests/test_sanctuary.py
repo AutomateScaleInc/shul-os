@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT))
 
 import ai_engine
 import broadcast_hub
+import community_hub
 import sacred_astronomy as sa
 import sacred_liturgy
 import sanctuary_rich_data as srd
@@ -137,7 +138,7 @@ class TestFrontendAndConfig(unittest.TestCase):
     def test_html_js_syntax_with_node(self):
         if not shutil.which("node"):
             self.skipTest("node not installed")
-        for fname in ("static/index.html", "static/watch.html"):
+        for fname in ("static/index.html", "static/watch.html", "static/give.html"):
             html = (ROOT / fname).read_text(encoding="utf-8")
             scripts = re.findall(r"<script[^>]*>(.*?)</script>", html, flags=re.S)
             self.assertTrue(scripts, f"No script blocks in {fname}")
@@ -202,6 +203,18 @@ class TestDatabaseAndRAG(unittest.TestCase):
             self.assertGreaterEqual(len(h["prominent_celebrations"]), 2, f"Missing prominent stories in {h['slug']}")
             self.assertTrue((art_dir / h["art"].replace("/art/", "")).exists(), f"Missing holiday art {h['art']}")
 
+    def test_community_syndication_and_sponsorships(self):
+        items = community_hub.list_sponsorship_items()
+        self.assertGreaterEqual(len(items), 7)
+        rss = community_hub.build_rss_xml("127.0.0.1:8080")
+        self.assertIn("<rss version=\"2.0\"", rss)
+        self.assertIn("<item>", rss)
+        emb = community_hub.build_embed_js("127.0.0.1:8080")
+        self.assertIn("document.createElement('div')", emb)
+        pack = community_hub.build_syndication_pack("127.0.0.1:8080")
+        for ch in ("rss", "website", "email", "whatsapp", "sms", "eventbrite", "pr"):
+            self.assertIn(ch, pack["channels"], f"Missing syndication channel {ch}")
+
 
 LIVE_URL = os.environ.get("TORAH_TEST_URL", "").rstrip("/")
 
@@ -212,6 +225,12 @@ class TestLiveHTTP(unittest.TestCase):
         endpoints = [
             "/",
             "/watch",
+            "/give",
+            "/feed.xml",
+            "/embed.js",
+            "/api/give/qr.svg",
+            "/api/give/items",
+            "/api/syndication/pack",
             "/api/today",
             "/api/celestial",
             "/api/characters",

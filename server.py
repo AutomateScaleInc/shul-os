@@ -16,6 +16,7 @@ import urllib.request
 
 import ai_engine
 import broadcast_hub
+import community_hub
 import sacred_astronomy
 import sacred_liturgy
 import sanctuary_rich_data
@@ -78,6 +79,14 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 self._send_json({"error": str(e)}, status=400)
             return
+        if parsed.path == "/api/give/items":
+            try:
+                iid = int(qs.get("id", ["0"])[0])
+                ok = community_hub.delete_sponsorship_item(iid)
+                self._send_json({"ok": ok})
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
         self.send_error(404, "Not Found")
 
     def do_GET(self):
@@ -111,6 +120,74 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+            return
+
+        if path in ("/give", "/give/", "/donate", "/sponsor"):
+            gp = STATIC_DIR / "give.html"
+            if not gp.exists():
+                self.send_error(404, "Give page not found")
+                return
+            body = gp.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if path in ("/feed.xml", "/rss.xml"):
+            xml_bytes = community_hub.build_rss_xml(self.headers.get("Host", "")).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/rss+xml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Length", str(len(xml_bytes)))
+            self.end_headers()
+            self.wfile.write(xml_bytes)
+            return
+
+        if path == "/embed.js":
+            js_bytes = community_hub.build_embed_js(self.headers.get("Host", "")).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/javascript; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Length", str(len(js_bytes)))
+            self.end_headers()
+            self.wfile.write(js_bytes)
+            return
+
+        if path == "/api/give/qr.svg":
+            target_url = qs.get("url", [""])[0] or community_hub.get_give_url(self.headers.get("Host", ""))
+            svg_bytes = broadcast_hub.generate_qr_svg(target_url)
+            self.send_response(200)
+            self.send_header("Content-Type", "image/svg+xml; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(svg_bytes)))
+            self.end_headers()
+            self.wfile.write(svg_bytes)
+            return
+
+        if path == "/api/give/items":
+            cfg = ai_engine.load_config()
+            base_u = community_hub.get_public_base_url(self.headers.get("Host", ""))
+            self._send_json({
+                "synagogue_name": cfg.get("synagogue_name", shul_events.SHUL_INFO["name"]),
+                "give_url": base_u + "/give",
+                "watch_url": base_u + "/watch",
+                "checkout_url": cfg.get("donation_checkout_url", shul_events.SHUL_INFO["website"]),
+                "items": community_hub.list_sponsorship_items(),
+            })
+            return
+
+        if path == "/api/give/pledges":
+            self._send_json({"pledges": community_hub.list_pledges()})
+            return
+
+        if path == "/api/syndication/pack":
+            self._send_json(community_hub.build_syndication_pack(self.headers.get("Host", "")))
             return
 
         if path == "/api/broadcast/state":
@@ -446,6 +523,33 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json(res)
             except Exception as e:
                 self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/give/items":
+            body = self._read_json_body()
+            try:
+                it = community_hub.add_sponsorship_item(body)
+                self._send_json({"ok": True, "item": it})
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/give/pledge":
+            body = self._read_json_body()
+            try:
+                res = community_hub.record_pledge(body)
+                self._send_json(res)
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/syndication/transmit":
+            body = self._read_json_body()
+            res = community_hub.transmit_all_channels(
+                channels=body.get("channels"),
+                request_host=self.headers.get("Host", ""),
+            )
+            self._send_json(res)
             return
 
         if path == "/api/shul/mailing/push":

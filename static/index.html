@@ -1320,6 +1320,38 @@
     border-radius: 0 10px 10px 0; padding: 10px 14px; margin-bottom: 8px;
     font-size: 0.92rem; line-height: 1.55;
   }
+
+  /* Lobby Scannable QR Donation & Connect Call-to-Action Bar */
+  .lobby-give-cta {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-top: 10px; padding: 8px 12px; border-radius: 13px;
+    background: linear-gradient(135deg, rgba(228,188,105,0.12), rgba(92,182,229,0.08));
+    border: 1px solid rgba(228,188,105,0.38);
+    cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .lobby-give-cta:hover { border-color: var(--gold); box-shadow: 0 6px 20px rgba(228,188,105,0.18); }
+  .lobby-give-qr {
+    width: 54px; height: 54px; flex-shrink: 0; border-radius: 8px;
+    background: #ffffff; padding: 3px; border: 1.5px solid var(--gold);
+  }
+  .give-modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 260;
+    background: rgba(5,10,22,0.86); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .give-modal-backdrop.open { display: flex; }
+  .give-modal-card {
+    max-width: 780px; width: 100%; max-height: 90vh; overflow-y: auto;
+    background: linear-gradient(145deg, #101e3b, #0a1326);
+    border: 1.5px solid var(--gold); border-radius: 20px; padding: 22px 24px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 36px rgba(228,188,105,0.2);
+  }
+  .syn-code {
+    width: 100%; min-height: 150px; background: rgba(7,12,24,0.88);
+    border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px;
+    color: #f4efe6; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem; line-height: 1.48; white-space: pre-wrap; overflow: auto;
+  }
 </style>
 </head>
 <body>
@@ -1374,6 +1406,7 @@
     </nav>
     <div class="hdr-tools">
       <button class="btn-primary" style="padding:6px 12px;font-size:0.84rem;" onclick="openPresentation('parasha','')" title="Launch Full-Screen Presentation for Rabbi & Community">🎬 Present</button>
+      <button class="tool-btn" style="border-color:var(--gold);color:var(--gold);font-weight:700;" onclick="openGiveModal()" title="Scan QR to Connect Your Phone & Sponsor The Shul">💛 Sponsor / QR</button>
       <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Talk to Torah Sanctuary (Offline Local Whisper + Deep Narrator Voice)">🎙 Talk</button>
       <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹ Stop Voice</button>
       <button class="tool-btn" onclick="adjustFont(-0.1)" title="Smaller text">A-</button>
@@ -1406,6 +1439,14 @@
               <span class="muted" id="spotCounter" style="font-size:0.84rem;margin-left:6px;"></span>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;" id="spotActions"></div>
+          </div>
+          <div class="lobby-give-cta" onclick="openGiveModal()" title="Scan with any phone camera to connect to this exact screen & sponsor The Shul">
+            <img class="lobby-give-qr" src="/api/give/qr.svg" alt="Scan QR to Connect & Sponsor">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;">💛 SCAN TO CONNECT &amp; SPONSOR THE SHUL (theshul.eu)</div>
+              <div style="font-size:0.84rem;color:#f3ead8;line-height:1.35;">Point any phone camera to mirror this screen &amp; sponsor Shabbat Kiddush, Kids Shul, or a Day of Learning!</div>
+            </div>
+            <span class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;white-space:nowrap;">Enlarge QR →</span>
           </div>
         </div>
         <div class="daily-stream">
@@ -1488,9 +1529,63 @@
             <div id="mailingStatus" class="muted" style="font-size:0.85rem;margin-bottom:8px;">Click "Build This Week's Mailing" to generate a ready-to-send newsletter for Mailchimp, Brevo, Chabad CRM, or email.</div>
             <div id="mailingPreview" style="display:none;background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;padding:14px;max-height:380px;overflow:auto;"></div>
           </div>
+
+          <!-- 📡 MULTI-CHANNEL AUTO-TRANSMIT & SYNDICATION HUB -->
+          <div class="card" style="margin-top:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
+              <div>
+                <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:800;">📡 MULTI-CHANNEL AUTO-SYNDICATION HUB</div>
+                <h3 style="margin:2px 0 0;">Transmit to RSS, Website, Email, WhatsApp, SMS, Eventbrite &amp; PR</h3>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="loadSyndicationHub()">↻ Refresh Channels</button>
+                <button class="btn-primary" onclick="transmitAllChannels()">🚀 Transmit to All 7 Channels</button>
+              </div>
+            </div>
+            <div class="liturgy-tabs" id="synTabBar" style="margin:8px 0 10px;">
+              <button class="liturgy-tab active" data-stab="whatsapp" onclick="switchSynChannel('whatsapp')">💬 WhatsApp</button>
+              <button class="liturgy-tab" data-stab="sms" onclick="switchSynChannel('sms')">📱 Text / SMS</button>
+              <button class="liturgy-tab" data-stab="rss" onclick="switchSynChannel('rss')">📰 RSS Feed</button>
+              <button class="liturgy-tab" data-stab="website" onclick="switchSynChannel('website')">🌐 Website Embed</button>
+              <button class="liturgy-tab" data-stab="eventbrite" onclick="switchSynChannel('eventbrite')">🎟 Eventbrite</button>
+              <button class="liturgy-tab" data-stab="pr" onclick="switchSynChannel('pr')">🗞 PR Release</button>
+              <button class="liturgy-tab" data-stab="email" onclick="switchSynChannel('email')">✉️ Email Digest</button>
+            </div>
+            <div id="synChannelOut" class="muted" style="font-size:0.86rem;">Loading 7-channel syndication payloads...</div>
+            <div id="synTransmitMsg" class="muted" style="font-size:0.84rem;margin-top:8px;"></div>
+          </div>
         </div>
 
         <aside>
+          <!-- 💛 LIVE SPONSORSHIP QR & INDIVIDUAL ITEM MANAGER -->
+          <div class="card" style="border-color:rgba(228,188,105,0.5);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
+              <h3 style="margin:0;color:var(--gold);">💛 Mobile QR Splash &amp; Sponsorships</h3>
+              <button class="btn-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="openGiveModal()">📺 Enlarge QR</button>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+              <img src="/api/give/qr.svg" alt="QR Code to /give" style="width:94px;height:94px;background:#fff;padding:5px;border-radius:10px;border:1.5px solid var(--gold);flex-shrink:0;">
+              <div style="font-size:0.82rem;line-height:1.45;">
+                <div style="font-weight:700;color:#fff;margin-bottom:4px;">Scan on any phone to sponsor an item or connect to this screen!</div>
+                <a id="shulGiveUrlLink" href="/give" target="_blank" style="color:var(--accent);word-break:break-all;">/give</a>
+              </div>
+            </div>
+            <div id="sponsorshipItemsAdmin" style="font-size:0.84rem;margin-bottom:10px;">Loading sponsorship items...</div>
+            <details style="margin-top:8px;">
+              <summary style="cursor:pointer;color:var(--gold);font-weight:700;font-size:0.84rem;">+ Add Sponsorable Item / Event</summary>
+              <div style="display:grid;gap:6px;margin-top:8px;">
+                <input class="form-input" id="spTitle" placeholder="e.g. Purim Seudah Wine & Hamantaschen">
+                <div style="display:flex;gap:6px;">
+                  <input class="form-input" id="spAmount" type="number" placeholder="Amount (€)" value="180" style="width:110px;">
+                  <input class="form-input" id="spSched" placeholder="Schedule (e.g. Shabbat)" style="flex:1;">
+                </div>
+                <input class="form-input" id="spDesc" placeholder="Short heartwarming description...">
+                <button class="btn-primary" onclick="addSponsorshipItemUi()">Save Sponsorship Item</button>
+              </div>
+            </details>
+            <div id="pledgesAdmin" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.8rem;" class="muted"></div>
+          </div>
+
           <div class="card">
             <h3>Join The Shul Mailing List</h3>
             <p class="muted" style="font-size:0.85rem;margin-bottom:10px;">Receive weekly Parashah insights, Brussels Shabbat times, and Rabbi Michoel's upcoming events from <strong>theshul.eu</strong>.</p>
@@ -1769,6 +1864,9 @@
             <label>Mailing / Newsletter Webhook URL (Mailchimp / Brevo / Zapier / CRM)<br><input class="form-input" style="width:100%" id="cfgMailHook" placeholder="https://... (receives signups & weekly newsletter pushes)"></label>
             <label>Custom Public Broadcast Domain (optional, e.g. https://live.theshul.eu)<br><input class="form-input" style="width:100%" id="cfgBroadcastBase" placeholder="Leave blank for automatic Cloudflare quick tunnel or LAN /watch"></label>
             <label>Companion House-Node: Follow Master Synagogue Broadcast URL (optional)<br><input class="form-input" style="width:100%" id="cfgBroadcastFollow" placeholder="e.g. https://live.theshul.eu or http://100.94.73.72:8080"></label>
+            <label>Public Sanctuary Base URL for QR Codes &amp; RSS (optional)<br><input class="form-input" style="width:100%" id="cfgPublicSanctuary" placeholder="e.g. https://sanctuary.theshul.eu (auto-detects Cloudflare or LAN if blank)"></label>
+            <label>Synagogue Donation Checkout URL (Stripe / PayPal / Bancontact / theshul.eu)<br><input class="form-input" style="width:100%" id="cfgDonateUrl" placeholder="https://www.theshul.eu"></label>
+            <label>Multi-Channel Syndication Webhook URL (Zapier / Make / n8n / Twilio / Eventbrite)<br><input class="form-input" style="width:100%" id="cfgSynHook" placeholder="https://... (auto-transmits RSS, Email, WhatsApp, SMS, Eventbrite & PR)"></label>
             <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
             <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
           </div>
@@ -1784,6 +1882,33 @@
     </div>
     <button class="tool-btn" id="tickerPauseBtn" onclick="toggleTickerPause()" title="Pause/Resume scrolling ticker">⏸</button>
   </footer>
+</div>
+
+<!-- FULL-SCREEN SCANNABLE QR & SPONSORSHIP CALL-TO-ACTION MODAL -->
+<div class="give-modal-backdrop" id="giveModal" onclick="if(event.target===this) closeGiveModal()">
+  <div class="give-modal-card sanctuary-reveal">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold);font-weight:800;">💛 CONNECT TO THIS SCREEN &amp; PARTNER WITH THE SHUL</div>
+        <h2 style="margin:4px 0 0;font-family:var(--serif);color:#fff;">Scan With Your Phone to Sponsor a Mitzvah</h2>
+      </div>
+      <button class="tool-btn" onclick="closeGiveModal()">✕ Close</button>
+    </div>
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:20px;align-items:center;">
+      <div style="text-align:center;">
+        <img id="giveModalQrImg" src="/api/give/qr.svg" alt="Scan QR to Sponsor" style="width:220px;height:220px;background:#fff;padding:10px;border-radius:16px;border:2px solid var(--gold);box-shadow:0 12px 30px rgba(0,0,0,0.45);">
+        <div id="giveModalUrl" style="font-size:0.8rem;color:var(--accent);margin-top:8px;word-break:break-all;font-weight:700;"></div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+          <a class="btn-primary" style="padding:5px 12px;font-size:0.8rem;text-decoration:none;" href="/give" target="_blank">Open Mobile Splash →</a>
+          <a class="btn-secondary" style="padding:5px 10px;font-size:0.8rem;text-decoration:none;" href="/watch" target="_blank">📺 Live Screen</a>
+        </div>
+      </div>
+      <div>
+        <p class="muted" style="margin:0 0 10px;font-size:0.9rem;">Scanning opens our mobile splash page where you can connect to this exact screen OR sponsor an individual synagogue item or event:</p>
+        <div id="giveModalItems" style="display:grid;gap:8px;max-height:290px;overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- FULL-SCREEN CINEMATIC SYNAGOGUE PRESENTATION OVERLAY -->
@@ -2244,7 +2369,7 @@ function switchView(name) {
   drawMarginStages();
   if (name === 'sky') loadCelestial();
   if (name === 'liturgy' && !window._liturgyLoaded) loadLiturgy(false);
-  if (name === 'shul' && !window._shulLoaded) loadShul(false);
+  if (name === 'shul' && !window._shulLoaded) { loadShul(false); loadSyndicationHub(); loadSponsorshipManager(); }
   if (name === 'parasha' && !window._parashaLoaded) loadParasha('');
   if (name === 'reader' && !booksCache.length) loadBooks();
   if (name === 'stories' && !window._storiesLoaded) loadStories();
@@ -5129,6 +5254,9 @@ async function loadSettings() {
   document.getElementById('cfgMailHook').value = c.mailing_webhook_url || '';
   document.getElementById('cfgBroadcastBase').value = c.broadcast_public_base_url || '';
   document.getElementById('cfgBroadcastFollow').value = c.broadcast_follow_url || '';
+  document.getElementById('cfgPublicSanctuary').value = c.public_sanctuary_url || '';
+  document.getElementById('cfgDonateUrl').value = c.donation_checkout_url || 'https://www.theshul.eu';
+  document.getElementById('cfgSynHook').value = c.syndication_webhook_url || '';
   if (c.broadcast_follow_url) initCompanionFollow(c.broadcast_follow_url);
 }
 
@@ -5158,6 +5286,9 @@ async function saveSettings() {
     mailing_webhook_url: document.getElementById('cfgMailHook').value.trim(),
     broadcast_public_base_url: document.getElementById('cfgBroadcastBase').value.trim(),
     broadcast_follow_url: document.getElementById('cfgBroadcastFollow').value.trim(),
+    public_sanctuary_url: document.getElementById('cfgPublicSanctuary').value.trim(),
+    donation_checkout_url: document.getElementById('cfgDonateUrl').value.trim() || 'https://www.theshul.eu',
+    syndication_webhook_url: document.getElementById('cfgSynHook').value.trim(),
   };
   initCompanionFollow(payload.broadcast_follow_url);
   currentVoiceProfile = payload.voice_profile;
@@ -5169,6 +5300,191 @@ async function saveSettings() {
     loadCelestial();
     loadToday(null);
   }
+}
+
+// =============================================================================
+// MOBILE QR DONATION MODAL, SPONSORSHIP MANAGER & 7-CHANNEL AUTO-SYNDICATION
+// =============================================================================
+let syndicationPackCache = null;
+let activeSynChannel = 'whatsapp';
+
+async function openGiveModal() {
+  const modal = document.getElementById('giveModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.getElementById('giveModalQrImg').src = '/api/give/qr.svg?t=' + Date.now();
+  try {
+    const r = await fetch('/api/give/items');
+    const d = await r.json();
+    document.getElementById('giveModalUrl').textContent = d.give_url || '/give';
+    document.getElementById('giveModalItems').innerHTML = (d.items || []).map(it => `
+      <div style="background:rgba(228,188,105,0.08);border:1px solid rgba(228,188,105,0.28);border-radius:11px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <div style="font-weight:700;color:#fff;font-size:0.9rem;">${esc(it.title)}</div>
+          <div class="muted" style="font-size:0.76rem;">${esc(it.schedule_label)} · ${esc((it.description || '').slice(0, 88))}...</div>
+        </div>
+        <span class="trait-pill" style="flex-shrink:0;font-weight:800;color:var(--gold);">€${esc(it.amount)}</span>
+      </div>`).join('');
+  } catch (e) {}
+}
+
+function closeGiveModal() {
+  const modal = document.getElementById('giveModal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function loadSyndicationHub() {
+  try {
+    const r = await fetch('/api/syndication/pack');
+    syndicationPackCache = await r.json();
+    const link = document.getElementById('shulGiveUrlLink');
+    if (link && syndicationPackCache.give_url) {
+      link.textContent = syndicationPackCache.give_url;
+      link.href = '/give';
+    }
+    switchSynChannel(activeSynChannel);
+  } catch (e) {
+    const out = document.getElementById('synChannelOut');
+    if (out) out.textContent = 'Could not load syndication payloads.';
+  }
+}
+
+function copySynText(txt, btn) {
+  navigator.clipboard.writeText(txt).then(() => {
+    if (btn) { const prev = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = prev, 1600); }
+  }).catch(() => {});
+}
+
+function switchSynChannel(chKey) {
+  activeSynChannel = chKey;
+  document.querySelectorAll('#synTabBar .liturgy-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === chKey));
+  const out = document.getElementById('synChannelOut');
+  if (!out || !syndicationPackCache) return;
+  const ch = syndicationPackCache.channels || {};
+  if (chKey === 'whatsapp') {
+    const w = ch.whatsapp || {};
+    out.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <a class="btn-primary" style="text-decoration:none;padding:6px 12px;font-size:0.82rem;" href="${esc(w.share_url || '#')}" target="_blank" rel="noopener">💬 Open in WhatsApp</a>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.channels.whatsapp.text, this)">📋 Copy WhatsApp Message</button>
+      </div>
+      <div class="syn-code">${esc(w.text || '')}</div>`;
+  } else if (chKey === 'sms') {
+    const s = ch.sms || {};
+    out.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="muted">Concise SMS / Text Message (${s.char_count || 0} chars)</span>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.channels.sms.text, this)">📋 Copy SMS Text</button>
+      </div>
+      <div class="syn-code">${esc(s.text || '')}</div>`;
+  } else if (chKey === 'rss') {
+    const r = ch.rss || {};
+    out.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+        <a class="btn-primary" style="text-decoration:none;padding:6px 12px;font-size:0.82rem;" href="/feed.xml" target="_blank">📰 Open Live /feed.xml</a>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.rss_url, this)">📋 Copy RSS URL</button>
+        <span class="muted" style="font-size:0.78rem;">Plug into Mailchimp RSS, WordPress, Slack, Zapier or Make!</span>
+      </div>
+      <div class="syn-code">${esc(r.xml_preview || '')}</div>`;
+  } else if (chKey === 'website') {
+    const w = ch.website || {};
+    out.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+        <button class="btn-primary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.embed_snippet, this)">📋 Copy 1-Line Website Embed</button>
+        <span class="muted" style="font-size:0.78rem;">Paste on theshul.eu to embed live Shabbat times, Parashah, Events &amp; Donate button!</span>
+      </div>
+      <div class="syn-code">${esc(w.embed_snippet || '')}</div>`;
+  } else if (chKey === 'eventbrite') {
+    const evs = (ch.eventbrite && ch.eventbrite.events) || [];
+    const jsonTxt = JSON.stringify(evs, null, 2);
+    out.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="muted">${evs.length} Eventbrite-ready Shul Events (title, summary, tags, venue &amp; sponsor link)</span>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(JSON.stringify(syndicationPackCache.channels.eventbrite.events, null, 2), this)">📋 Copy Eventbrite JSON</button>
+      </div>
+      <div class="syn-code">${esc(jsonTxt)}</div>`;
+  } else if (chKey === 'pr') {
+    const p = ch.pr || {};
+    out.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="muted">Brussels &amp; Jewish Community Press Release Draft</span>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.channels.pr.text, this)">📋 Copy Press Release</button>
+      </div>
+      <div class="syn-code">${esc(p.text || '')}</div>`;
+  } else if (chKey === 'email') {
+    const em = ch.email || {};
+    out.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong style="color:var(--gold);">${esc(em.subject || '')}</strong>
+        <button class="btn-secondary" style="padding:6px 12px;font-size:0.82rem;" onclick="copySynText(syndicationPackCache.channels.email.plain_text, this)">📋 Copy Email Text</button>
+      </div>
+      <div class="syn-code">${esc((em.plain_text || '').slice(0, 1800))}</div>`;
+  }
+}
+
+async function transmitAllChannels() {
+  const msg = document.getElementById('synTransmitMsg');
+  if (msg) msg.textContent = 'Transmitting multi-channel syndication bundle...';
+  try {
+    const r = await fetch('/api/syndication/transmit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channels: ['rss', 'website', 'email', 'whatsapp', 'sms', 'eventbrite', 'pr'] }),
+    });
+    const d = await r.json();
+    if (msg) msg.innerHTML = `<strong style="color:${d.ok ? '#4ade80' : '#fbbf24'};">${esc(d.status.toUpperCase())}:</strong> ${esc(d.detail)}`;
+  } catch (e) {
+    if (msg) msg.textContent = 'Transmission error: ' + e;
+  }
+}
+
+async function loadSponsorshipManager() {
+  try {
+    const [rIt, rPl] = await Promise.all([fetch('/api/give/items'), fetch('/api/give/pledges')]);
+    const dIt = await rIt.json();
+    const dPl = await rPl.json();
+    const box = document.getElementById('sponsorshipItemsAdmin');
+    if (box) {
+      box.innerHTML = (dIt.items || []).map(it => `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid rgba(228,188,105,0.14);">
+          <div>
+            <div style="font-weight:700;color:#fff;">${esc(it.title)} <span style="color:var(--gold);">€${esc(it.amount)}</span></div>
+            <div class="muted" style="font-size:0.74rem;">${esc(it.schedule_label)}${it.sponsored_count ? ` · 💛 ${it.sponsored_count} pledged` : ''}</div>
+          </div>
+          <button class="tool-btn" style="padding:2px 7px;font-size:0.72rem;" onclick="deleteSponsorshipItemUi(${it.id})">✕</button>
+        </div>`).join('');
+    }
+    const pBox = document.getElementById('pledgesAdmin');
+    const pledges = dPl.pledges || [];
+    if (pBox) {
+      pBox.innerHTML = pledges.length
+        ? `<strong style="color:var(--gold);">Recent Pledges (${pledges.length}):</strong>` + pledges.slice(0, 5).map(p => `<div style="margin-top:4px;">💛 <strong>${esc(p.donor_name)}</strong> · €${esc(p.amount)} — ${esc(p.item_title)}${p.dedication ? ` <em>("${esc(p.dedication)}")</em>` : ''}</div>`).join('')
+        : 'No sponsorship pledges recorded yet — scan the QR above to test!';
+    }
+  } catch (e) {}
+}
+
+async function addSponsorshipItemUi() {
+  const title = document.getElementById('spTitle').value.trim();
+  if (!title) return;
+  await fetch('/api/give/items', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title,
+      amount: parseInt(document.getElementById('spAmount').value, 10) || 180,
+      schedule_label: document.getElementById('spSched').value.trim() || 'Upcoming',
+      description: document.getElementById('spDesc').value.trim(),
+    }),
+  });
+  document.getElementById('spTitle').value = '';
+  document.getElementById('spDesc').value = '';
+  loadSponsorshipManager();
+}
+
+async function deleteSponsorshipItemUi(id) {
+  await fetch('/api/give/items?id=' + encodeURIComponent(id), { method: 'DELETE' });
+  loadSponsorshipManager();
 }
 
 loadHealth();

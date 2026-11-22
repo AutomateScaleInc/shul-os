@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sponsor &amp; Connect — The European Synagogue (Ohel Eliezer)</title>
+<style>
+  :root {
+    --bg: #080f1e; --card: #101c34; --elev: #162646;
+    --gold: #e4bc69; --gold-soft: rgba(228,188,105,0.14);
+    --accent: #5cb6e5; --ok: #4ade80;
+    --text: #f4efe6; --muted: #b4c2d8;
+    --border: rgba(228,188,105,0.28);
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: var(--sans); background: radial-gradient(circle at top, #132347 0%, var(--bg) 62%);
+    color: var(--text); min-height: 100vh; padding: 16px 14px 44px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  .hero {
+    text-align: center; padding: 22px 18px; border-radius: 20px;
+    background: linear-gradient(145deg, rgba(20,35,68,0.94), rgba(10,18,36,0.96));
+    border: 1.5px solid rgba(228,188,105,0.5);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    margin-bottom: 16px;
+  }
+  .emblem {
+    width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 50%;
+    background: var(--gold-soft); border: 1.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; color: var(--gold);
+  }
+  .kicker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--gold); font-weight: 800; }
+  h1 { font-family: var(--serif); margin: 6px 0 6px; font-size: 1.58rem; color: #fff; }
+  .sub { color: var(--muted); font-size: 0.9rem; line-height: 1.48; margin: 0 auto 14px; }
+  .live-bar {
+    display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    background: rgba(8,15,30,0.68); border: 1px solid var(--border);
+    border-radius: 12px; padding: 8px 12px; font-size: 0.82rem; margin-bottom: 14px;
+  }
+  .quick-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-gold {
+    background: linear-gradient(135deg, #f3d796, #d9a74a); color: #091122;
+    border: none; border-radius: 12px; padding: 11px 18px; font-weight: 800; font-size: 0.92rem;
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-outline {
+    background: rgba(92,182,229,0.12); color: #9fd8f8; border: 1px solid rgba(92,182,229,0.5);
+    border-radius: 12px; padding: 11px 16px; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .section-title {
+    font-family: var(--serif); font-size: 1.18rem; color: var(--gold);
+    margin: 18px 0 10px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .item-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 15px 16px; margin-bottom: 11px; cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .item-card:hover, .item-card.selected {
+    border-color: var(--gold); transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(228,188,105,0.16);
+    background: linear-gradient(145deg, rgba(228,188,105,0.1), var(--card));
+  }
+  .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .item-title { font-family: var(--serif); font-size: 1.06rem; font-weight: 700; color: #fff; margin: 0; }
+  .price-pill {
+    flex-shrink: 0; background: var(--gold-soft); border: 1px solid var(--gold);
+    color: var(--gold); font-weight: 800; font-size: 0.92rem;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .item-meta { font-size: 0.76rem; color: var(--accent); font-weight: 700; margin: 4px 0 5px; }
+  .item-desc { font-size: 0.87rem; color: var(--muted); line-height: 1.48; margin: 0; }
+  .pledge-card {
+    background: linear-gradient(145deg, #132242, #0d182f);
+    border: 1.5px solid var(--gold); border-radius: 18px; padding: 18px; margin-top: 16px;
+  }
+  .chai-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+  .chai-btn {
+    background: var(--elev); border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 7px 12px; font-weight: 700; cursor: pointer; font-size: 0.86rem;
+  }
+  .chai-btn.active { background: var(--gold); color: #091122; border-color: var(--gold); }
+  label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  input, textarea {
+    width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: rgba(8,15,30,0.85); color: #fff; font-size: 0.96rem; margin-bottom: 11px;
+    font-family: var(--sans);
+  }
+  .thanks-box {
+    display: none; background: rgba(34,197,94,0.14); border: 1.5px solid var(--ok);
+    border-radius: 16px; padding: 18px; text-align: center; margin-top: 14px;
+  }
+  footer { text-align: center; margin-top: 22px; font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
+  footer a { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="emblem">✡</div>
+    <div class="kicker" id="shulName">THE EUROPEAN SYNAGOGUE · OHEL ELIEZER</div>
+    <h1>Sponsor a Mitzvah &amp; Connect to This Screen</h1>
+    <p class="sub">Partner with Rabbi Michoel Rosenblum &amp; our Brussels community—sponsor a Shabbat Kiddush, Kids Shul, Day of Learning, or connect straight to the live Torah Sanctuary screen in your hands.</p>
+    <div class="live-bar" id="liveBar">Loading this week's Parashah &amp; Shabbat times...</div>
+    <div class="quick-actions">
+      <a class="btn-gold" href="#pledgeForm">💛 Sponsor Now</a>
+      <a class="btn-outline" href="/watch">📺 Connect to Live Screen</a>
+      <a class="btn-outline" href="/">📖 Full Torah Library</a>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span>✨ Choose an Item or Event to Sponsor</span>
+    <span style="font-family:var(--sans);font-size:0.76rem;color:var(--muted);">Tap any card below</span>
+  </div>
+  <div id="itemsList">Loading sponsorships...</div>
+
+  <div class="pledge-card" id="pledgeForm">
+    <div class="kicker">💛 TZEDAKAH &amp; SPONSORSHIP DEDICATION</div>
+    <h2 id="selectedTitle" style="font-family:var(--serif);margin:4px 0 6px;font-size:1.25rem;color:#fff;">General Tzedakah &amp; Synagogue Support</h2>
+    <div class="chai-row" id="chaiRow">
+      <button type="button" class="chai-btn" onclick="pickAmount(18)">€18 (Chai)</button>
+      <button type="button" class="chai-btn" onclick="pickAmount(36)">€36 (2× Chai)</button>
+      <button type="button" class="chai-btn" onclick="pickAmount(72)">€72</button>
+      <button type="button" class="chai-btn" onclick="pickAmount(180)">€180</button>
+      <button type="button" class="chai-btn" onclick="pickAmount(360)">€360</button>
+      <button type="button" class="chai-btn" onclick="pickAmount(540)">€540</button>
+    </div>
+    <label for="fAmount">Contribution Amount (EUR €)</label>
+    <input type="number" id="fAmount" min="1" value="36">
+    <label for="fName">Your Name *</label>
+    <input type="text" id="fName" placeholder="e.g. David &amp; Sarah Cohen">
+    <label for="fEmail">Email (for receipt &amp; weekly shul updates)</label>
+    <input type="email" id="fEmail" placeholder="you@example.com">
+    <label for="fPhone">WhatsApp / Phone (optional)</label>
+    <input type="tel" id="fPhone" placeholder="+32 ...">
+    <label for="fDedication">Dedication (In honor of / In memory of / Refuah Shleimah)</label>
+    <textarea id="fDedication" rows="2" placeholder="Optional dedication to display on the Shabbat Kiddush &amp; Sanctuary screen..."></textarea>
+    <button type="button" class="btn-gold" style="width:100%;justify-content:center;font-size:1rem;padding:13px;" onclick="submitPledge()">💛 Confirm Sponsorship &amp; Proceed</button>
+    <div id="pledgeErr" style="color:#fca5a5;font-size:0.85rem;margin-top:8px;"></div>
+  </div>
+
+  <div class="thanks-box" id="thanksBox">
+    <div style="font-size:2rem;margin-bottom:4px;">✨ תּוֹדָה רַבָּה · Todah Rabah!</div>
+    <h3 style="margin:4px 0 8px;color:#fff;font-family:var(--serif);" id="thanksHead">Thank you for partnering with The Shul!</h3>
+    <p id="thanksMsg" style="font-size:0.9rem;color:#e8dfd0;line-height:1.5;margin:0 0 14px;"></p>
+    <div class="quick-actions">
+      <a class="btn-gold" id="checkoutLink" href="https://www.theshul.eu" target="_blank" rel="noopener">Complete Online Payment →</a>
+      <a class="btn-outline" href="/watch">📺 Open Live Screen</a>
+    </div>
+  </div>
+
+  <footer>
+    <strong>The European Synagogue — Ohel Eliezer</strong> · Rue Froissart 109, 1040 Brussels<br>
+    Rabbi Michoel Rosenblum · +32 2 335 5771 · <a href="mailto:office@theshul.eu">office@theshul.eu</a> · <a href="https://www.theshul.eu" target="_blank">theshul.eu</a>
+  </footer>
+</div>
+
+<script>
+let items = [];
+let selectedItem = { slug: 'general-tzedakah', title: 'General Tzedakah & Synagogue Support', amount: 36, currency: 'EUR' };
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function selectItem(slug) {
+  const it = items.find(x => x.slug === slug);
+  if (!it) return;
+  selectedItem = it;
+  document.querySelectorAll('.item-card').forEach(el => el.classList.toggle('selected', el.dataset.slug === slug));
+  document.getElementById('selectedTitle').textContent = it.title;
+  pickAmount(it.amount);
+  document.getElementById('pledgeForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function pickAmount(val) {
+  document.getElementById('fAmount').value = val;
+  document.querySelectorAll('.chai-btn').forEach(b => b.classList.toggle('active', b.textContent.includes('€' + val)));
+}
+
+async function initGivePage() {
+  try {
+    const [rItems, rToday] = await Promise.all([fetch('/api/give/items'), fetch('/api/today')]);
+    const dItems = await rItems.json();
+    const dToday = await rToday.json();
+    items = dItems.items || [];
+    if (dItems.synagogue_name) document.getElementById('shulName').textContent = dItems.synagogue_name.toUpperCase();
+    const p = dToday.parasha || {};
+    const sh = dToday.shabbat_times || {};
+    document.getElementById('liveBar').innerHTML = `
+      <span>📖 <strong>Parashat ${esc(p.en_name || '')}</strong></span>
+      ${sh.candle_lighting ? `<span>🕯 Candles: <strong>${esc(sh.candle_lighting)}</strong></span>` : ''}
+      ${sh.havdalah ? `<span>✨ Havdalah: <strong>${esc(sh.havdalah)}</strong></span>` : ''}`;
+
+    const host = document.getElementById('itemsList');
+    host.innerHTML = items.map(it => `
+      <div class="item-card ${it.slug === selectedItem.slug ? 'selected' : ''}" data-slug="${esc(it.slug)}" onclick="selectItem('${esc(it.slug)}')">
+        <div class="item-top">
+          <h3 class="item-title">${esc(it.title)}</h3>
+          <span class="price-pill">€${esc(it.amount)}</span>
+        </div>
+        <div class="item-meta">${esc(it.category)} · ${esc(it.schedule_label)}${it.sponsored_count ? ` · 💛 ${it.sponsored_count} sponsored` : ''}</div>
+        <p class="item-desc">${esc(it.description)}</p>
+      </div>`).join('');
+    if (items.length) selectItem(items[0].slug);
+  } catch (e) {
+    document.getElementById('itemsList').innerHTML = '<div style="color:#fca5a5;">Could not load sponsorship items right now.</div>';
+  }
+}
+
+async function submitPledge() {
+  const errEl = document.getElementById('pledgeErr');
+  errEl.textContent = '';
+  const name = document.getElementById('fName').value.trim();
+  const amount = parseInt(document.getElementById('fAmount').value, 10) || 36;
+  if (!name) { errEl.textContent = 'Please enter your name so Rabbi Michoel can thank you!'; return; }
+  try {
+    const r = await fetch('/api/give/pledge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item_slug: selectedItem.slug,
+        item_title: selectedItem.title,
+        amount,
+        currency: selectedItem.currency || 'EUR',
+        donor_name: name,
+        donor_email: document.getElementById('fEmail').value.trim(),
+        donor_phone: document.getElementById('fPhone').value.trim(),
+        dedication: document.getElementById('fDedication').value.trim(),
+      }),
+    });
+    const d = await r.json();
+    if (!d.ok) { errEl.textContent = d.error || 'Could not record pledge.'; return; }
+    document.getElementById('thanksHead').textContent = `Thank you, ${name}! (€${amount} · ${selectedItem.title})`;
+    document.getElementById('thanksMsg').textContent = 'Your sponsorship dedication has been recorded for Rabbi Michoel & The European Synagogue. Tap below to complete your contribution online or return to the live Sanctuary screen.';
+    if (d.checkout_url) document.getElementById('checkoutLink').href = d.checkout_url;
+    document.getElementById('thanksBox').style.display = 'block';
+    document.getElementById('thanksBox').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    errEl.textContent = 'Network error — please try again.';
+  }
+}
+
+initGivePage();
+</script>
+</body>
+</html>

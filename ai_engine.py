@@ -35,6 +35,9 @@ DEFAULT_CONFIG = {
     "scribe_online_ingest": True,
     "broadcast_public_base_url": "",
     "broadcast_follow_url": "",
+    "public_sanctuary_url": "",
+    "donation_checkout_url": "https://www.theshul.eu",
+    "syndication_webhook_url": "",
     "location": {
         "city": "Brussels, Belgium",
         "lat": 50.8503,
