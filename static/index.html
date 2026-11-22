@@ -5293,7 +5293,7 @@ function formatClassicalCommentary(rawText, opts = {}) {
   const decorateCitations = (plain) => {
     let h = esc(plain);
     h = h.replace(
-      /\(([^()]{2,48}?(?:\d+[ab]|\d+:\d+(?:[:\-]\d+)?|Rabbah|Tanchuma|Midrash|Berakhot|Shabbat|Yevamot|Sanhedrin|Pesachim|Rosh Hashanah|Sotah|Megillah|Bava|Ketubot|Kiddushin|Chullin|Nedarim|Gittin|Avot)[^()]{0,24})\)/gi,
+      /\(([^()]{0,48}?(?:\d+[ab]|\d+:\d+(?:[:\-]\d+)?|Rabbah|Tanchuma|Midrash|Berakhot|Shabbat|Yevamot|Sanhedrin|Pesachim|Rosh Hashanah|Sotah|Megillah|Bava|Ketubot|Kiddushin|Chullin|Nedarim|Gittin|Avot)[^()]{0,24})\)/gi,
       '<span class="comm-cite">$1</span>'
     );
     return h;
