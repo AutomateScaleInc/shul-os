@@ -166,8 +166,8 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 "echo \"✡ Downloading Shul.OS from $HUB_URL ...\"\n"
                 "mkdir -p \"$DEST\"\n"
                 "curl -fsSL \"$HUB_URL/download/shul-os.tar.gz\" | tar -xz -C \"$DEST\" --strip-components=1\n"
-                "cd \"$DEST\" && chmod +x install-omarchy-shul.sh\n"
-                "exec ./install-omarchy-shul.sh --follow \"$HUB_URL\" \"$@\"\n"
+                "cd \"$DEST\" && chmod +x install-shul-os.sh shul-os-launch.sh\n"
+                "exec ./install-shul-os.sh --follow \"$HUB_URL\" \"$@\"\n"
             ).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/x-shellscript; charset=utf-8")
@@ -183,7 +183,7 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             buf = io.BytesIO()
             with tarfile.open(fileobj=buf, mode="w:gz") as tf:
                 for p in sorted(BASE_DIR.iterdir()):
-                    if p.is_file() and (
+                    if p.is_file() and p.name != "install-omarchy-shul.sh" and (
                         p.suffix in (".py", ".md", ".sh")
                         or p.name in ("LICENSE", "config.example.json")
                     ):

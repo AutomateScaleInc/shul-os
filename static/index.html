@@ -1740,7 +1740,7 @@
   }
   .settings-check input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
 
-  /* OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH */
+  /* SHUL.OS SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH */
   .mesh-cap-strip {
     display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
   }
@@ -2100,7 +2100,7 @@
     <div style="display:flex;align-items:center;gap:10px;min-width:0;">
       <span style="font-size:1.15rem;">📡</span>
       <div style="min-width:0;">
-        <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);" id="meshInFrom">OMARCHY SHUL MESH LIVE</div>
+        <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);" id="meshInFrom">SHUL.OS MESH LIVE</div>
         <div style="font-size:0.92rem;font-weight:700;" id="meshInText"></div>
       </div>
     </div>
@@ -2490,22 +2490,22 @@
       <div class="cards-grid" id="historyGrid"></div>
     </section>
 
-    <!-- 5B. OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH -->
+    <!-- 5B. SHUL.OS SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH -->
     <section id="view-mesh" class="view">
       <div class="card" style="padding:18px 22px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:10px;">
           <div>
-            <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);">OMARCHY OS · ENCRYPTED WIREGUARD TAILNET + STUDIO CAMERA + SHABBAT GUARD</div>
-            <h2 style="margin:3px 0 4px;">🌐 Synagogue, Chabad House &amp; Residence Broadcast Mesh</h2>
-            <p class="muted" style="font-size:0.86rem;margin:0;max-width:780px;">Link sister synagogues, Chabad Houses, and family residences directly through Omarchy's encrypted Tailscale mesh &amp; Studio virtual camera. Broadcast live Torah slides, Rabbi video feeds, and community announcements in one click—automatically respecting each building's local Shabbat Zmanim.</p>
+            <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);">SHUL.OS · ENCRYPTED WIREGUARD MESH + STUDIO CAMERA + SHABBAT GUARD</div>
+            <h2 style="margin:3px 0 4px;">🌐 Shul.OS Synagogue, Chabad House &amp; Residence Broadcast Mesh</h2>
+            <p class="muted" style="font-size:0.86rem;margin:0;max-width:780px;">Link sister synagogues, Chabad Houses, and family residences directly through Shul.OS's encrypted WireGuard mesh &amp; Studio virtual camera. Broadcast live Torah slides, Rabbi video feeds, and community announcements in one click—automatically respecting each building's local Shabbat Zmanim.</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn-secondary" onclick="loadShulMesh(true)">🔄 Ping All Nodes</button>
-            <button class="btn-primary" onclick="scanTailscaleMesh()">🔍 Scan Tailscale Mesh</button>
+            <button class="btn-primary" onclick="scanTailscaleMesh()">🔍 Scan Shul.OS Mesh</button>
           </div>
         </div>
         <div class="mesh-cap-strip" id="meshCapStrip">
-          <span class="mesh-cap-pill">Detecting Omarchy OS &amp; Tailscale Mesh...</span>
+          <span class="mesh-cap-pill">Detecting Shul.OS Hardware &amp; Encrypted Mesh...</span>
         </div>
       </div>
 
@@ -2549,7 +2549,7 @@
                 <label class="settings-field">Rabbi / Host Contact (optional)
                   <input class="form-input" id="mNodeHost" placeholder="e.g. Rabbi &amp; Rebbetzin">
                 </label>
-                <label class="settings-field">Omarchy Studio Camera URL (optional)
+                <label class="settings-field">Shul.OS Studio Camera URL (optional)
                   <input class="form-input" id="mNodeCam" placeholder="http://100.x.y.z:53317/program.mjpg">
                 </label>
               </div>
@@ -2565,10 +2565,10 @@
         <!-- RIGHT COLUMN: ONE-CLICK NETWORK BROADCAST + ZERO-TOUCH JOIN PACK -->
         <div class="settings-stack">
           <div class="card" style="margin-bottom:0;border-color:rgba(228,188,105,0.48);">
-            <h3 style="margin-top:0;">📡 Broadcast Live Across the Shul Mesh</h3>
-            <p class="muted" style="font-size:0.84rem;margin:0 0 12px;">Push a live synchronized Torah Shiur (+ Omarchy Studio camera feed) or an instant community banner to every linked Synagogue, Chabad House &amp; Residence.</p>
+            <h3 style="margin-top:0;">📡 Broadcast Live Across the Shul.OS Mesh</h3>
+            <p class="muted" style="font-size:0.84rem;margin:0 0 12px;">Push a live synchronized Torah Shiur (+ Shul.OS Studio camera feed) or an instant community banner to every linked Synagogue, Chabad House &amp; Residence.</p>
             <div class="settings-section" style="margin-bottom:12px;">
-              <div class="settings-section-title">1 · Live Torah Shiur + Omarchy Camera Broadcast</div>
+              <div class="settings-section-title">1 · Live Torah Shiur + Studio Camera Broadcast</div>
               <div class="settings-row-2">
                 <label class="settings-field">Presentation Topic
                   <select id="mCastKind">
@@ -2584,7 +2584,7 @@
                 <label class="settings-check"><input type="checkbox" class="mTargetType" value="synagogue" checked> 🏛️ Synagogues</label>
                 <label class="settings-check"><input type="checkbox" class="mTargetType" value="chabad" checked> 🕯️ Chabad</label>
                 <label class="settings-check"><input type="checkbox" class="mTargetType" value="residence" checked> 🏠 Residences</label>
-                <label class="settings-check"><input type="checkbox" id="mCastCam" checked> 🎥 Include Omarchy Studio Cam</label>
+                <label class="settings-check"><input type="checkbox" id="mCastCam" checked> 🎥 Include Shul.OS Studio Cam</label>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="btn-primary" onclick="broadcastMeshShiur()">📡 Start Mesh Live Broadcast</button>
@@ -2606,13 +2606,13 @@
           </div>
 
           <div class="card" style="margin-bottom:0;">
-            <h3 style="margin-top:0;">🤝 Zero-Touch Omarchy Node Join Pack</h3>
+            <h3 style="margin-top:0;">🤝 Zero-Touch Shul.OS Node Join Pack</h3>
             <div style="display:grid;grid-template-columns:116px minmax(0,1fr);gap:14px;align-items:center;">
               <div style="background:#fffdf7;padding:6px;border-radius:12px;border:1.5px solid var(--gold);text-align:center;">
-                <img id="meshJoinQr" src="/api/mesh/join-qr.svg" alt="Join Shul Mesh QR" style="width:100px;height:100px;display:block;margin:0 auto;">
+                <img id="meshJoinQr" src="/api/mesh/join-qr.svg" alt="Join Shul.OS Mesh QR" style="width:100px;height:100px;display:block;margin:0 auto;">
               </div>
               <div style="min-width:0;">
-                <div style="font-size:0.78rem;color:var(--accent);font-weight:700;">THIS HUB'S OMARCHY MESH ADDRESS</div>
+                <div style="font-size:0.78rem;color:var(--accent);font-weight:700;">THIS HUB'S SHUL.OS MESH ADDRESS</div>
                 <div id="meshJoinHubUrl" style="font-family:monospace;font-size:0.82rem;color:var(--gold);word-break:break-all;margin:3px 0 8px;">Loading...</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   <a class="btn-primary" style="padding:5px 10px;font-size:0.78rem;text-decoration:none;" href="/download/shul-os.tar.gz" download="shul-os.tar.gz">⬇️ Download Shul.OS</a>
@@ -2661,16 +2661,16 @@
 
           <div class="card" style="margin-bottom:0;border-color:rgba(92,182,229,0.4);">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-              <h3 style="margin:0;">🌐 Omarchy Shul Mesh Ready</h3>
+              <h3 style="margin:0;">🌐 Shul.OS Mesh Ready</h3>
               <button class="btn-secondary" style="padding:5px 11px;font-size:0.8rem;" onclick="switchView('mesh')">Open Mesh Console →</button>
             </div>
-            <p class="muted" style="font-size:0.84rem;margin:0;">Link Synagogues, Chabad Houses &amp; Family Residences over encrypted Tailscale WireGuard + Omarchy Studio Camera (`OmarchyStudioProgram`) with automatic per-city Shabbat Stillness protection.</p>
+            <p class="muted" style="font-size:0.84rem;margin:0;">Link Synagogues, Chabad Houses &amp; Family Residences over encrypted WireGuard Mesh + Shul.OS Studio Camera with automatic per-city Shabbat Stillness protection.</p>
           </div>
         </div>
 
         <div class="card" style="margin-bottom:0;">
-          <h2>Synagogue, Omarchy Mesh &amp; Hybrid AI Settings</h2>
-          <p class="muted" style="font-size:0.85rem;margin-bottom:14px;">Works 100% offline using local Ollama. Optionally connect cloud AI, Omarchy Studio camera streams, or external calendar &amp; syndication webhooks.</p>
+          <h2>Synagogue, Shul.OS Mesh &amp; Hybrid AI Settings</h2>
+          <p class="muted" style="font-size:0.85rem;margin-bottom:14px;">Works 100% offline using local Ollama. Optionally connect cloud AI, Shul.OS Studio camera streams, or external calendar &amp; syndication webhooks.</p>
           <div class="settings-stack">
 
             <div class="settings-section">
@@ -2679,7 +2679,7 @@
                 <label class="settings-field">Synagogue / Station Name
                   <input class="form-input" id="cfgSynName">
                 </label>
-                <label class="settings-field">Omarchy Mesh Node Role
+                <label class="settings-field">Shul.OS Mesh Node Role
                   <select id="cfgMeshType">
                     <option value="synagogue">🏛️ Main Synagogue Hub</option>
                     <option value="chabad">🕯️ Chabad House</option>
@@ -2750,9 +2750,9 @@
             </div>
 
             <div class="settings-section">
-              <div class="settings-section-title">📡 Omarchy Broadcast Mesh, Camera &amp; Companion Sync</div>
+              <div class="settings-section-title">📡 Shul.OS Broadcast Mesh, Camera &amp; Companion Sync</div>
               <div class="settings-row-2">
-                <label class="settings-field">Omarchy Studio Camera Feed URL
+                <label class="settings-field">Shul.OS Studio Camera Feed URL
                   <input class="form-input" id="cfgMeshCam" placeholder="http://127.0.0.1:53317/program.mjpg">
                 </label>
                 <label class="settings-field">Public Broadcast Domain (optional)
@@ -7046,7 +7046,7 @@ async function deleteSponsorshipItemUi(id) {
 }
 
 // =============================================================================
-// OMARCHY SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH
+// SHUL.OS SYNAGOGUE, CHABAD HOUSE & RESIDENCE BROADCAST MESH
 // =============================================================================
 let meshJoinCmdCache = '';
 
@@ -7058,9 +7058,9 @@ async function loadShulMesh(probe = false) {
     const ts = caps.tailscale || {};
 
     const pills = [];
-    pills.push(`<span class="mesh-cap-pill ${caps.is_omarchy ? 'gold' : ''}">${caps.is_omarchy ? '✦ Omarchy OS Native' : '🖥 Linux Sanctuary OS'} · ${esc(caps.hostname || '')}</span>`);
-    pills.push(`<span class="mesh-cap-pill ${ts.active ? 'ok' : ''}">${ts.active ? '🔒 Tailscale WireGuard LIVE · ' + esc(ts.self_ip) + ' (' + (caps.online_tailscale_peers || 0) + ' peers)' : '🔒 Tailscale Standby · LAN ' + esc(caps.lan_ip || '')}</span>`);
-    pills.push(`<span class="mesh-cap-pill ${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? 'ok' : ''}">${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? '🎥 Omarchy Studio Cam READY' : '🎥 Studio Cam Optional'}</span>`);
+    pills.push(`<span class="mesh-cap-pill gold">✦ Shul.OS Native · ${esc(caps.hostname || '')}</span>`);
+    pills.push(`<span class="mesh-cap-pill ${ts.active ? 'ok' : ''}">${ts.active ? '🔒 Encrypted Mesh LIVE · ' + esc(ts.self_ip) + ' (' + (caps.online_tailscale_peers || 0) + ' peers)' : '🔒 Mesh Standby · LAN ' + esc(caps.lan_ip || '')}</span>`);
+    pills.push(`<span class="mesh-cap-pill ${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? 'ok' : ''}">${(caps.studio_cam_pipewire || caps.director_mjpeg_live) ? '🎥 Shul.OS Studio Cam READY' : '🎥 Studio Cam Optional'}</span>`);
     if (caps.hyprsunset_available) pills.push(`<span class="mesh-cap-pill gold">🌅 Hyprland + hyprsunset Warmth</span>`);
     if (caps.ble_lighting_live) pills.push(`<span class="mesh-cap-pill ok">💡 BLE Sanctuary RGB Sync</span>`);
     if (caps.cloudflared_available) pills.push(`<span class="mesh-cap-pill ok">☁ Cloudflare Zero-Config Tunnel</span>`);
@@ -7142,7 +7142,7 @@ async function scanTailscaleMesh() {
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;border-radius:9px;background:rgba(12,20,38,0.55);border:1px solid ${p.sanctuary_running ? 'rgba(74,222,128,0.5)' : 'var(--border)'};font-size:0.8rem;">
             <div>
               <strong>${esc(p.host)}</strong> <code>${esc(p.ip)}</code> (${esc(p.os)})
-              ${p.sanctuary_running ? ` <span style="color:#4ade80;font-weight:700;">✦ Torah Sanctuary Ready (${p.latency_ms}ms)</span>` : ` <span class="muted">· Omarchy / Tailnet peer</span>`}
+              ${p.sanctuary_running ? ` <span style="color:#4ade80;font-weight:700;">✦ Shul.OS Ready (${p.latency_ms}ms)</span>` : ` <span class="muted">· Shul.OS Mesh peer</span>`}
             </div>
             <button class="btn-secondary" style="padding:3px 9px;font-size:0.75rem;" onclick="linkDiscoveredPeer('${esc(p.beacon && p.beacon.name ? p.beacon.name : p.host)}','${esc(p.endpoint_url)}','${esc(p.beacon && p.beacon.city ? p.beacon.city : '')}','${esc(p.beacon && p.beacon.node_type ? p.beacon.node_type : 'chabad')}')">+ Link</button>
           </div>`).join('')}
@@ -7258,7 +7258,7 @@ function copyMeshJoinCmd() {
   if (!meshJoinCmdCache) return;
   navigator.clipboard.writeText(meshJoinCmdCache).catch(() => {});
   const st = document.getElementById('meshCastStatus');
-  if (st) st.textContent = '📋 Copied Omarchy Mesh Join Command — paste on any sister Shul, Chabad House, or family residence node!';
+  if (st) st.textContent = '📋 Copied Shul.OS Mesh Join Command — paste on any sister Shul, Chabad House, or family residence node!';
 }
 
 async function pollMeshIncoming() {

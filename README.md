@@ -1,8 +1,8 @@
-# ✡ Torah Sanctuary OS
+# ✡ Shul.OS — Living Synagogue Operating System
 
-**An open-source, 100% offline-capable Sacred Operating Framework for Synagogues, Batei Midrash, Jewish Schools, and Homes.**
+**An open-source, 100% offline-capable Sacred Operating System for Synagogues, Chabad Houses, Jewish Schools, and Homes.**
 
-Turn any Linux or [Omarchy](https://omarchy.org) computer (even a donated 2012–2019 iMac or mini PC) into a living Torah & Tanakh sanctuary synchronized from the ground up with the **exact Jewish calendar, real-time Sun & Moon astronomy, Halachic Zmanim, weekly Parashah, classical commentaries, illuminated art, and warm local voice AI.**
+Turn any Linux computer (even a donated 2012–2019 iMac or mini PC) into **Shul.OS** — a living Torah & Tanakh sanctuary synchronized from the ground up with the **exact Jewish calendar, real-time Sun & Moon astronomy, Halachic Zmanim, weekly Parashah, classical commentaries, illuminated art, and warm local voice AI.**
 
 ---
 
@@ -20,7 +20,7 @@ Turn any Linux or [Omarchy](https://omarchy.org) computer (even a donated 2012�
 
 ---
 
-## 🚀 1-Command Install (Any Linux / Omarchy Machine)
+## 🚀 1-Command Install (Shul.OS)
 
 ```bash
 git clone https://github.com/YOUR-ORG/torah-sanctuary-os.git

@@ -598,7 +598,7 @@ def build_join_pack(request_host: str = "") -> dict:
     watch_url = f"{hub_url}/watch"
     name = cfg.get("synagogue_name") or "The European Synagogue · Torah Sanctuary"
     join_cmd = (
-        f"# On any Omarchy Synagogue / Chabad / Residence node:\n"
+        f"# On any Shul.OS Synagogue / Chabad / Residence node:\n"
         f"curl -sS -X POST http://127.0.0.1:8080/api/config "
         f"-H 'Content-Type: application/json' "
         f"-d '{{\"broadcast_follow_url\":\"{hub_url}\",\"mesh_auto_receive\":true}}'"
