@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShulOS / Torah Sanctuary — Under the Hood Presentation</title>
+<style>
+  :root {
+    --bg: #070d1b; --card: rgba(15, 25, 48, 0.92); --gold: #e4bc69; --gold-soft: rgba(228,188,105,0.16);
+    --accent: #5cb6e5; --green: #4ade80; --text: #f3ead8; --muted: #b7c2d6;
+    --border: rgba(228,188,105,0.3); --serif: Georgia, 'Times New Roman', serif;
+    --hebrew: 'Noto Serif Hebrew', 'SBL Hebrew', Georgia, serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%; background: radial-gradient(ellipse at top, #132244 0%, #070d1b 70%);
+    color: var(--text); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+  }
+  .deck {
+    display: grid; grid-template-rows: auto 1fr auto; height: 100dvh;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 26px; background: rgba(7, 12, 24, 0.88);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .emblem {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--gold-soft);
+    border: 1px solid var(--gold); display: grid; place-items: center; color: var(--gold); font-size: 1.1rem;
+  }
+  .brand .t { font-family: var(--serif); color: var(--gold); font-weight: 700; font-size: 1.08rem; }
+  .brand .s { font-size: 0.76rem; color: var(--muted); }
+  .tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    background: rgba(228,188,105,0.14); border: 1px solid var(--gold); color: var(--gold);
+    border-radius: 9px; padding: 6px 13px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(228,188,105,0.28); }
+  .btn.primary { background: linear-gradient(135deg, #f3d796, #d9a74a); color: #091122; }
+  main {
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px 32px; overflow-y: auto;
+  }
+  .slide {
+    display: none; width: 100%; max-width: 1260px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 24px; padding: 30px 36px;
+    box-shadow: 0 28px 70px rgba(0,0,0,0.62), 0 0 40px rgba(228,188,105,0.08);
+    animation: slideIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .slide.active { display: block; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .kicker { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); font-weight: 800; margin-bottom: 6px; }
+  h1 { font-family: var(--serif); font-size: clamp(1.7rem, 3.2vw, 2.75rem); color: var(--gold); line-height: 1.14; margin-bottom: 10px; }
+  .hook {
+    font-size: clamp(1rem, 1.45vw, 1.22rem); color: #fff6df; line-height: 1.5;
+    border-left: 4px solid var(--gold); padding: 10px 16px; border-radius: 0 12px 12px 0;
+    background: rgba(228,188,105,0.09); margin: 12px 0 18px; font-style: italic;
+  }
+  .two-col { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 26px; align-items: center; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .slide { padding: 20px; } main { padding: 12px; } }
+  .shot {
+    border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(228,188,105,0.52);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.55); background: #050a14;
+  }
+  .shot img { width: 100%; height: auto; display: block; max-height: 460px; object-fit: cover; }
+  .shot.phone img { max-height: 470px; width: auto; margin: 0 auto; object-fit: contain; }
+  .shot-cap { padding: 8px 12px; font-size: 0.76rem; color: var(--muted); background: rgba(6,11,22,0.92); border-top: 1px solid var(--border); }
+  .points { list-style: none; display: grid; gap: 10px; }
+  .points li {
+    background: rgba(20, 33, 60, 0.78); border: 1px solid rgba(228,188,105,0.22);
+    border-radius: 12px; padding: 11px 14px; font-size: 0.96rem; line-height: 1.46;
+  }
+  .points strong { color: var(--gold); }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 14px; }
+  .stat {
+    background: rgba(20, 33, 60, 0.85); border: 1px solid rgba(228,188,105,0.34);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .stat .v { font-family: var(--serif); font-size: 1.65rem; font-weight: 800; color: var(--gold); }
+  .stat .k { font-size: 0.78rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .stat .d { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+  .broll {
+    margin-top: 14px; padding: 10px 14px; border-radius: 11px;
+    background: rgba(74, 222, 128, 0.09); border: 1px solid rgba(74, 222, 128, 0.4);
+    font-size: 0.85rem; color: #bbf7d0;
+  }
+  .arch-flow {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px;
+  }
+  @media (max-width: 860px) { .arch-flow { grid-template-columns: 1fr 1fr; } }
+  .arch-box {
+    background: rgba(18, 30, 56, 0.9); border: 1px solid rgba(92,182,229,0.42);
+    border-radius: 14px; padding: 13px;
+  }
+  .arch-box h3 { font-size: 0.86rem; color: var(--gold); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .arch-box p { font-size: 0.82rem; color: var(--muted); line-height: 1.42; }
+  .script-box {
+    background: rgba(9,16,32,0.86); border: 1px solid var(--gold); border-radius: 14px;
+    padding: 16px 18px; font-size: 0.94rem; line-height: 1.56; display: grid; gap: 9px;
+  }
+  .script-box .ts { color: var(--accent); font-weight: 800; font-family: monospace; margin-right: 6px; }
+  footer {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px 26px; background: rgba(7, 12, 24, 0.88);
+    border-top: 1px solid var(--border); font-size: 0.84rem; color: var(--muted);
+  }
+  .dots { display: flex; gap: 7px; align-items: center; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: rgba(228,188,105,0.28);
+    cursor: pointer; border: none; transition: all 0.2s ease;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.3); }
+</style>
+</head>
+<body>
+<div class="deck">
+  <header>
+    <div class="brand">
+      <div class="emblem">✡</div>
+      <div>
+        <div class="t">ShulOS / Torah Sanctuary — Under the Hood</div>
+        <div class="s">Creator &amp; Architecture Deck · Rescued 2013 iMac → Open-Source Living Synagogue OS</div>
+      </div>
+    </div>
+    <div class="tools">
+      <a class="btn" href="https://shul.automatescale.com" target="_blank">🌐 Live Sanctuary</a>
+      <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
+      <button class="btn primary" onclick="step(1)">Next Slide ▶</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- SLIDE 1: TITLE & OVERVIEW -->
+    <section class="slide active">
+      <div class="two-col">
+        <div>
+          <div class="kicker">SLIDE 1 · THE BIG STORY</div>
+          <h1>A 13-Year-Old iMac Turned Into a Living Synagogue OS</h1>
+          <div class="hook">“Everyone throws away 2013 iMacs. We stripped one to bare-metal Omarchy Arch Linux and turned it into a 100% offline-capable, open-source Operating System for Synagogues, Chabad Houses, and Jewish homes.”</div>
+          <div class="stats-grid">
+            <div class="stat"><div class="v">19,899</div><div class="k">Lines Pure Code</div><div class="d">Zero React, zero Node server, MIT Open Source</div></div>
+            <div class="stat"><div class="v">71 MB</div><div class="k">Offline Brain</div><div class="d">23,206 verses + 21,763 commentaries in SQLite FTS5</div></div>
+            <div class="stat"><div class="v">qwen2.5:3b</div><div class="k">Unplugged AI</div><div class="d">4096-ctx local Ollama reasoning with zero Wi-Fi</div></div>
+            <div class="stat"><div class="v">~60 ms</div><div class="k">Global Live QR</div><div class="d">shul.automatescale.com on any phone (4G/5G/Wi-Fi)</div></div>
+          </div>
+        </div>
+        <div class="shot">
+          <img src="showcase/showcase_sanctuary_desktop.png" alt="ShulOS Desktop Sanctuary">
+          <div class="shot-cap">Live on 2013 iMac (`sentinel`) — Parashat Vayishlach, 400 Armed Men Swath, Live Tefillin Zmanim &amp; Always-On HTTPS QR</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: SYSTEM ARCHITECTURE -->
+    <section class="slide">
+      <div class="kicker">SLIDE 2 · FULL-STACK ARCHITECTURE</div>
+      <h1>From Bare-Metal Silicon to Global Chabad Mesh</h1>
+      <div class="hook">“Zero cloud lock-in. Unplug it from the wall, walk it into Rabbi Michoel’s house, plug it back in — 6 systemd units bring the entire Living OS back in seconds.”</div>
+      <div class="arch-flow">
+        <div class="arch-box">
+          <h3>1 · Hardware &amp; OS</h3>
+          <p>2013 21.5" iMac (i5, 8GB RAM) running <strong>Omarchy Arch Linux + Hyprland Wayland</strong>. Automated <code>hyprsunset</code> warmth, BLE RGB sync, and a 2-min PipeWire <strong>0.42 Volume Guard</strong>.</p>
+        </div>
+        <div class="arch-box">
+          <h3>2 · 71 MB Offline Brain</h3>
+          <p>Pure-Python stdlib server (:8080) over SQLite FTS5: <strong>39 Tanakh books (23,206 verses)</strong>, <strong>21,763 commentaries</strong>, 15-step Haggadah, Siddur, 5 Megillot, 150 Psalms, 54 Parashiyot.</p>
+        </div>
+        <div class="arch-box">
+          <h3>3 · Local AI &amp; 48kHz Voice</h3>
+          <p>Offline <strong>Ollama qwen2.5:3b</strong> (4096 ctx) + <strong>Mini-Orca</strong> 30-min autonomous scribe + <strong>48kHz Studio Neural Hebrew &amp; English</strong> (disk-cached) + offline Piper TTS + Whisper STT.</p>
+        </div>
+        <div class="arch-box">
+          <h3>4 · Mesh &amp; Zero-Mouse QR</h3>
+          <p>Encrypted <strong>Tailscale WireGuard Mesh</strong> + <strong>Omarchy Studio Virtual Camera</strong> + Cloudflare Named Tunnel (<code>shul.automatescale.com</code>) + 7-Channel Auto-Syndication.</p>
+        </div>
+      </div>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Film unplugging the single power cable from the 2013 iMac, carrying it to another room, plugging it in, and watching it boot straight into fullscreen Torah Sanctuary with zero Wi-Fi!</div>
+    </section>
+
+    <!-- SLIDE 3: LIVING ASTRONOMICAL OS -->
+    <section class="slide">
+      <div class="kicker">SLIDE 3 · LIVING CELESTIAL OS</div>
+      <h1>Pure-Math Solar &amp; Lunar Ephemeris (Zero APIs)</h1>
+      <div class="hook">“The OS literally knows the exact angle of the sun and moon over Brussels right now — and automatically dims into Shabbat Stillness at Candle Lighting without touching the internet.”</div>
+      <ul class="points">
+        <li><strong>Offline Halachic Zmanim (<code>sacred_astronomy.py</code>):</strong> Computes <em>Alot HaShachar, Misheyakir, Sunrise, Sof Zman Shema, Chatzot, Mincha, Shkiah, Candle Lighting &amp; Havdalah</em> for any city on Earth purely from orbital math.</li>
+        <li><strong>Mizrach Compass &amp; 13-Month Hebrew Wheel:</strong> Live bearing &amp; distance straight toward Jerusalem (118° ESE · 3,298 km from Brussels) + lunar illumination % and <em>Kiddush Levana</em> window.</li>
+        <li><strong>OS-Level Hardware Symbiosis:</strong> Syncs Hyprland display color warmth (<code>hyprsunset</code>) + Omarchy BLE RGB sanctuary lighting to the Halachic watch of day, and pauses scrapers &amp; broadcasts on Shabbat/Yom Tov.</li>
+      </ul>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Click the top Celestial Ribbon to open the real-time Sun &amp; Moon Observatory dome, Jerusalem compass, and countdown to Sunset.</div>
+    </section>
+
+    <!-- SLIDE 4: 3-TIER VERIFIED SOURCE STANDARD -->
+    <section class="slide">
+      <div class="kicker">SLIDE 4 · EPISTEMIC INTEGRITY &amp; UNPLUGGED AI</div>
+      <h1>The 3-Tier Verified Source Standard (Anti-Hallucination, Anti-Dogma)</h1>
+      <div class="hook">“Most AI either fabricates verses or preaches one opinion as absolute truth. We engineered a strict 3-Tier Foundation Standard directly into the database, RAG pipeline, and UI.”</div>
+      <ul class="points">
+        <li><strong>📜 Tier 1 — Primary Verified Scripture:</strong> Verbatim local Tanakh (23,206 verses) + <strong>verified coinciding cross-scripture parallels</strong> hydrated directly from SQLite (e.g., Genesis 32 ↔ Hosea 12:4–5 ↔ Obadiah 1:1 ↔ Psalm 91:11).</li>
+        <li><strong>⚖️ Tier 2 — Cited Interpretations (Explicitly Non-Exclusive):</strong> Babylonian Talmud (<em>Bavli</em> tractate &amp; folio) and classical commentators (<em>Rashi, Rambam, Ramban, Ibn Ezra, Rashbam, Or HaChaim</em>) are ALWAYS labeled as interpretations and paired with differing classical lenses.</li>
+        <li><strong>🧠 Unplugged <code>qwen2.5:3b</code> Synthesis:</strong> With 4096-token context packing verbatim Scripture + coinciding parallels + 5 diverse commentators + Haggadah/Siddur, it delivers cunning comparative reasoning even with the internet unplugged.</li>
+      </ul>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Expand the Source Foundation card at the bottom of Today's Reading, then disconnect Wi-Fi and ask the AI to contrast Rashi vs. Ibn Ezra on Esau's kiss.</div>
+    </section>
+
+    <!-- SLIDE 5: VISUAL STORYTELLING, SWATHS & GRAVITY -->
+    <section class="slide">
+      <div class="two-col">
+        <div>
+          <div class="kicker">SLIDE 5 · STORYTELLING THAT CLICKS</div>
+          <h1>400-Soldier Swaths, 7/7 Daily Art &amp; 60fps Gravity Physics</h1>
+          <div class="hook">“Reading ‘Esau came with 400 men’ is abstract. Seeing 400 miniature armed soldiers marching behind Esau and the glowing Night Angel makes the Torah click in half a second.”</div>
+          <ul class="points">
+            <li><strong>Procedural Crowds &amp; Armies:</strong> Dynamically visualizes countable miniature groups (e.g., 12 children, 15 people) and receding armed formations (Esau’s 400 Armed Men).</li>
+            <li><strong>7/7 Unique Daily Artwork + Time-Travel:</strong> Every day of the week &amp; every week transforms the hero painting, accent color, opening Aliyah excerpt, and top animated emblems — step backward or forward to any date!</li>
+            <li><strong>60fps Gravity-Spring Side Blocks:</strong> Heavenly icons float weightlessly up top; grounded story blocks obey cushioned gravity and fall smoothly onto the QR dock when a whisper card slips away.</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <img src="showcase/showcase_sanctuary_desktop.png" alt="400 Armed Men Swath and Gravity Rail">
+          <div class="shot-cap">Look right: ⚔️ 400 ARMED MEN behind Esau &amp; Night Angel · Look left: Gravity-stacked Jacob + Whisper + Always-On QR</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: STUDIO HEBREW, SINGING & GUIDED TEFILLIN -->
+    <section class="slide">
+      <div class="kicker">SLIDE 6 · HIGH-QUALITY AUDIO &amp; LIVING LITURGY</div>
+      <h1>48 kHz Studio Hebrew, Singing &amp; Guided “Say It With Me” Tefillin</h1>
+      <div class="hook">“At weekday Misheyakir through Sunset, a glowing Tefillin Coach lights up in the top ribbon — speaking phrase-by-phrase Studio Hebrew with transliteration so anyone can wrap and repeat aloud.”</div>
+      <ul class="points">
+        <li><strong>Hybrid 48 kHz Studio Neural Voice:</strong> Authentic nikud Hebrew (<code>he-IL-AvriNeural</code>) + warm Studio English (<code>en-US-BrianMultilingualNeural</code>), ffmpeg-mastered &amp; permanently cached offline (22 Tefillin Hebrew phrases pre-warmed on SSD!) + offline Piper TTS &amp; Whisper STT.</li>
+        <li><strong>Guided 5-Step Tefillin Coach:</strong> Tallit → Arm Tefillin → Head Tefillin → Hosea 2:21–22 Finger Wraps → Shema Yisrael — speaks 2–4 word Hebrew phrases slowly, then fills a glowing <em>“Your Turn — Repeat Aloud”</em> bar.</li>
+        <li><strong>Complete Offline Bookshelf &amp; Singing:</strong> Polyphonic harp/choir melody player for sacred songs (<em>Shalom Aleichem, Lecha Dodi, Adon Olam, Ma'oz Tzur</em>), full 15-step <strong>Passover Haggadah</strong>, complete <strong>Siddur</strong> (Kiddush, Havdalah, transliterated Kaddish, Mi Sheberach), 150 Psalms &amp; all 5 Megillot.</li>
+      </ul>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Tap the glowing <code>🟦 Tefillin Time · Say With Me</code> pill and record the Studio Hebrew voice guiding Shema while the repeat bar animates!</div>
+    </section>
+
+    <!-- SLIDE 7: ZERO-MOUSE QR & MOBILE EXPERIENCE -->
+    <section class="slide">
+      <div class="two-col">
+        <div>
+          <div class="kicker">SLIDE 7 · ZERO-MOUSE LOBBY TO POCKET</div>
+          <h1>Scan Any Phone → Sponsor, Message Rabbi, or Mirror Screen</h1>
+          <div class="hook">“No mouse, no keyboard in a synagogue lobby. Point any iPhone or Android at the corner QR — on 4G, 5G, or Wi-Fi — and you’re connected to the exact screen and Rabbi Michoel in 60 milliseconds.”</div>
+          <ul class="points">
+            <li><strong>Permanent Branded HTTPS Tunnel:</strong> Dedicated Cloudflare Named Tunnel runs right on the iMac (<code>https://shul.automatescale.com/give</code>) — portable even when carried to another building!</li>
+            <li><strong>Itemized Shul Sponsorships &amp; Direct Rabbi Inbox:</strong> Sponsor Shabbat Kiddush, Kids Shul, or Day of Learning, or send a Shabbat RSVP / <em>Mi Sheberach</em> prayer straight to Rabbi Michoel’s inbox with <strong>1-click WhatsApp reply links</strong>.</li>
+            <li><strong>Native-Grade Mobile App Feel:</strong> Responsive sticky swipeable nav, zero scroll hijacking, plus <strong>7-Channel Auto-Syndication</strong> (RSS, Website Embed, Email, WhatsApp, SMS, Eventbrite, PR).</li>
+          </ul>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="shot phone"><img src="showcase/showcase_phone_give.png" alt="Mobile QR Splash"><div class="shot-cap">/give — QR Splash &amp; Connect</div></div>
+          <div class="shot phone"><img src="showcase/showcase_phone_home.png" alt="Mobile Sanctuary"><div class="shot-cap">/ — Full Mobile Sanctuary</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: OMARCHY GLOBAL SHUL MESH -->
+    <section class="slide">
+      <div class="two-col">
+        <div>
+          <div class="kicker">SLIDE 8 · OPEN-SOURCE GLOBAL NETWORK</div>
+          <h1>The Omarchy Synagogue, Chabad House &amp; Residence Mesh</h1>
+          <div class="hook">“Because it runs on Omarchy + Tailscale WireGuard, every Synagogue, Chabad House, and Jewish home can link into one encrypted, Shabbat-aware broadcast network.”</div>
+          <ul class="points">
+            <li><strong>Real Hardware Auto-Detection:</strong> Detects Omarchy OS, encrypted Tailscale WireGuard peers, <strong>Omarchy Studio Virtual Camera</strong> (<code>OmarchyStudioProgram</code>), Hyprland warmth, BLE RGB lighting &amp; Cloudflare Tunnel.</li>
+            <li><strong>1-Click Mesh Broadcast + Local Shabbat Guard:</strong> Stream <code>&lt;50ms</code> synchronized Torah slides + live Rabbi Studio Camera PiP (<code>/watch</code>) or push announcements — every receiving node automatically protects its own local Shabbat!</li>
+            <li><strong>MIT Open Source Rollout:</strong> Turnkey <code>./install-omarchy-shul.sh</code> + 1-click <strong>Export Shul Bundle</strong> so any Chabad House worldwide can join in 2 minutes.</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <img src="showcase/showcase_shul_mesh.png" alt="Omarchy Shul Mesh Console">
+          <div class="shot-cap">Live Omarchy Shul Mesh on Sentinel — 6 active native stack badges, Tailscale 100.94.73.72 (8 peers) &amp; 1-click Broadcast</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: 60-SECOND CREATOR SCRIPT & HOOKS -->
+    <section class="slide">
+      <div class="kicker">SLIDE 9 · READY-TO-FILM CREATOR KIT</div>
+      <h1>60-Second Video Script &amp; Viral Content Hooks</h1>
+      <div class="script-box">
+        <div><span class="ts">[0:00–0:08]</span> <em>(Pan across glowing 2013 iMac)</em> “This is a 13-year-old iMac everyone else would throw away. We turned it into an open-source Operating System for synagogues — and it doesn’t even need the internet.”</div>
+        <div><span class="ts">[0:08–0:22]</span> <em>(Show Source Standard + unplug Wi-Fi)</em> “Inside is 71 megabytes of pure verified Scripture — all 23,206 verses of the Tanakh, 21,763 classical commentaries, the full Passover Haggadah, Siddur, and a local AI (<code>qwen2.5:3b</code>) engineered to separate primary Scripture from cited Talmudic interpretations — never pushing one view as dogma.”</div>
+        <div><span class="ts">[0:22–0:36]</span> <em>(Close-up on 400 Armed Men + tap Tefillin Coach)</em> “It computes live Brussels astronomy offline, visualizes biblical armies like Esau’s 400 men so stories click instantly, and during weekday Tefillin hours lights up a 48 kHz Studio Hebrew ‘Say It With Me’ coach.”</div>
+        <div><span class="ts">[0:36–0:50]</span> <em>(Scan corner QR with iPhone + show Shul Mesh)</em> “No mouse or keyboard in the lobby — scan the corner QR on any phone to sponsor Kiddush or message the Rabbi. Underneath, Omarchy + Tailscale WireGuard lets Chabad Houses and homes worldwide link up to broadcast live — while automatically respecting every city’s local Shabbat.”</div>
+        <div><span class="ts">[0:50–1:00]</span> <em>(Wide shot)</em> “100% MIT open source. One command turns any spare computer into a living sanctuary. Drop a comment if your community wants to link into the mesh!”</div>
+      </div>
+      <div class="broll">🔥 <strong>Top Titles:</strong> (1) <em>“I Turned a 2013 iMac Into an Open-Source Operating System for Synagogues (100% Offline AI + Mesh)”</em> · (2) <em>“No Cloud, No Mouse, No Hallucinations: Building ShulOS on Arch Linux &amp; Tailscale”</em></div>
+    </section>
+  </main>
+
+  <footer>
+    <div id="counter">Slide 1 of 9</div>
+    <div class="dots" id="dots"></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" onclick="step(-1)">◀ Prev</button>
+      <button class="btn primary" onclick="step(1)">Next ▶</button>
+      <span style="font-size:0.78rem;margin-left:6px;">Use ← / → keys · F for Fullscreen</span>
+    </div>
+  </footer>
+</div>
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+let idx = 0;
+function render() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+  document.getElementById('counter').textContent = `Slide ${idx + 1} of ${slides.length}`;
+  document.getElementById('dots').innerHTML = slides.map((_, i) =>
+    `<button class="dot ${i === idx ? 'active' : ''}" onclick="go(${i})" title="Slide ${i + 1}"></button>`
+  ).join('');
+}
+function go(i) { idx = Math.max(0, Math.min(i, slides.length - 1)); render(); }
+function step(d) { go((idx + d + slides.length) % slides.length); }
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+  else document.exitFullscreen().catch(() => {});
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); step(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+  else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+});
+render();
+</script>
+</body>
+</html>

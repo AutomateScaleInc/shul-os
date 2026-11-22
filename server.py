@@ -139,6 +139,35 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
 
+        if path in ("/under-the-hood", "/under-the-hood/", "/deck", "/presentation"):
+            dp = STATIC_DIR / "under-the-hood.html"
+            if not dp.exists():
+                self.send_error(404, "Presentation not found")
+                return
+            body = dp.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if path.startswith("/showcase/"):
+            fname = os.path.basename(path)
+            sp = STATIC_DIR / "showcase" / fname
+            if not sp.exists() or not sp.is_file():
+                self.send_error(404, "Showcase image not found")
+                return
+            body = sp.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/png")
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         if path in ("/feed.xml", "/rss.xml"):
             xml_bytes = community_hub.build_rss_xml(self.headers.get("Host", "")).encode("utf-8")
             self.send_response(200)
