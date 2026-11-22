@@ -676,14 +676,24 @@ def get_daily_portion(day_index: int = None) -> dict:
             comms = [dict(r) for r in c_rows]
             enriched_verses.append({**v, "commentaries": comms})
 
-        # Find a matching curated story dossier for this Parashah's book/chapters if available
+        # Find a matching curated story dossier for this Parashah's book/chapters (match CHAPTERS only, never verse numbers!)
         matching_story = None
         for d in conn.execute("SELECT slug, title, he_title, subtitle, refs, kid_story, adult_analysis, discussion_questions FROM documents WHERE category = 'story' ORDER BY slug").fetchall():
             d_dict = dict(d)
-            if parasha["book_slug"].replace("_", " ").lower() in (d_dict["refs"] or "").lower():
-                # Check chapter overlap
-                nums = [int(x) for x in re.findall(r"\b(\d+)(?::|\b)", d_dict["refs"] or "")]
-                if any(parasha["start_ch"] <= ch <= parasha["end_ch"] for ch in nums):
+            refs_txt = d_dict["refs"] or ""
+            if parasha["book_slug"].replace("_", " ").lower() in refs_txt.lower():
+                # Extract real chapter numbers: e.g. "Genesis 12:1-3; 18:1-33" -> [12, 18], "Genesis 28-33" -> [28..33]
+                chapters = set()
+                for m_ch in re.finditer(r"(?:^|[\s;,])(\d+)(?=:)", refs_txt):
+                    chapters.add(int(m_ch.group(1)))
+                for m_rng in re.finditer(r"[A-Za-z]\s+(\d+)\s*[-–]\s*(\d+)(?!\s*:)", refs_txt):
+                    c1, c2 = int(m_rng.group(1)), int(m_rng.group(2))
+                    if c1 <= c2 <= 150:
+                        chapters.update(range(c1, c2 + 1))
+                for _bk, ch, _v1, _v2 in parse_refs(refs_txt):
+                    if _bk.replace(" ", "_").lower() == parasha["book_slug"].lower():
+                        chapters.add(ch)
+                if any(parasha["start_ch"] <= ch <= parasha["end_ch"] for ch in chapters):
                     matching_story = d_dict
                     break
 
