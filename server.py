@@ -5,11 +5,13 @@ Pure Python standard library + SQLite FTS5 + Hybrid Ollama/Cloud streaming SSE.
 """
 
 import http.server
+import io
 import json
 import os
 import pathlib
 import socketserver
 import subprocess
+import tarfile
 import tempfile
 import urllib.parse
 import urllib.request
@@ -151,6 +153,57 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+            return
+
+        if path in ("/install.sh", "/shul-os/install.sh"):
+            base_u = community_hub.get_public_base_url(self.headers.get("Host", ""))
+            script = (
+                "#!/usr/bin/env bash\n"
+                "# Shul.OS — Self-Replicating Open-Source Installer (MIT License)\n"
+                "set -euo pipefail\n"
+                f"HUB_URL=\"${{SHUL_OS_HUB:-{base_u}}}\"\n"
+                "DEST=\"${SHUL_OS_DIR:-$HOME/shul-os}\"\n"
+                "echo \"✡ Downloading Shul.OS from $HUB_URL ...\"\n"
+                "mkdir -p \"$DEST\"\n"
+                "curl -fsSL \"$HUB_URL/download/shul-os.tar.gz\" | tar -xz -C \"$DEST\" --strip-components=1\n"
+                "cd \"$DEST\" && chmod +x install-omarchy-shul.sh\n"
+                "exec ./install-omarchy-shul.sh --follow \"$HUB_URL\" \"$@\"\n"
+            ).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/x-shellscript; charset=utf-8")
+            self.send_header("Content-Disposition", 'inline; filename="install-shul-os.sh"')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-Length", str(len(script)))
+            self.end_headers()
+            self.wfile.write(script)
+            return
+
+        if path in ("/download/shul-os.tar.gz", "/shul-os.tar.gz"):
+            # Build clean open-source Shul.OS tarball on the fly (strict allowlist — NEVER includes config.json, keys, or private DB!)
+            buf = io.BytesIO()
+            with tarfile.open(fileobj=buf, mode="w:gz") as tf:
+                for p in sorted(BASE_DIR.iterdir()):
+                    if p.is_file() and (
+                        p.suffix in (".py", ".md", ".sh")
+                        or p.name in ("LICENSE", "config.example.json")
+                    ):
+                        tf.add(p, arcname=f"shul-os/{p.name}")
+                for sub in ("static", "tests"):
+                    sp = BASE_DIR / sub
+                    if sp.exists() and sp.is_dir():
+                        for fp in sorted(sp.rglob("*")):
+                            if fp.is_file() and "__pycache__" not in fp.parts:
+                                rel = fp.relative_to(BASE_DIR)
+                                tf.add(fp, arcname=f"shul-os/{rel.as_posix()}")
+            raw = buf.getvalue()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/gzip")
+            self.send_header("Content-Disposition", 'attachment; filename="shul-os.tar.gz"')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "public, max-age=300")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
             return
 
         if path.startswith("/showcase/"):

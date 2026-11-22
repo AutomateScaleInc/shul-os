@@ -122,16 +122,17 @@
     <div class="brand">
       <div class="emblem">✡</div>
       <div>
-        <div class="t">ShulOS / Torah Sanctuary — Under the Hood</div>
-        <div class="s">Creator &amp; Architecture Deck · Rescued 2013 iMac → Open-Source Living Synagogue OS</div>
+        <div class="t">Shul.OS · Torah Sanctuary — Under the Hood</div>
+        <div class="s">Open-Source Living Synagogue OS (MIT) · Rescued 2013 iMac → Global Chabad &amp; Shul Mesh</div>
       </div>
     </div>
     <div class="tools">
+      <a class="btn primary" href="/download/shul-os.tar.gz" download="shul-os.tar.gz">⬇️ Download Shul.OS</a>
       <a class="btn" href="/" target="_blank">🌐 Live Sanctuary</a>
       <a class="btn" href="/?view=mesh" target="_blank">🔗 Shul Mesh</a>
       <a class="btn" href="/give" target="_blank">💛 Sponsor / Connect</a>
       <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen (F)</button>
-      <button class="btn primary" onclick="step(1)">Next Slide ▶</button>
+      <button class="btn" onclick="step(1)">Next ▶</button>
     </div>
   </header>
 
@@ -297,11 +298,14 @@
       <div style="margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 16px;border-radius:14px;background:rgba(228,188,105,0.09);border:1px solid rgba(228,188,105,0.42);">
         <img src="/api/mesh/deck-qr.svg" alt="Scan to Share Presentation" style="width:76px;height:76px;background:#fff;padding:4px;border-radius:10px;border:1.5px solid var(--gold);flex-shrink:0;" onerror="this.style.display='none'">
         <div style="flex:1;min-width:220px;">
-          <div style="font-size:0.76rem;font-weight:800;color:var(--gold);letter-spacing:0.08em;">🌱 SELF-REPLICATE THIS OS FOR YOUR SHUL OR CHABAD HOUSE</div>
-          <div style="font-size:0.84rem;color:var(--muted);margin:3px 0 6px;">Scan to share this deck, or deploy a linked node in 2 minutes:</div>
-          <code style="font-size:0.78rem;color:#93c5fd;">./install-omarchy-shul.sh --name "Your Shul" --type chabad --follow "https://shul.automatescale.com"</code>
+          <div style="font-size:0.76rem;font-weight:800;color:var(--gold);letter-spacing:0.08em;">🌱 DOWNLOAD &amp; SELF-REPLICATE Shul.OS FOR YOUR SHUL OR CHABAD HOUSE</div>
+          <div style="font-size:0.84rem;color:var(--muted);margin:3px 0 6px;">Scan to share this deck, download <code>shul-os.tar.gz</code>, or install in 1 command:</div>
+          <code style="font-size:0.78rem;color:#93c5fd;">curl -sSL https://shul.automatescale.com/install.sh | bash</code>
         </div>
-        <a class="btn primary" href="/api/admin/export-bundle" download="shulos-synagogue-bundle.json">📦 Export Shul Bundle</a>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a class="btn primary" href="/download/shul-os.tar.gz" download="shul-os.tar.gz">⬇️ Download Shul.OS</a>
+          <a class="btn" href="/api/admin/export-bundle" download="shulos-synagogue-bundle.json">📦 Export Config</a>
+        </div>
       </div>
     </section>
   </main>
