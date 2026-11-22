@@ -934,18 +934,97 @@
   }
   .bg-vignette {
     position: fixed; z-index: 1; pointer-events: none;
-    width: 240px; height: 340px;
+    width: 240px; height: 295px;
     opacity: 0; transform: translateY(22px) scale(0.92);
     transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
     filter: drop-shadow(0 0 22px rgba(228,188,105,0.22));
   }
-  .bg-vignette.visible { opacity: 0.55; transform: translateY(0) scale(1); }
-  #bgSceneLeft  { left: 10px; top: 175px; }
-  #bgSceneRight { right: 10px; top: 155px; width: 210px; height: 290px; }
+  .bg-vignette.visible { opacity: 0.52; transform: translateY(0) scale(1); }
+  #bgSceneLeft  { left: 26px; top: 155px; }
+  #bgSceneRight { right: 26px; top: 138px; width: 205px; height: 210px; }
   @media (max-width: 1480px) {
-    .bg-vignette { width: 155px; height: 230px; opacity: 0.38; }
-    #bgSceneRight { width: 145px; height: 210px; }
+    .bg-vignette { width: 155px; height: 200px; opacity: 0.36; }
+    #bgSceneRight { width: 140px; height: 155px; }
   }
+
+  /* ===== WALKING ANIMATED CHARACTERS & ANGELS IN OPEN SIDE MARGINS ===== */
+  .margin-stage {
+    position: fixed; z-index: 6; pointer-events: none;
+    width: 290px; display: flex; flex-direction: column; align-items: center;
+  }
+  #marginStageLeft  { left: 16px; top: 455px; }
+  #marginStageRight { right: 16px; top: 345px; }
+  @media (max-width: 1520px) {
+    .margin-stage { display: none; }
+  }
+  .walker-wrap {
+    width: 100%; display: flex; flex-direction: column; align-items: center;
+    opacity: 0;
+  }
+  .walker-wrap.enter-left {
+    animation: walkInLeft 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .walker-wrap.enter-right {
+    animation: walkInRight 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .walker-wrap.glide-angel {
+    animation: angelGlideIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes walkInLeft {
+    0%   { opacity: 0; transform: translateX(-160px) translateY(8px); }
+    35%  { opacity: 0.9; transform: translateX(-65px) translateY(-5px); }
+    68%  { opacity: 1; transform: translateX(-16px) translateY(3px); }
+    100% { opacity: 1; transform: translateX(0) translateY(0); }
+  }
+  @keyframes walkInRight {
+    0%   { opacity: 0; transform: translateX(160px) translateY(8px); }
+    35%  { opacity: 0.9; transform: translateX(65px) translateY(-5px); }
+    68%  { opacity: 1; transform: translateX(16px) translateY(3px); }
+    100% { opacity: 1; transform: translateX(0) translateY(0); }
+  }
+  @keyframes angelGlideIn {
+    0%   { opacity: 0; transform: translateY(-90px) scale(0.82); }
+    65%  { opacity: 1; transform: translateY(6px) scale(1.03); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes figureBob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-7px) rotate(1.2deg); }
+  }
+  @keyframes wingFlapL {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-10deg); }
+  }
+  @keyframes wingFlapR {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(10deg); }
+  }
+  .walker-figure {
+    width: 132px; height: 132px;
+    animation: figureBob 3.8s ease-in-out infinite;
+    filter: drop-shadow(0 10px 22px rgba(0,0,0,0.55));
+  }
+  .walker-card {
+    width: 100%; margin-top: 4px;
+    background: linear-gradient(145deg, rgba(14,24,46,0.92), rgba(20,34,62,0.92));
+    border: 1.5px solid rgba(228,188,105,0.55);
+    border-radius: 15px; padding: 10px 13px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    text-align: left;
+  }
+  .walker-card.role-angel { border-color: rgba(92,182,229,0.72); box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 22px rgba(92,182,229,0.22); }
+  .walker-card.role-antagonist { border-color: rgba(245,158,11,0.72); box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245,158,11,0.18); }
+  .walker-card.role-ally { border-color: rgba(74,222,128,0.65); }
+  .walker-role-tag {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em;
+    font-weight: 800; color: var(--gold);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .walker-card.role-angel .walker-role-tag { color: #7dd3fc; }
+  .walker-card.role-antagonist .walker-role-tag { color: #fbbf24; }
+  .walker-card.role-ally .walker-role-tag { color: #86efac; }
+  .walker-name { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: #fff; margin: 2px 0 4px; }
+  .walker-speech { font-size: 0.8rem; line-height: 1.4; color: #e8dfd0; }
 
   /* Mid-Slide Animated Pop-In Pill inside Spotlight Art Stage */
   .mid-popin {
@@ -1032,6 +1111,8 @@
 <div id="sanctuaryBackdrop"></div>
 <div id="bgSceneLeft" class="bg-vignette"></div>
 <div id="bgSceneRight" class="bg-vignette"></div>
+<div id="marginStageLeft" class="margin-stage"></div>
+<div id="marginStageRight" class="margin-stage"></div>
 <div id="sparkBurstLayer" class="spark-burst-layer"></div>
 
 <div class="app">
@@ -1100,7 +1181,6 @@
             </div>
             <button class="tool-btn" onclick="switchView('ask')">Ask a Question →</button>
           </div>
-          <div id="rightCastStrip"></div>
           <div id="dailyStreamList"></div>
         </div>
       </div>
@@ -1782,6 +1862,7 @@ function switchView(name) {
   document.querySelectorAll('#mainNav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
   if (name === 'today' && !dailyData) loadToday();
+  drawMarginStages();
   if (name === 'sky') loadCelestial();
   if (name === 'shul' && !window._shulLoaded) loadShul(false);
   if (name === 'parasha' && !window._parashaLoaded) loadParasha('');
@@ -1977,54 +2058,169 @@ function buildStoryStoryboard(d, en) {
     </div>`).join('')}</div>`;
 }
 
-let rightCastMembers = [];
-let rightCastIdx = 0;
-let rightCastTimer = null;
+let marginLeftCast = [];
+let marginRightCast = [];
+let marginLeftIdx = 0;
+let marginRightIdx = 0;
+let marginStageTimer = null;
+
+function renderIllustratedFigureSvg(role, name) {
+  const n = String(name || '').toLowerCase();
+  if (role === 'angel' || n.includes('angel') || n.includes('malach') || n.includes('messenger')) {
+    // Luminous Orthodox-respectful celestial angel-light figure with shimmering wings & radiant star halo
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+      <defs>
+        <radialGradient id="angAura" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.85"/><stop offset="60%" stop-color="#5cb6e5" stop-opacity="0.28"/><stop offset="100%" stop-color="#5cb6e5" stop-opacity="0"/></radialGradient>
+        <linearGradient id="angRobe" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff8dc"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
+      </defs>
+      <circle cx="70" cy="68" r="56" fill="url(#angAura)"/>
+      <!-- Shimmering geometric wings -->
+      <path d="M64 62 C36 32, 10 44, 18 76 C26 94, 48 86, 62 76 Z" fill="rgba(186,230,253,0.45)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:64px 68px;animation:wingFlapL 3.2s ease-in-out infinite"/>
+      <path d="M76 62 C104 32, 130 44, 122 76 C114 94, 92 86, 78 76 Z" fill="rgba(186,230,253,0.45)" stroke="#bae6fd" stroke-width="1.6" style="transform-origin:76px 68px;animation:wingFlapR 3.2s ease-in-out infinite"/>
+      <!-- Radiant halo ring & flowing robe -->
+      <ellipse cx="70" cy="24" rx="18" ry="5" stroke="#ffe588" stroke-width="2.2" fill="none"/>
+      <circle cx="70" cy="42" r="12" fill="#fff7d6" stroke="#e4bc69" stroke-width="1.8"/>
+      <path d="M54 56 Q70 50 86 56 L96 116 Q70 124 44 116 Z" fill="url(#angRobe)" opacity="0.92" stroke="#e0f2fe" stroke-width="1.4"/>
+      <circle cx="70" cy="78" r="5" fill="#ffe588"/>
+      <circle cx="28" cy="36" r="2.5" fill="#fff" style="animation:starTwinkle 2.2s infinite"/>
+      <circle cx="114" cy="38" r="2.8" fill="#ffe588" style="animation:starTwinkle 2.7s 0.8s infinite"/>
+    </svg>`;
+  }
+  if (role === 'antagonist' || n.includes('esau') || n.includes('laban') || n.includes('pharaoh')) {
+    // Stylized Biblical Antagonist / Foil in warm crimson-amber cloak with traveler shield/bow silhouette
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+      <defs>
+        <linearGradient id="antCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b45309"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
+      </defs>
+      <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.45)"/>
+      <!-- Bow / crescent emblem on back -->
+      <path d="M98 30 Q122 68 98 106" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <line x1="98" y1="30" x2="98" y2="106" stroke="rgba(251,191,36,0.55)" stroke-width="1.2"/>
+      <!-- Flowing crimson-amber mantle & turban -->
+      <path d="M46 56 Q70 46 94 56 L104 120 Q70 128 36 120 Z" fill="url(#antCloak)" stroke="#f59e0b" stroke-width="1.8"/>
+      <path d="M56 60 L70 98 L84 60" stroke="#fde68a" stroke-width="1.5" fill="none" opacity="0.65"/>
+      <circle cx="70" cy="39" r="14" fill="#d97706" stroke="#fde68a" stroke-width="1.8"/>
+      <path d="M54 34 Q70 20 86 34 Q70 30 54 34 Z" fill="#fef3c7"/>
+    </svg>`;
+  }
+  if (role === 'ally' || n.includes('rachel') || n.includes('leah') || n.includes('ruth') || n.includes('miriam') || n.includes('esther')) {
+    // Warm Illustrated Biblical Matriarch / Ally with emerald-gold woven shawl & lantern/sheaf
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+      <defs>
+        <linearGradient id="allyCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f766e"/><stop offset="100%" stop-color="#064e3b"/></linearGradient>
+      </defs>
+      <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.42)"/>
+      <path d="M44 52 Q70 38 96 52 L106 120 Q70 128 34 120 Z" fill="url(#allyCloak)" stroke="#4ade80" stroke-width="1.8"/>
+      <path d="M50 40 Q70 22 90 40 L98 76 Q70 68 42 76 Z" fill="rgba(228,188,105,0.28)" stroke="#e4bc69" stroke-width="1.6"/>
+      <circle cx="70" cy="40" r="12" fill="#f5d0a9" stroke="#e4bc69" stroke-width="1.6"/>
+      <!-- Warm lantern glow -->
+      <circle cx="104" cy="84" r="14" fill="rgba(255,229,136,0.28)" style="animation:rayPulse 3s infinite"/>
+      <circle cx="104" cy="84" r="5" fill="#ffe588"/>
+    </svg>`;
+  }
+  if (role === 'setting') {
+    // Illustrated Ancient Map Scroll & Compass Rose
+    return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="50" fill="rgba(22,38,70,0.85)" stroke="#e4bc69" stroke-width="2.2"/>
+      <circle cx="70" cy="70" r="40" stroke="rgba(92,182,229,0.45)" stroke-dasharray="4 4" stroke-width="1.4"/>
+      <polygon points="70,26 78,66 70,58 62,66" fill="#ffe588"/>
+      <polygon points="70,114 78,74 70,82 62,74" fill="#5cb6e5"/>
+      <polygon points="26,70 66,62 58,70 66,78" fill="#5cb6e5"/>
+      <polygon points="114,70 74,62 82,70 74,78" fill="#ffe588"/>
+      <circle cx="70" cy="70" r="6" fill="#fff"/>
+    </svg>`;
+  }
+  // Protagonist — Illustrated Patriarch / Hero (Jacob, Moses, Abraham, David) in royal sapphire-gold tallit cloak & shepherd staff!
+  return `<svg class="walker-figure" viewBox="0 0 140 140" fill="none">
+    <defs>
+      <linearGradient id="heroCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e40af"/><stop offset="100%" stop-color="#172554"/></linearGradient>
+    </defs>
+    <ellipse cx="70" cy="126" rx="34" ry="7" fill="rgba(0,0,0,0.45)"/>
+    <!-- Glowing Shepherd's Staff -->
+    <path d="M104 124 L104 34 Q104 18 118 18 Q128 18 128 28" stroke="#e4bc69" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+    <circle cx="104" cy="36" r="10" fill="rgba(255,229,136,0.22)" style="animation:rayPulse 3.4s infinite"/>
+    <!-- Flowing Royal Blue & Gold Tallit Mantle -->
+    <path d="M44 54 Q70 44 96 54 L104 120 Q70 128 36 120 Z" fill="url(#heroCloak)" stroke="#e4bc69" stroke-width="2"/>
+    <path d="M52 54 L60 120 M88 54 L80 120" stroke="#f3d796" stroke-width="2.2" opacity="0.72"/>
+    <circle cx="70" cy="39" r="13.5" fill="#f3cfa6" stroke="#e4bc69" stroke-width="1.8"/>
+    <path d="M54 35 Q70 18 86 35 Q70 28 54 35 Z" fill="#fef3c7" stroke="#e4bc69" stroke-width="1.2"/>
+  </svg>`;
+}
 
 function renderRightCastStrip(anatomy) {
-  const host = document.getElementById('rightCastStrip');
-  if (!host || !anatomy) return;
-  rightCastMembers = [
+  if (!anatomy) return;
+  const allies = (anatomy.angels_and_allies || []).map(a => ({ ...a, role: a.kind || 'angel' }));
+  // Left Margin Cast: Protagonist + Angels + Friends walking/gliding in!
+  marginLeftCast = [
     { ...anatomy.protagonist, role: 'protagonist' },
-    { ...anatomy.antagonist, role: 'antagonist' },
-    ...(anatomy.angels_and_allies || []).map(a => ({ ...a, role: a.kind || 'angel' })),
+    ...allies,
   ];
-  rightCastIdx = 0;
-  drawRightCastMember();
-  if (rightCastTimer) clearInterval(rightCastTimer);
-  rightCastTimer = setInterval(() => {
-    if (currentViewName !== 'today' || !rightCastMembers.length) return;
-    rightCastIdx = (rightCastIdx + 1) % rightCastMembers.length;
-    drawRightCastMember();
-  }, 5500);
+  // Right Margin Cast: Antagonist/Foil + Setting/Era + Hidden Torah Patterns walking in from right!
+  const stg = anatomy.setting || {};
+  marginRightCast = [
+    { ...anatomy.antagonist, role: 'antagonist' },
+    {
+      name: stg.region || 'Biblical Land of Israel',
+      he: 'מָקוֹם וּזְמַן',
+      tag: '🗺 SETTING & ERA',
+      role: 'setting',
+      intro: `${stg.area || ''} · ${stg.era || ''}`,
+    },
+    ...((anatomy.patterns || []).slice(0, 2).map((pt, i) => ({
+      name: `Torah Pattern #${i + 1}`,
+      he: 'דְּפוּס בַּתּוֹרָה',
+      tag: '🔁 RECURRING PATTERN',
+      role: 'setting',
+      intro: pt.replace(/^🔁\s*/, ''),
+    }))),
+  ];
+  marginLeftIdx = 0;
+  marginRightIdx = 0;
+  drawMarginStages();
+  if (marginStageTimer) clearInterval(marginStageTimer);
+  marginStageTimer = setInterval(() => {
+    if (currentViewName !== 'today' || document.getElementById('presModal').classList.contains('open')) return;
+    marginLeftIdx = (marginLeftIdx + 1) % Math.max(1, marginLeftCast.length);
+    marginRightIdx = (marginRightIdx + 1) % Math.max(1, marginRightCast.length);
+    drawMarginStages();
+  }, 9500);
 }
 
-function selectRightCast(idx) {
-  rightCastIdx = idx;
-  drawRightCastMember();
-}
+function drawMarginStages() {
+  const leftHost = document.getElementById('marginStageLeft');
+  const rightHost = document.getElementById('marginStageRight');
+  if (!leftHost || !rightHost) return;
+  const showStages = (currentViewName === 'today') && !document.getElementById('presModal').classList.contains('open');
+  leftHost.style.display = showStages ? 'flex' : 'none';
+  rightHost.style.display = showStages ? 'flex' : 'none';
+  if (!showStages) return;
 
-function drawRightCastMember() {
-  const host = document.getElementById('rightCastStrip');
-  if (!host || !rightCastMembers.length) return;
-  const cur = rightCastMembers[rightCastIdx] || rightCastMembers[0];
-  host.innerHTML = `
-    <div class="cast-strip-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);font-weight:800;">🎭 Meet Today's Cast, Angels &amp; Friends</span>
-        <span style="font-size:0.7rem;color:var(--accent);font-weight:700;">${esc(cur.tag || '')}</span>
-      </div>
-      <div class="cast-avatars">
-        ${rightCastMembers.map((m, i) => `
-          <div class="cast-av role-${esc(m.role)} ${i === rightCastIdx ? 'active' : ''}" onclick="selectRightCast(${i})">
-            <span class="av-em">${esc(m.emoji || '✨')}</span>
-            <span>${esc(m.name)}</span>
-          </div>`).join('')}
-      </div>
-      <div class="cast-intro-bubble" key="${rightCastIdx}">
-        <strong>👋 ${esc(cur.name)}</strong> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:4px;">${esc(cur.he || '')}</span> — ${esc(cur.intro || '')}
-      </div>
-    </div>`;
+  const lm = marginLeftCast[marginLeftIdx];
+  if (lm) {
+    const enterCls = lm.role === 'angel' ? 'glide-angel' : 'enter-left';
+    leftHost.innerHTML = `
+      <div class="walker-wrap ${enterCls}">
+        ${renderIllustratedFigureSvg(lm.role, lm.name)}
+        <div class="walker-card role-${esc(lm.role)}">
+          <div class="walker-role-tag"><span>${esc(lm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.88rem;">${esc(lm.he || '')}</span></div>
+          <div class="walker-name">👋 ${esc(lm.name)}</div>
+          <div class="walker-speech">${esc(lm.intro || '')}</div>
+        </div>
+      </div>`;
+  }
+  const rm = marginRightCast[marginRightIdx];
+  if (rm) {
+    const enterCls = rm.role === 'angel' ? 'glide-angel' : 'enter-right';
+    rightHost.innerHTML = `
+      <div class="walker-wrap ${enterCls}">
+        ${renderIllustratedFigureSvg(rm.role, rm.name)}
+        <div class="walker-card role-${esc(rm.role)}">
+          <div class="walker-role-tag"><span>${esc(rm.tag || '')}</span><span style="font-family:var(--hebrew);font-size:0.88rem;">${esc(rm.he || '')}</span></div>
+          <div class="walker-name">${esc(rm.name)}</div>
+          <div class="walker-speech">${esc(rm.intro || '')}</div>
+        </div>
+      </div>`;
+  }
 }
 
 function revealCurrentQuiz(pickedIdx = null) {
