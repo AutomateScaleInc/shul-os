@@ -9,6 +9,7 @@ SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="${TORAH_INSTALL_DIR:-$HOME/torah-sanctuary}"
 SYNAGOGUE_NAME="Torah Sanctuary · Synagogue Study Station"
 CITY_KEY="brussels"
+FOLLOW_URL=""
 ENABLE_KIOSK=1
 ENABLE_VOICE=1
 ENABLE_OLLAMA=1
@@ -18,11 +19,12 @@ while [[ $# -gt 0 ]]; do
     --synagogue) SYNAGOGUE_NAME="$2"; shift 2 ;;
     --city) CITY_KEY="$2"; shift 2 ;;
     --dir) INSTALL_DIR="$2"; shift 2 ;;
+    --follow-url) FOLLOW_URL="$2"; shift 2 ;;
     --no-kiosk) ENABLE_KIOSK=0; shift ;;
     --no-voice) ENABLE_VOICE=0; shift ;;
     --no-ollama) ENABLE_OLLAMA=0; shift ;;
     -h|--help)
-      echo "Usage: $0 [--synagogue NAME] [--city brussels|antwerp|jerusalem|tel_aviv|london|paris|new_york|miami|los_angeles] [--dir PATH] [--no-kiosk] [--no-voice] [--no-ollama]"
+      echo "Usage: $0 [--synagogue NAME] [--city brussels|antwerp|jerusalem|tel_aviv|london|paris|new_york|miami|los_angeles] [--follow-url URL] [--dir PATH] [--no-kiosk] [--no-voice] [--no-ollama]"
       exit 0 ;;
     *) echo "Unknown arg: $1"; exit 1 ;;
   esac
@@ -36,8 +38,9 @@ if [[ "$SRC_DIR" != "$INSTALL_DIR" ]]; then
   tar -C "$SRC_DIR" --exclude='.git' --exclude='__pycache__' --exclude='config.json' --exclude='data/kiosk-profile' -cf - . | tar -C "$INSTALL_DIR" -xf -
 fi
 chmod +x "$INSTALL_DIR"/server.py "$INSTALL_DIR"/sacred_astronomy.py "$INSTALL_DIR"/sacred-os-daemon.py \
-         "$INSTALL_DIR"/torah-ctl "$INSTALL_DIR"/torah-mcp "$INSTALL_DIR"/torah-motd "$INSTALL_DIR"/torah-presence.py \
-         "$INSTALL_DIR"/ingest_corpus.py "$INSTALL_DIR"/seed_knowledge.py "$INSTALL_DIR"/scripts/*.sh 2>/dev/null || true
+         "$INSTALL_DIR"/torah_scribe.py "$INSTALL_DIR"/torah-ctl "$INSTALL_DIR"/torah-mcp "$INSTALL_DIR"/torah-motd \
+         "$INSTALL_DIR"/torah-presence.py "$INSTALL_DIR"/ingest_corpus.py "$INSTALL_DIR"/seed_knowledge.py \
+         "$INSTALL_DIR"/scripts/*.sh 2>/dev/null || true
 
 # 2. Install base OS dependencies (Arch / Omarchy or Debian / Ubuntu)
 if command -v pacman >/dev/null 2>&1; then
@@ -51,7 +54,7 @@ if command -v pacman >/dev/null 2>&1; then
   fi
 elif command -v apt-get >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
   sudo apt-get update -qq
-  sudo apt-get install -y python3 sqlite3 ffmpeg curl || true
+  sudo apt-get install -y python3 sqlite3 ffmpeg curl qrencode || true
 fi
 
 # 3. Auto-select Ollama model by RAM
@@ -64,11 +67,11 @@ elif (( RAM_GB >= 14 )); then
 fi
 echo "Detected ${RAM_GB} GB RAM -> local AI model: ${OLLAMA_MODEL}"
 
-# 4. Write config.json cleanly if absent (or update synagogue/location)
-python3 - "$INSTALL_DIR" "$SYNAGOGUE_NAME" "$CITY_KEY" "$OLLAMA_MODEL" <<'PY'
+# 4. Write config.json cleanly if absent (or update synagogue/location/follow URL)
+python3 - "$INSTALL_DIR" "$SYNAGOGUE_NAME" "$CITY_KEY" "$OLLAMA_MODEL" "$FOLLOW_URL" <<'PY'
 import json, sys
 from pathlib import Path
-idir, syn_name, city_key, model = sys.argv[1:5]
+idir, syn_name, city_key, model, follow_url = sys.argv[1:6]
 sys.path.insert(0, idir)
 import sacred_astronomy as sa
 
@@ -81,6 +84,8 @@ if cfg_p.exists():
         pass
 cfg["synagogue_name"] = syn_name
 cfg["ollama_model"] = model
+if follow_url:
+    cfg["broadcast_follow_url"] = follow_url
 if city_key.lower() in sa.CITY_PRESETS:
     cfg["location"] = sa.CITY_PRESETS[city_key.lower()]
 cfg_p.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")

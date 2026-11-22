@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Torah Sanctuary OS — 1-Command Node Cloner over SSH
-# Clones this entire Holy Node (including pre-built 69MB Tanakh DB + 12 illuminated artworks)
+# Clones this entire Holy Node (including pre-built offline Tanakh DB + 16 illuminated artworks)
 # onto ANY target Linux / Omarchy computer in one command!
 #
 # Usage:
 #   ./scripts/clone-to-node.sh user@new-imac --synagogue "The European Synagogue" --city brussels
+#   ./scripts/clone-to-node.sh user@house-node --synagogue "Rabbi Michoel Home" --city brussels --follow-url https://live.theshul.eu
 set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <ssh-target> [--synagogue NAME] [--city brussels|jerusalem|new_york|...] [--no-kiosk]"
+  echo "Usage: $0 <ssh-target> [--synagogue NAME] [--city brussels|jerusalem|new_york|...] [--follow-url URL] [--no-kiosk]"
   exit 1
 fi
 
