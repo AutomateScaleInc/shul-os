@@ -80,6 +80,39 @@ def apply_display_kelvin(target_k: int) -> str:
     return f"applied:{target_k}K"
 
 
+def enforce_sanctuary_volume(max_vol: float) -> str:
+    """Keep synagogue lobby speaker volume gentle & reverent (never startlingly loud)."""
+    if not shutil.which("wpctl"):
+        return "wpctl_not_installed"
+    try:
+        max_vol = max(0.05, min(1.0, float(max_vol)))
+        runtime = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+        env = dict(os.environ)
+        env["XDG_RUNTIME_DIR"] = runtime
+        out = subprocess.check_output(
+            ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"],
+            env=env,
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=3,
+        ).strip()
+        # Format: "Volume: 0.42" or "Volume: 0.94 [MUTED]"
+        parts = out.split()
+        cur = float(parts[1]) if len(parts) >= 2 else 0.0
+        if cur > max_vol + 0.01:
+            subprocess.run(
+                ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{max_vol:.2f}"],
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=3,
+            )
+            return f"capped:{cur:.2f}->{max_vol:.2f}"
+        return f"ok:{cur:.2f}"
+    except Exception:
+        return "unavailable"
+
+
 def render_motd(snap: dict, parasha_name: str, parasha_he: str) -> str:
     g = "\033[38;5;221m"  # Warm gold
     c = "\033[38;5;117m"  # Sky blue
@@ -125,6 +158,8 @@ def sync_once() -> dict:
     if cfg.get("os_color_temp_sync", True):
         color_status = apply_display_kelvin(int(snap["watch"]["kelvin"]))
 
+    vol_status = enforce_sanctuary_volume(cfg.get("max_sanctuary_volume", 0.42))
+
     state_payload = {
         "updated_at": snap["timestamp_iso"],
         "parasha": {"en": p_en, "he": p_he},
@@ -136,6 +171,7 @@ def sync_once() -> dict:
         "mizrach": snap["mizrach"],
         "next_zman": snap["next_zman"],
         "color_temp_sync": color_status,
+        "volume_guard": vol_status,
     }
 
     runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}")

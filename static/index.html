@@ -434,25 +434,42 @@
     font-family: var(--hebrew);
     direction: rtl;
     text-align: right;
-    font-size: 1.9rem;
-    line-height: 1.9;
+    font-size: clamp(1.42rem, 2.25vh, 1.84rem);
+    line-height: 1.72;
     color: var(--gold);
-    margin: 14px 0 12px;
+    margin: 8px 0 8px;
   }
+  .spot-he-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 6px 0 8px;
+  }
+  .verse-micro-badge {
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(228,188,105,0.14), rgba(92,182,229,0.1));
+    border: 1px solid rgba(228,188,105,0.34);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.28), inset 0 0 14px rgba(228,188,105,0.12);
+    animation: actorFloat 4.2s ease-in-out infinite;
+  }
+  .verse-micro-badge svg { width: 32px; height: 32px; }
   .spot-en {
     font-family: var(--serif);
-    font-size: 1.38rem;
-    line-height: 1.65;
+    font-size: clamp(1.1rem, 1.82vh, 1.32rem);
+    line-height: 1.56;
     color: var(--text);
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
   .spot-comm {
     background: var(--gold-soft);
     border-left: 3px solid var(--gold);
     border-radius: 0 12px 12px 0;
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    font-size: 0.96rem;
+    padding: 11px 15px;
+    margin-bottom: 12px;
+    font-size: 0.93rem;
   }
   .spot-comm .c-label {
     font-weight: 700; color: var(--gold); font-size: 0.84rem;
@@ -2367,6 +2384,29 @@ function revealCurrentQuiz(pickedIdx = null) {
   celebrateQuizReveal();
 }
 
+function getVerseMicroEmblem(slide) {
+  const txt = `${(slide && slide.title) || ''} ${(slide && slide.en_text) || ''} ${(slide && slide.art) || ''}`.toLowerCase();
+  if (txt.includes('angel') || txt.includes('messenger') || txt.includes('mahanaim')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><path d="M20 22 C13 13, 5 11, 4 19 C9 20, 14 23, 20 25 C26 23, 31 20, 36 19 C35 11, 27 13, 20 22 Z" stroke="#8ad4ff" stroke-width="1.8" fill="rgba(138,212,255,0.22)"/><circle cx="20" cy="11" r="3.5" fill="#ffe89c" style="animation:starTwinkle 2.4s infinite"/></svg>`;
+  }
+  if (txt.includes('ladder') || txt.includes('jacob') || txt.includes('israel') || txt.includes('esau')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><line x1="13" y1="35" x2="16" y2="5" stroke="#e4bc69" stroke-width="2"/><line x1="27" y1="35" x2="24" y2="5" stroke="#e4bc69" stroke-width="2"/><line x1="15" y1="12" x2="25" y2="12" stroke="#f3d796" stroke-width="1.8"/><line x1="14.5" y1="20" x2="25.5" y2="20" stroke="#f3d796" stroke-width="1.8"/><line x1="14" y1="28" x2="26" y2="28" stroke="#f3d796" stroke-width="1.8"/><circle cx="20" cy="8" r="2.6" fill="#ffe89c" style="animation:starTwinkle 2.2s infinite"/></svg>`;
+  }
+  if (txt.includes('fire') || txt.includes('bush') || txt.includes('flame') || txt.includes('moses')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><path d="M20 6 C14 14, 11 20, 14 28 C16 32, 24 32, 26 28 C29 20, 26 14, 20 6 Z" stroke="#ffd270" stroke-width="1.8" fill="rgba(255,168,48,0.28)"/><path d="M20 15 C18 20, 18 24, 20 27 C22 24, 22 20, 20 15 Z" fill="#fff0a8"/></svg>`;
+  }
+  if (txt.includes('sea') || txt.includes('water') || txt.includes('river') || txt.includes('jabbok')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><path d="M4 22 Q12 14 20 22 T36 22" stroke="#7dd3fc" stroke-width="2.2" fill="none"/><path d="M4 29 Q12 21 20 29 T36 29" stroke="#e4bc69" stroke-width="1.8" fill="none"/><circle cx="20" cy="11" r="3" fill="#ffe89c"/></svg>`;
+  }
+  if (txt.includes('king') || txt.includes('crown') || txt.includes('esther') || txt.includes('solomon') || txt.includes('joseph')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><path d="M7 29 L10 14 L16 21 L20 11 L24 21 L30 14 L33 29 Z" stroke="#e4bc69" stroke-width="2" fill="rgba(228,188,105,0.22)"/><line x1="7" y1="32" x2="33" y2="32" stroke="#f3d796" stroke-width="2"/></svg>`;
+  }
+  if (txt.includes('sinai') || txt.includes('tablet') || txt.includes('commandment')) {
+    return `<svg viewBox="0 0 40 40" fill="none"><path d="M7 33 V15 A6 6 0 0 1 19 15 V33 Z" stroke="#e4bc69" stroke-width="1.8" fill="rgba(228,188,105,0.14)"/><path d="M21 33 V15 A6 6 0 0 1 33 15 V33 Z" stroke="#e4bc69" stroke-width="1.8" fill="rgba(228,188,105,0.14)"/></svg>`;
+  }
+  return `<svg viewBox="0 0 40 40" fill="none"><polygon points="20,6 32,27 8,27" stroke="#e4bc69" stroke-width="1.8" fill="rgba(228,188,105,0.12)"/><polygon points="20,34 32,13 8,13" stroke="#e4bc69" stroke-width="1.8" fill="none"/></svg>`;
+}
+
 function renderSpotlight() {
   if (!dailyData || !dailyData.slides || !dailyData.slides.length) return;
   clearShowBeatTimers();
@@ -2611,7 +2651,7 @@ function renderSpotlight() {
           <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(s.he_kicker || '')}</span>
         </div>
         <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
-        ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
+        ${s.he_text ? `<div class="spot-he-wrap"><div class="verse-micro-badge" title="Illuminated Verse Emblem">${getVerseMicroEmblem(s)}</div><div class="spot-he" style="margin:0;flex:1;">${esc(s.he_text)}</div></div>` : ''}
         <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
         ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${s.kind === 'story' ? renderMarkdown(s.commentary) : esc(s.commentary)}</div></div>` : ''}
         ${todayHint}

@@ -1701,6 +1701,342 @@ STORY_ANATOMY = {
             "🔁 Holiness in Exile Pattern: Even on a cold stone far from home, the Gate of Heaven stands open.",
         ],
     },
+    "bereishit": {
+        "title": "Parashat Bereishit — Creation, Dignity & Shabbat",
+        "he_title": "פרשת בראשית · בריאת העולם והשבת",
+        "art": "/art/creation-shabbat.jpg",
+        "protagonist": {
+            "name": "Adam & Eve (First Humanity)", "he": "אָדָם וְחַוָּה", "emoji": "🌿", "tag": "⭐ Protagonists",
+            "intro": "Created in the Divine Image (B'tzelem Elohim) and entrusted with tending and guarding the Garden of Eden.",
+        },
+        "antagonist": {
+            "name": "The Serpent & Temptation", "he": "הַנָּחָשׁ וְיֵצֶר הָרָע", "emoji": "🐍", "tag": "⚡ Foil / Test",
+            "intro": "Introduces doubt and envy into Eden — mirroring the inner human struggle between impulse and responsibility.",
+        },
+        "angels_and_allies": [
+            {"name": "Cherubim of Eden", "he": "הַכְּרוּבִים", "emoji": "✨", "kind": "angel", "tag": "✨ Angels", "intro": "Angelic guardians placed at the eastern gate of Eden, keeping the way to the Tree of Life sacred."},
+            {"name": "Shabbat — Queen of Time", "he": "שַׁבָּת קֹדֶשׁ", "emoji": "🕯", "kind": "ally", "tag": "💛 Sacred Partner", "intro": "The very first thing declared holy in Torah (Gen. 2:3) — humanity's weekly cathedral in time."},
+        ],
+        "setting": {
+            "area": "Formless Cosmos → Garden of Eden (Four Rivers) → East of Eden",
+            "region": "Dawn of Creation & Ancient Near East",
+            "era": "Beginning of Time · Six Days of Creation & First Shabbat",
+            "time_of_day": "'And there was evening and there was morning' — Jewish days always climb from darkness into light!",
+        },
+        "patterns": [
+            "🔁 Speech Creates Worlds: God creates with Ten Utterances — our words likewise build or break worlds every day.",
+            "🔁 'Where Are You?' (Ayekah): God's first question to humanity is an eternal call to honesty and self-awareness.",
+            "🔁 'Am I My Brother's Keeper?': Torah answers Cain's question with a resounding YES — mutual care defines civilization.",
+        ],
+    },
+    "noach": {
+        "title": "Parashat Noach — The Ark, Dove & Rainbow Covenant",
+        "he_title": "פרשת נח · התיבה, היונה והקשת",
+        "art": "/art/noah-rainbow.jpg",
+        "protagonist": {
+            "name": "Noah (Noach)", "he": "נֹחַ", "emoji": "⛵", "tag": "⭐ Protagonist",
+            "intro": "A righteous steward who patiently builds an Ark in dry weather to preserve life and begin humanity anew.",
+        },
+        "antagonist": {
+            "name": "Lawlessness & Tower of Babel", "he": "חָמָס וּמִגְדַּל בָּבֶל", "emoji": "🌊", "tag": "⚡ Antagonist / Crisis",
+            "intro": "A corrupt society filled with violence (Chamas), followed by Babel's uniform empire that valued bricks over human lives.",
+        },
+        "angels_and_allies": [
+            {"name": "The Returning Dove", "he": "הַיּוֹנָה וַעֲלֵה הַזַּיִת", "emoji": "🕊", "kind": "ally", "tag": "💛 Messenger of Peace", "intro": "Brings back a fresh olive leaf in its beak — choosing a small free gift from God over gilded captivity."},
+            {"name": "Noah's Family & Creation", "he": "שֵׁם, חָם וְיֶפֶת", "emoji": "🌈", "kind": "ally", "tag": "💛 Stewards", "intro": "Working tirelessly day and night inside the Ark feeding every creature — the Midrash calls it a year-long marathon of Chesed!"},
+        ],
+        "setting": {
+            "area": "The Ark → Mountains of Ararat → Valley of Shinar (Babel)",
+            "region": "Mesopotamia & Armenian Highlands",
+            "era": "Ten Generations After Creation",
+            "time_of_day": "40 days of rain clearing into sunlit clouds crowned by the very first Rainbow!",
+        },
+        "patterns": [
+            "🔁 Tevah = Ark & Word: In Hebrew 'Tevah' means both Ark and Word — honest, calm words shelter us through life's floods.",
+            "🔁 Upward-Pointing Bow (Keshet): God turns the hunter's bow away from earth as an eternal universal covenant of peace.",
+            "🔁 Unity vs. Uniformity: Babel forced everyone to speak identically; Torah celebrates diverse nations united in ethics.",
+        ],
+    },
+    "lech-lecha": {
+        "title": "Parashat Lech-Lecha — Open Tents & Starlit Promise",
+        "he_title": "פרשת לך־לך · אברהם, שרה וכוכבי השמים",
+        "art": "/art/abraham-stars.jpg",
+        "protagonist": {
+            "name": "Abraham & Sarah", "he": "אַבְרָהָם וְשָׂרָה", "emoji": "⛺", "tag": "⭐ Protagonists",
+            "intro": "Spiritual pioneers who leave everything familiar to journey toward Canaan and bring ethical monotheism to the world.",
+        },
+        "antagonist": {
+            "name": "Four Empires & Comfort Zone", "he": "אַרְבַּעַת הַמְּלָכִים", "emoji": "⚔️", "tag": "⚡ Antagonist / Test",
+            "intro": "Regional warlords who capture Lot, famine in Canaan, and the inner fear of leaving home without a map.",
+        },
+        "angels_and_allies": [
+            {"name": "Melchizedek of Salem", "he": "מַלְכִּי־צֶדֶק", "emoji": "🍞", "kind": "ally", "tag": "💛 Ally & Priest-King", "intro": "Ancient King of Jerusalem who greets Abraham with bread, wine, and blessing after Lot's rescue."},
+            {"name": "Covenant Messengers", "he": "מַלְאַךְ ה׳", "emoji": "✨", "kind": "angel", "tag": "✨ Angel", "intro": "Comforts Hagar at the desert spring ('Be'er Lachai Ro'i') — proving God hears every lonely voice."},
+        ],
+        "setting": {
+            "area": "Ur → Haran → Shechem → Beit El → Hebron (Oaks of Mamre)",
+            "region": "Mesopotamia to the Hill Country of Canaan",
+            "era": "Dawn of the Patriarchs · c. 1800 BCE",
+            "time_of_day": "Clear desert starlight — 'Look up at the heavens and count the stars!' (Genesis 15:5)",
+        },
+        "patterns": [
+            "🔁 Lech Lecha ('Go to Yourself'): Stepping outside your comfort zone is how you discover who you truly are.",
+            "🔁 Generosity Over Plunder: Abraham refuses war spoils ('not even a thread or sandal strap') to keep his integrity spotless.",
+            "🔁 Name Expansion Pattern: Abram & Sarai receive the letter 'Hei' (ה) — growing from local leaders into blessing for all nations.",
+        ],
+    },
+    "vayera": {
+        "title": "Parashat Vayera — Open Tent Hospitality & Mount Moriah",
+        "he_title": "פרשת וירא · הכנסת אורחים ועקדת יצחק",
+        "art": "/art/abraham-stars.jpg",
+        "protagonist": {
+            "name": "Abraham, Sarah & Isaac", "he": "אַבְרָהָם, שָׂרָה וְיִצְחָק", "emoji": "⛺", "tag": "⭐ Protagonists",
+            "intro": "Modeling boundless hospitality in the midday heat, arguing boldly for justice in Sodom, and answering 'Hineni' at Moriah.",
+        },
+        "antagonist": {
+            "name": "Cruelty of Sodom & Ultimate Test", "he": "סְדוֹם וְהַנִּסָּיוֹן", "emoji": "🔥", "tag": "⚡ Foil / Test",
+            "intro": "Sodom represents a wealthy city that outlawed kindness to strangers — the exact opposite of Abraham's four-door tent.",
+        },
+        "angels_and_allies": [
+            {"name": "The Three Angels (Michael, Gabriel, Raphael)", "he": "שְׁלֹשֶׁת הַמַּלְאָכִים", "emoji": "✨", "kind": "angel", "tag": "✨ Three Angels", "intro": "Arrive disguised as dusty travelers — each carrying one sacred mission: healing Abraham, announcing Isaac, and rescuing Lot."},
+            {"name": "Angel of Mount Moriah", "he": "מַלְאַךְ ה׳ מִן־הַשָּׁמַיִם", "emoji": "🐏", "kind": "angel", "tag": "✨ Angel", "intro": "Calls 'Abraham, Abraham! Do not harm the boy!' — forever affirming the sanctity of human life."},
+        ],
+        "setting": {
+            "area": "Oaks of Mamre (Hebron) → Plains of Sodom → Beersheba → Mount Moriah (Jerusalem)",
+            "region": "Judean Hills & Dead Sea Valley",
+            "era": "Patriarchal Era · c. 1775 BCE",
+            "time_of_day": "Blazing noon heat at Mamre → early dawn rising for the 3-day walk to Mount Moriah.",
+        },
+        "patterns": [
+            "🔁 Hospitality > Prophecy: Abraham asks God to wait so he can welcome three dusty strangers (Shabbat 127a)!",
+            "🔁 Speaking Truth to Power: 'Shall the Judge of all the earth not do justice?' — Jewish faith treasures moral courage.",
+            "🔁 'Hineni' (Here I Am): Total, undivided presence at life's defining crossroads.",
+        ],
+    },
+    "vayeshev": {
+        "title": "Parashat Vayeshev — Dreams, Coat of Colors & Integrity in the Pit",
+        "he_title": "פרשת וישב · חלומות יוסף וגבורת יהודה",
+        "art": "/art/joseph-egypt.jpg",
+        "protagonist": {
+            "name": "Joseph (Yosef HaTzaddik)", "he": "יוֹסֵף הַצַּדִּיק", "emoji": "👑", "tag": "⭐ Protagonist",
+            "intro": "A 17-year-old dreamer betrayed into slavery and prison — refuses to surrender his integrity, kindness, or hope.",
+        },
+        "antagonist": {
+            "name": "Jealousy & False Accusation", "he": "קִנְאָה וְעֲלִילַת שָׁוְא", "emoji": "⛓", "tag": "⚡ Antagonist / Crisis",
+            "intro": "Brotherhood fractured by favoritism, followed by Potiphar's wife's false accusation that casts Joseph into an Egyptian dungeon.",
+        },
+        "angels_and_allies": [
+            {"name": "The Mysterious Man in the Field", "he": "וַיִּמְצָאֵהוּ אִישׁ", "emoji": "✨", "kind": "angel", "tag": "✨ Angel Gabriel", "intro": "Rashi (Gen. 37:15) identifies the stranger guiding lost Joseph toward Dothan as the Angel Gabriel setting history in motion!"},
+            {"name": "Reuben & Tamar", "he": "רְאוּבֵן וְתָמָר", "emoji": "💛", "kind": "ally", "tag": "💛 Voices of Conscience", "intro": "Reuben secretly tries to rescue Joseph from the pit; Tamar's dignified courage sparks Judah's historic confession ('She is more righteous than I')."},
+        ],
+        "setting": {
+            "area": "Hebron → Shechem & Dothan → Caravan Road → Potiphar's Estate & Prison in Egypt",
+            "region": "Canaan to Nile Delta, Ancient Egypt",
+            "era": "Late Patriarchal Era · c. 1680 BCE (17-year-old Joseph)",
+            "time_of_day": "Moonlit dreams of sheaves and eleven stars → shadowed dungeon where Joseph notices two sad faces.",
+        },
+        "patterns": [
+            "🔁 Garment Motif: Joseph's striped coat and abandoned cloak — outer clothes can be torn away, never inner character.",
+            "🔁 Notice Other People's Pain: Even inside prison, Joseph asks the cupbearer & baker 'Why do your faces look sad today?'",
+            "🔁 Hidden Descent Before Ascent: Every pit in Joseph's journey becomes the stepping-stone to saving millions.",
+        ],
+    },
+    "miketz": {
+        "title": "Parashat Miketz — From Dungeon to Palace & Chanukah Light",
+        "he_title": "פרשת מקץ · חלומות פרעה וגאולת הרעב",
+        "art": "/art/joseph-egypt.jpg",
+        "protagonist": {
+            "name": "Joseph (Viceroy of Egypt)", "he": "יוֹסֵף הַמַּשְׁבִּיר", "emoji": "👑", "tag": "⭐ Protagonist",
+            "intro": "Rises in a single morning from forgotten prisoner to Egypt's chief strategist, preparing granaries to save the entire region from famine.",
+        },
+        "antagonist": {
+            "name": "Seven Years of Famine & Unhealed Guilt", "he": "שֶׁבַע שְׁנֵי הָרָעָב", "emoji": "🌾", "tag": "⚡ Crisis / Test",
+            "intro": "A devastating regional famine collides with 22 years of unresolved brotherly betrayal when Joseph's brothers arrive for grain.",
+        },
+        "angels_and_allies": [
+            {"name": "Benjamin & Judah", "he": "בִּנְיָמִין וִיהוּדָה", "emoji": "🛡", "kind": "ally", "tag": "💛 Brothers Tested", "intro": "Judah guarantees Benjamin's safety with his own life — setting up the greatest test of genuine Teshuvah in Torah."},
+            {"name": "Chanukah Miracle Light", "he": "נֵר חֲנוּכָּה", "emoji": "🕯", "kind": "angel", "tag": "✨ Seasonal Light", "intro": "Miketz is almost always read on Chanukah — celebrating light emerging suddenly out of the darkest winter night!"},
+        ],
+        "setting": {
+            "area": "Nile Riverbank → Pharaoh's Throne Room → Royal Granaries of Egypt",
+            "region": "Memphis / Nile Delta, Egypt",
+            "era": "Two Full Years After the Cupbearer's Release (Joseph Age 30)",
+            "time_of_day": "Pharaoh's restless pre-dawn dreams → rapid morning transformation from dungeon to royal chariot!",
+        },
+        "patterns": [
+            "🔁 Humility at the Summit: Joseph tells Pharaoh 'It is NOT in me — God will give Pharaoh an answer of peace!'",
+            "🔁 Prepare in Plenty for Scarcity: Save 20% during the seven fat years — the Torah's timeless blueprint for wise stewardship.",
+            "🔁 Naming Children with Gratitude: Menashe (healing pain) & Ephraim (flourishing even in the land of affliction).",
+        ],
+    },
+    "vayigash": {
+        "title": "Parashat Vayigash — Judah's Courage & 'I Am Joseph!'",
+        "he_title": "פרשת ויגש · גבורת יהודה ואני יוסף",
+        "art": "/art/joseph-egypt.jpg",
+        "protagonist": {
+            "name": "Judah & Joseph", "he": "יְהוּדָה וְיוֹסֵף", "emoji": "🤝", "tag": "⭐ Co-Protagonists",
+            "intro": "Judah offers himself in place of Benjamin — proving true repentance — and Joseph weeps aloud: 'I am Joseph! Is my father still alive?'",
+        },
+        "antagonist": {
+            "name": "Past Betrayal & Fear of Revenge", "he": "פַּחַד הַנְּקָמָה", "emoji": "💔", "tag": "⚡ Emotional Conflict",
+            "intro": "The brothers stand speechless in shock, fearing Egypt's ruler will repay their cruelty — until Joseph disarms fear with love.",
+        },
+        "angels_and_allies": [
+            {"name": "Jacob (Israel) & Serach bat Asher", "he": "יַעֲקֹב וְסֶרַח בַּת אָשֵׁר", "emoji": "🎵", "kind": "ally", "tag": "💛 Gentle Messengers", "intro": "Midrash tells how young Serach gently played her harp singing 'Joseph lives!' so Jacob's heart wouldn't be overwhelmed with shock."},
+            {"name": "Divine Providence at Beersheba", "he": "מַרְאוֹת הַלַּיְלָה", "emoji": "✨", "kind": "angel", "tag": "✨ Night Vision", "intro": "God reassures aging Jacob: 'Do not fear going down to Egypt — I Myself will go down with you and bring you up again.'"},
+        ],
+        "setting": {
+            "area": "Pharaoh's Palace → Beersheba → Land of Goshen (Nile Delta)",
+            "region": "Canaan to Goshen, Egypt",
+            "era": "Year 2 of the Great Famine · Family Reunion After 22 Years",
+            "time_of_day": "Electric palace courtroom confrontation melting into tears of reconciliation and reunion!",
+        },
+        "patterns": [
+            "🔁 True Teshuvah (Maimonides's Benchmark): Facing the exact same temptation twice — and choosing loyalty and sacrifice.",
+            "🔁 Forgiveness Reframes History: 'Do not blame yourselves — God sent me ahead to preserve life!' (Genesis 45:5)",
+            "🔁 Wagons ('Agalot') Secret Code: Joseph sends wagons echoing his last Torah study with Jacob before they parted!",
+        ],
+    },
+    "shemot": {
+        "title": "Parashat Shemot — Five Brave Women & The Burning Bush",
+        "he_title": "פרשת שמות · גבורת הנשים והסנה הבוער",
+        "art": "/art/burning-bush.jpg",
+        "protagonist": {
+            "name": "Moses (Moshe Rabbeinu)", "he": "מֹשֶׁה רַבֵּינוּ", "emoji": "🌿", "tag": "⭐ Protagonist",
+            "intro": "Raised in Pharaoh's palace yet steps out to see his people's pain — notices a humble burning bush and reluctantly accepts history's greatest mission.",
+        },
+        "antagonist": {
+            "name": "Pharaoh & Systemic Slavery", "he": "פַּרְעֹה מֶלֶךְ מִצְרַיִם", "emoji": "⛓", "tag": "⚡ Antagonist",
+            "intro": "A tyrannical ruler who forgets Joseph's kindness, enslaves the Israelites, and decrees murder against newborn sons.",
+        },
+        "angels_and_allies": [
+            {"name": "Five Heroines of the Exodus", "he": "שִׁפְרָה, פּוּעָה, יוֹכֶבֶד, מִרְיָם וּבַתְיָה", "emoji": "💛", "kind": "ally", "tag": "💛 Five Brave Women", "intro": "Shifrah & Puah (civil disobedience!), Yocheved, Miriam, and Pharaoh's own daughter Batyah launch the Exodus before Moses says one word!"},
+            {"name": "Angel in the Flame of the Bush", "he": "מַלְאַךְ ה׳ בְּלַבַּת־אֵשׁ", "emoji": "🔥", "kind": "angel", "tag": "✨ Angel of Fire", "intro": "Blazes inside a lowly desert thornbush without consuming it — proving God stands beside the humble and persecuted."},
+        ],
+        "setting": {
+            "area": "Nile River Reeds → Royal Palace → Wells of Midian → Mount Horeb (Sinai)",
+            "region": "Lower Egypt to Sinai Peninsula",
+            "era": "Dawn of the Exodus · c. 1313 BCE",
+            "time_of_day": "Quiet afternoon tending sheep in the wilderness — broken by a blazing, unconsumed golden flame!",
+        },
+        "patterns": [
+            "🔁 Turning Aside to Notice: God waits to speak until Moses pauses his routine and 'turns aside to see' (Ex. 3:4).",
+            "🔁 Humility Qualifies a Leader: Moses asks 'Who am I?' — and Midrash says God chose him because he chased one thirsty lost lamb!",
+            "🔁 Aaron's Joyful Heart: God assures Moses 'Your brother Aaron will see you and rejoice in his heart' — zero jealousy!",
+        ],
+    },
+    "bo": {
+        "title": "Parashat Bo — Midnight Redemption & The Very First Mitzvah",
+        "he_title": "פרשת בא · יציאת מצרים והחודש הזה לכם",
+        "art": "/art/exodus-sea.jpg",
+        "protagonist": {
+            "name": "Moses, Aaron & Israel", "he": "מֹשֶׁה, אַהֲרֹן וְיִשְׂרָאֵל", "emoji": "🌙", "tag": "⭐ Protagonists",
+            "intro": "Standing fearless before Pharaoh, marking their doorposts in unity, and marching out of centuries of bondage into freedom.",
+        },
+        "antagonist": {
+            "name": "Pharaoh's Stubborn Heart", "he": "פַּרְעֹה וְלִבּוֹ הַכָּבֵד", "emoji": "🌑", "tag": "⚡ Antagonist",
+            "intro": "Clings to power through locusts and three days of palpable darkness until midnight shatters Egyptian tyranny forever.",
+        },
+        "angels_and_allies": [
+            {"name": "The New Moon (Rosh Chodesh)", "he": "הַחֹדֶשׁ הַזֶּה לָכֶם", "emoji": "🌙", "kind": "angel", "tag": "✨ First Mitzvah", "intro": "Freedom begins by owning your TIME — God hands the lunar calendar to the Jewish people before they even leave Egypt!"},
+            {"name": "The Questioning Child", "he": "וְהָיָה כִּי־יִשְׁאָלְךָ בִנְךָ", "emoji": "💛", "kind": "ally", "tag": "💛 Future Generations", "intro": "Three times in Bo, Torah commands: when your child asks 'What does this mean?' — pass the story of freedom forward with warmth!"},
+        ],
+        "setting": {
+            "area": "Goshen Homes → Pharaoh's Throne → Rameses to Sukkot",
+            "region": "Eastern Nile Delta, Egypt",
+            "era": "14–15 Nisan · The Night of the First Passover Seder",
+            "time_of_day": "Three days of darkness → Midnight Redemption → Marching out in radiant morning daylight!",
+        },
+        "patterns": [
+            "🔁 Slaves Don't Own Time — Free People Do: That's why sanctifying the New Moon is the very first national mitzvah!",
+            "🔁 Questions Keep Freedom Alive: The Passover Seder begins with a child asking questions, not an adult lecturing.",
+            "🔁 Light in Dwellings: Even during the plague of darkness, 'all the Israelites had light in their homes' — inner warmth defeats gloom.",
+        ],
+    },
+    "beshalach": {
+        "title": "Parashat Beshalach — Splitting the Sea & Miriam's Song",
+        "he_title": "פרשת בשלח · קריעת ים סוף ושירת הים",
+        "art": "/art/exodus-sea.jpg",
+        "protagonist": {
+            "name": "Moses, Miriam & Nachshon", "he": "מֹשֶׁה, מִרְיָם וְנַחְשׁוֹן", "emoji": "🌊", "tag": "⭐ Protagonists",
+            "intro": "Facing water ahead and chariots behind — Nachshon wades in, Moses lifts his staff, and Miriam leads the nation in joyous timbrel song!",
+        },
+        "antagonist": {
+            "name": "Pharaoh's 600 Chariots & Amalek", "he": "חֵיל פַּרְעֹה וַעֲמָלֵק", "emoji": "⚔️", "tag": "⚡ Antagonists",
+            "intro": "Egypt's elite cavalry pursuing at the sea, followed by Amalek attacking the weary stragglers at the back of the camp.",
+        },
+        "angels_and_allies": [
+            {"name": "Angel & Pillars of Cloud and Fire", "he": "מַלְאַךְ הָאֱלֹהִים וְעַמּוּד הָאֵשׁ", "emoji": "✨", "kind": "angel", "tag": "✨ Guiding Angel", "intro": "Moves behind Israel all night between the two camps — shining warm light for Israel while shielding them from harm."},
+            {"name": "Miriam's Timbrels & Daily Manna", "he": "תֹּף מִרְיָם וְהַמָּן", "emoji": "🥁", "kind": "ally", "tag": "💛 Hope & Sustenance", "intro": "Miriam packed musical instruments BEFORE leaving Egypt, and Manna falls fresh every morning — with a double portion for Shabbat!"},
+        ],
+        "setting": {
+            "area": "Sea of Reeds (Yam Suf) → Marah → Elim (12 Springs, 70 Palms) → Rephidim",
+            "region": "Sinai Wilderness",
+            "era": "7th Day After Exodus · First Month in Freedom",
+            "time_of_day": "All-night east wind parting the waters → triumphant golden sunrise Song of the Sea!",
+        },
+        "patterns": [
+            "🔁 Action Unlocks the Miracle: 'Speak to Israel and tell them to GO FORWARD!' — the sea splits only after Nachshon steps in.",
+            "🔁 Compassion Even for Adversaries: Midrash says God quieted the angels' song: 'My handiwork is drowning in the sea — and you sing?'",
+            "🔁 Pack Your Tambourine Early: Miriam teaches living with faithful optimism before the breakthrough arrives.",
+        ],
+    },
+    "yitro": {
+        "title": "Parashat Yitro — Jethro's Advice & Thunder at Mount Sinai",
+        "he_title": "פרשת יתרו · מתן תורה ועשרת הדברות",
+        "art": "/art/sinai-tablets.jpg",
+        "protagonist": {
+            "name": "Moses & Israel 'As One Heart'", "he": "מֹשֶׁה וְיִשְׂרָאֵל כְּאִישׁ אֶחָד", "emoji": "📜", "tag": "⭐ Protagonists",
+            "intro": "Two million newly freed people camp beneath Mount Sinai 'like one person with one heart' to receive the Ten Commandments.",
+        },
+        "antagonist": {
+            "name": "Burnout & Division", "he": "שְׁחִיקָה וּפֵרוּד", "emoji": "⚡", "tag": "⚡ Challenge Overcome",
+            "intro": "Moses tries to judge every single dispute alone from morning till night — until Jethro teaches him to delegate and build leaders.",
+        },
+        "angels_and_allies": [
+            {"name": "Jethro (Yitro) — Wise Mentor", "he": "יִתְרוֹ חֹתֵן מֹשֶׁה", "emoji": "💛", "kind": "ally", "tag": "💛 Wise Ally", "intro": "Moses's Midianite father-in-law hears of the Exodus, comes to join Israel, and designs the world's first independent judiciary!"},
+            {"name": "Heavenly Shofar & Sinai Radiance", "he": "קוֹל שׁוֹפָר חָזָק מְאֹד", "emoji": "✨", "kind": "angel", "tag": "✨ Sinai Revelation", "intro": "Midrash says at Sinai the entire world fell completely silent — no bird chirped, no wave crashed — so every soul could hear clearly."},
+        ],
+        "setting": {
+            "area": "Wilderness of Sinai · Base of Mount Sinai",
+            "region": "Southern Sinai Desert (Ownerless Land Belonging to All)",
+            "era": "6 Sivan · 50 Days After the Exodus (First Shavuot)",
+            "time_of_day": "Third morning at daybreak — lightning, rising Shofar blast, and the Two Paired Tablets!",
+        },
+        "patterns": [
+            "🔁 Unity Before Revelation: Torah could ONLY be given when Israel stopped quarreling and stood 'as one person with one heart.'",
+            "🔁 Two Paired Tablets: Duties to God (1–5) sit directly across from duties to people (6–10) — faith and ethics are inseparable.",
+            "🔁 Open-Minded Leadership: The entire Sinai Parashah is named after Jethro — proving great leaders welcome wise advice from everyone!",
+        ],
+    },
+    "shelach": {
+        "title": "Parashat Shelach — Twelve Scouts, Caleb's Courage & Tzitzit",
+        "he_title": "פרשת שלח · יהושע, כלב וציצית",
+        "art": "/art/promised-land.jpg",
+        "protagonist": {
+            "name": "Caleb & Joshua", "he": "כָּלֵב וִיהוֹשֻׁעַ", "emoji": "🍇", "tag": "⭐ Protagonists",
+            "intro": "Standing calm against panic and herd mentality: 'The land is exceedingly good — we can surely go up and succeed!'",
+        },
+        "antagonist": {
+            "name": "The 'Grasshopper Mindset'", "he": "רוּחַ הַיֵּאוּשׁ וְהַפַּחַד", "emoji": "🦗", "tag": "⚡ Antagonist / Mindset",
+            "intro": "Ten frightened scouts project their own self-doubt outward: 'We looked like grasshoppers in our own eyes, and so we looked to them!'",
+        },
+        "angels_and_allies": [
+            {"name": "Valley of Eshcol Fruit", "he": "אֶשְׁכּוֹל עֲנָבִים וְרִמּוֹנִים", "emoji": "🍇", "kind": "ally", "tag": "💛 Living Proof", "intro": "Giant clusters of grapes, pomegranates, and figs carried back on a wooden pole — proof of the Promised Land's abundance."},
+            {"name": "Thread of Tekhelet (Tzitzit)", "he": "פְּתִיל תְּכֵלֶת", "emoji": "✨", "kind": "angel", "tag": "✨ Visual Compass", "intro": "Sky-blue fringes on garment corners remind us to lift our eyes from fear toward heaven and all 613 Mitzvot!"},
+        ],
+        "setting": {
+            "area": "Kadesh-Barnea → Hebron & Valley of Eshcol → Wilderness of Paran",
+            "region": "Negev Border & Judean Vineyards",
+            "era": "Second Year After the Exodus (40-Day Mission)",
+            "time_of_day": "Golden late-summer grape harvest — overshadowed by a night of needless weeping (9 Av).",
+        },
+        "patterns": [
+            "🔁 Self-Image Shapes Reality: 'We were grasshoppers in OUR OWN eyes' — how you view yourself determines how you meet giants.",
+            "🔁 A Different Spirit (Ruach Acheret): Courage to disagree respectfully with a panicked majority is a supreme Torah virtue.",
+            "🔁 Habit Design (Tzitzit): Put visible reminders of your highest values right in front of your eyes every morning.",
+        ],
+    },
     "default": {
         "title": "Torah Story Cast, Angels, Setting & Patterns",
         "he_title": "דמויות, מלאכים, מקומות ודפוסים בתורה",
@@ -1734,18 +2070,31 @@ STORY_ANATOMY = {
 VERSE_CAST_MATCHERS = [
     ("Jacob", "🏕 Jacob", "protagonist", ["jacob", "israel", "ya'akov"]),
     ("Esau", "⚔️ Esau", "antagonist", ["esau", "seir", "edom"]),
-    ("Angels", "✨ Angels", "angel", ["angel", "messenger", "mahanaim", "host of god", "camp of god"]),
+    ("Angels", "✨ Angels", "angel", ["angel", "messenger", "mahanaim", "host of god", "camp of god", "cherub"]),
     ("Rachel", "💛 Rachel", "ally", ["rachel"]),
     ("Leah", "💛 Leah", "ally", ["leah"]),
     ("Laban", "🎭 Laban", "antagonist", ["laban"]),
     ("Joseph", "👑 Joseph", "protagonist", ["joseph"]),
+    ("Judah", "🛡 Judah", "ally", ["judah"]),
+    ("Benjamin", "💛 Benjamin", "ally", ["benjamin"]),
+    ("Potiphar", "⛓ Potiphar", "antagonist", ["potiphar"]),
     ("Moses", "🌿 Moses", "protagonist", ["moses"]),
     ("Aaron", "🕯 Aaron", "ally", ["aaron"]),
     ("Miriam", "🥁 Miriam", "ally", ["miriam"]),
+    ("Jethro", "💛 Jethro", "ally", ["jethro", "yitro"]),
     ("Pharaoh", "⚡ Pharaoh", "antagonist", ["pharaoh"]),
+    ("Joshua", "🧭 Joshua", "protagonist", ["joshua"]),
+    ("Caleb", "🍇 Caleb", "ally", ["caleb"]),
+    ("Noah", "⛵ Noah", "protagonist", ["noah"]),
     ("Abraham", "⛺ Abraham", "protagonist", ["abraham", "abram"]),
+    ("Sarah", "💛 Sarah", "ally", ["sarah", "sarai"]),
     ("Isaac", "🌿 Isaac", "protagonist", ["isaac"]),
+    ("Rebecca", "💛 Rebecca", "ally", ["rebecca", "rebekah"]),
     ("David", "🎵 David", "protagonist", ["david"]),
+    ("Solomon", "🏛 Solomon", "protagonist", ["solomon"]),
+    ("Elijah", "⛰ Elijah", "protagonist", ["elijah"]),
+    ("Esther", "👑 Esther", "protagonist", ["esther", "hadassah"]),
+    ("Mordechai", "📜 Mordechai", "ally", ["mordecai", "mordechai"]),
     ("Ruth", "🌾 Ruth", "protagonist", ["ruth"]),
 ]
 
