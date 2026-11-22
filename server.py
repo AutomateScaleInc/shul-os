@@ -264,6 +264,9 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 p_obj = daily.get("parasha") or {}
                 p_key = (p_obj.get("slug") or p_obj.get("en_name") or "").lower().replace(" ", "-")
                 daily["show_extras"] = sanctuary_rich_data.get_handsfree_show_extras(p_key)
+                # Tag each verse slide with cute cast/angel badges for the right-hand panel!
+                for sl in (daily.get("slides") or []):
+                    sl["cast_badges"] = sanctuary_rich_data.detect_verse_cast(sl.get("en_text", "") + " " + sl.get("commentary", ""))
             except Exception:
                 pass
             try:

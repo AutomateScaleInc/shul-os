@@ -976,6 +976,55 @@
     0%   { transform: translate(0, 0) scale(0.4) rotate(0deg); opacity: 1; }
     100% { transform: translate(var(--dx), var(--dy)) scale(1.25) rotate(140deg); opacity: 0; }
   }
+
+  /* ===== RIGHT-PANEL CHARMING CAST STRIP, ROLE BADGES & STORY ANATOMY ===== */
+  .cast-strip-box {
+    background: linear-gradient(135deg, rgba(20,33,60,0.92), rgba(14,24,46,0.94));
+    border: 1px solid var(--border-strong); border-radius: 13px;
+    padding: 9px 11px; margin-bottom: 10px;
+  }
+  .cast-avatars { display: flex; gap: 7px; align-items: center; overflow-x: auto; padding-bottom: 4px; }
+  .cast-av {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 9px 4px 5px; border-radius: 999px;
+    background: rgba(11,17,32,0.85); border: 1.5px solid var(--border);
+    font-size: 0.76rem; color: var(--text); white-space: nowrap; cursor: pointer;
+    transition: all 0.35s ease;
+  }
+  .cast-av .av-em {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(228,188,105,0.2); display: flex; align-items: center; justify-content: center;
+    font-size: 0.92rem; flex-shrink: 0;
+  }
+  .cast-av.active {
+    border-color: var(--gold); background: rgba(228,188,105,0.18);
+    transform: translateY(-2px); box-shadow: 0 4px 14px rgba(228,188,105,0.28);
+  }
+  .cast-av.role-angel.active { border-color: #5cb6e5; background: rgba(92,182,229,0.2); }
+  .cast-av.role-antagonist.active { border-color: #f59e0b; background: rgba(245,158,11,0.2); }
+  .cast-intro-bubble {
+    margin-top: 6px; padding: 7px 10px; border-radius: 10px;
+    background: rgba(10,17,32,0.75); border-left: 3px solid var(--gold);
+    font-size: 0.8rem; line-height: 1.38; color: #e8e0cf;
+    animation: sanctuaryReveal 0.45s ease both;
+  }
+  .v-cast-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .v-cast-pill {
+    font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    border: 1px solid rgba(228,188,105,0.35); background: rgba(228,188,105,0.12); color: #f6dc9b;
+  }
+  .v-cast-pill.role-angel { border-color: rgba(92,182,229,0.5); background: rgba(92,182,229,0.16); color: #a8e1ff; }
+  .v-cast-pill.role-antagonist { border-color: rgba(245,158,11,0.55); background: rgba(245,158,11,0.16); color: #fde68a; }
+  .v-cast-pill.role-ally { border-color: rgba(74,222,128,0.45); background: rgba(74,222,128,0.14); color: #bbf7d0; }
+  .anatomy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .anatomy-card {
+    background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 13px;
+    padding: 10px 12px; animation: sanctuaryReveal 0.55s ease both;
+  }
+  .anatomy-card.protag { border-top: 3px solid var(--gold); }
+  .anatomy-card.antag  { border-top: 3px solid #f59e0b; }
+  .anatomy-card.angel  { border-top: 3px solid #5cb6e5; }
+  .anatomy-card.ally   { border-top: 3px solid #4ade80; }
 </style>
 </head>
 <body>
@@ -1051,6 +1100,7 @@
             </div>
             <button class="tool-btn" onclick="switchView('ask')">Ask a Question →</button>
           </div>
+          <div id="rightCastStrip"></div>
           <div id="dailyStreamList"></div>
         </div>
       </div>
@@ -1455,6 +1505,7 @@ function weaveLivingShow(d) {
   const quizzes = ex.quizzes || [];
   const syms = ex.featured_symbols || [];
   const hwords = ex.hebrew_words || [];
+  const anatomy = ex.story_anatomy || null;
   const artCycle = [
     (d.rich && d.rich.art) || '/art/jacobs-ladder.jpg',
     '/art/abraham-stars.jpg',
@@ -1466,13 +1517,45 @@ function weaveLivingShow(d) {
     '/art/sacred-symbols.jpg',
   ];
   const out = [];
-  let sIdx = 0, qIdx = 0, symIdx = 0, hwIdx = 0, vSeen = 0;
+  let sIdx = 0, qIdx = 0, symIdx = 0, hwIdx = 0, vSeen = 0, anatomyInserted = false, patternsInserted = false;
   base.forEach((sl, idx) => {
     const copy = Object.assign({}, sl);
     if (!copy.art) copy.art = (idx === 0) ? artCycle[0] : artCycle[idx % artCycle.length];
     out.push(copy);
+    if (idx === 0 && anatomy && !anatomyInserted) {
+      anatomyInserted = true;
+      out.push({
+        kind: 'cast_spotlight',
+        title: `🎭 Meet the Cast: Protagonist, Antagonist & Angels`,
+        kicker: `STORY ANATOMY · PROTAGONIST, FOIL, ANGELS & FRIENDS`,
+        he_kicker: anatomy.he_title,
+        en_text: `Meet ${anatomy.protagonist.name}, ${anatomy.antagonist.name}, and the Angels & Friends of this portion!`,
+        commentator: 'Cast & Roles',
+        anatomy: anatomy,
+        art: anatomy.art || artCycle[0],
+        cast_badges: [
+          { label: `${anatomy.protagonist.emoji} ${anatomy.protagonist.name}`, role: 'protagonist' },
+          { label: `${anatomy.antagonist.emoji} ${anatomy.antagonist.name}`, role: 'antagonist' },
+          { label: '✨ Angels & Allies', role: 'angel' },
+        ],
+      });
+    }
     if (sl.kind === 'verse') {
       vSeen++;
+      if (vSeen === 3 && anatomy && !patternsInserted) {
+        patternsInserted = true;
+        out.push({
+          kind: 'setting_patterns',
+          title: `🗺 Setting, Era & Hidden Torah Patterns`,
+          kicker: `WHERE & WHEN IT HAPPENED · RECURRING PATTERNS`,
+          he_kicker: 'מְקוֹמוֹת, זְמַנִּים וּדְפוּסִים',
+          en_text: `${anatomy.setting.area} (${anatomy.setting.era})`,
+          commentator: 'Literary & Historical Atlas',
+          anatomy: anatomy,
+          art: anatomy.art || artCycle[1],
+          cast_badges: [{ label: '🗺 Setting & Era', role: 'ally' }, { label: '🔁 Patterns', role: 'angel' }],
+        });
+      }
       // Keep energy high! Interleave Quiz Challenges every 2nd verse, plus Character Scenes, Hebrew Roots & Symbols!
       if (vSeen % 3 === 1 && sIdx < scenes.length) {
         const sc = scenes[sIdx++];
@@ -1732,14 +1815,19 @@ async function loadToday(dayIdx = null) {
   document.getElementById('streamTitle').textContent = `Parashat ${dailyData.parasha.en_name} · ${dailyData.aliyah_en}`;
   document.getElementById('streamSub').textContent = `${dailyData.date_str} · ${dailyData.aliyah_ref} (${dailyData.verses_count} verses + living show)`;
 
-  // Render daily stream list
+  // Render charming auto-introducing Cast, Angels & Friends strip at top of right panel!
+  renderRightCastStrip(dailyData.show_extras && dailyData.show_extras.story_anatomy);
+
+  // Render daily stream list with cute per-verse character & angel badges!
   const sList = document.getElementById('dailyStreamList');
   sList.innerHTML = (dailyData.slides || []).map((s, i) => {
-    const tag = s.kind === 'banner' ? '· Daily Overview' : (s.kind === 'character_scene' ? '· Animated Scene' : (s.kind === 'quiz' ? '· Guess Challenge' : (s.kind === 'symbol_feature' ? '· Symbol Spotlight' : (s.kind === 'story' ? '· Torah Story' : ''))));
+    const tag = s.kind === 'banner' ? '· Daily Overview' : (s.kind === 'cast_spotlight' ? '· Meet the Cast' : (s.kind === 'setting_patterns' ? '· Setting & Patterns' : (s.kind === 'character_scene' ? '· Animated Scene' : (s.kind === 'quiz' ? '· Guess Challenge' : (s.kind === 'hebrew_word' ? '· Hebrew Root' : (s.kind === 'symbol_feature' ? '· Symbol Spotlight' : (s.kind === 'story' ? '· Torah Story' : '')))))));
+    const badges = (s.cast_badges || []).map(b => `<span class="v-cast-pill role-${esc(b.role || 'protagonist')}">${esc(b.label)}</span>`).join('');
     return `
     <div class="stream-item ${i === 0 ? 'active' : ''}" id="stream-item-${i}" onclick="jumpSlide(${i})">
       <div class="s-ref">${esc(s.title)} ${tag}</div>
-      <div class="s-en">${esc((s.en_text || '').slice(0, 115))}${(s.en_text || '').length > 115 ? '...' : ''}</div>
+      <div class="s-en">${esc((s.en_text || '').slice(0, 108))}${(s.en_text || '').length > 108 ? '...' : ''}</div>
+      ${badges ? `<div class="v-cast-row">${badges}</div>` : ''}
       ${s.commentator ? `<div class="s-comm">✦ ${esc(s.commentator)}</div>` : ''}
     </div>`;
   }).join('');
@@ -1889,6 +1977,56 @@ function buildStoryStoryboard(d, en) {
     </div>`).join('')}</div>`;
 }
 
+let rightCastMembers = [];
+let rightCastIdx = 0;
+let rightCastTimer = null;
+
+function renderRightCastStrip(anatomy) {
+  const host = document.getElementById('rightCastStrip');
+  if (!host || !anatomy) return;
+  rightCastMembers = [
+    { ...anatomy.protagonist, role: 'protagonist' },
+    { ...anatomy.antagonist, role: 'antagonist' },
+    ...(anatomy.angels_and_allies || []).map(a => ({ ...a, role: a.kind || 'angel' })),
+  ];
+  rightCastIdx = 0;
+  drawRightCastMember();
+  if (rightCastTimer) clearInterval(rightCastTimer);
+  rightCastTimer = setInterval(() => {
+    if (currentViewName !== 'today' || !rightCastMembers.length) return;
+    rightCastIdx = (rightCastIdx + 1) % rightCastMembers.length;
+    drawRightCastMember();
+  }, 5500);
+}
+
+function selectRightCast(idx) {
+  rightCastIdx = idx;
+  drawRightCastMember();
+}
+
+function drawRightCastMember() {
+  const host = document.getElementById('rightCastStrip');
+  if (!host || !rightCastMembers.length) return;
+  const cur = rightCastMembers[rightCastIdx] || rightCastMembers[0];
+  host.innerHTML = `
+    <div class="cast-strip-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);font-weight:800;">🎭 Meet Today's Cast, Angels &amp; Friends</span>
+        <span style="font-size:0.7rem;color:var(--accent);font-weight:700;">${esc(cur.tag || '')}</span>
+      </div>
+      <div class="cast-avatars">
+        ${rightCastMembers.map((m, i) => `
+          <div class="cast-av role-${esc(m.role)} ${i === rightCastIdx ? 'active' : ''}" onclick="selectRightCast(${i})">
+            <span class="av-em">${esc(m.emoji || '✨')}</span>
+            <span>${esc(m.name)}</span>
+          </div>`).join('')}
+      </div>
+      <div class="cast-intro-bubble" key="${rightCastIdx}">
+        <strong>👋 ${esc(cur.name)}</strong> <span style="font-family:var(--hebrew);color:var(--gold);margin-left:4px;">${esc(cur.he || '')}</span> — ${esc(cur.intro || '')}
+      </div>
+    </div>`;
+}
+
 function revealCurrentQuiz(pickedIdx = null) {
   if (!dailyData || !dailyData.slides) return;
   const s = dailyData.slides[spotIdx];
@@ -1926,7 +2064,67 @@ function renderSpotlight() {
   currentSpotDurationMs = (s.kind === 'quiz' || s.kind === 'character_scene') ? 15500 : 12500;
   document.getElementById('spotCounter').textContent = `${spotIdx + 1} / ${dailyData.slides.length}`;
 
-  if (s.kind === 'character_scene' && s.scene) {
+  if (s.kind === 'cast_spotlight' && s.anatomy) {
+    const an = s.anatomy;
+    const capHtml = `
+      <div>
+        <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:#f3d796;font-weight:800;">🎭 STORY CAST · PROTAGONIST, ANTAGONIST, ANGELS &amp; FRIENDS</div>
+        <div style="font-family:var(--serif);font-size:1.45rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(an.title)}</div>
+      </div>
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.25rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(an.he_title)}</div>`;
+    const allies = (an.angels_and_allies || []).slice(0, 2);
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${renderLivingScene(an.art || slideArt, 'clamp(120px, 14vh, 175px)', capHtml, '', 'margin-bottom:8px;')}
+        <div class="anatomy-grid">
+          <div class="anatomy-card protag" style="animation-delay:0.05s;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.72rem;font-weight:800;color:var(--gold);">${esc(an.protagonist.tag)}</span><span style="font-family:var(--hebrew);color:var(--gold);">${esc(an.protagonist.he)}</span></div>
+            <div style="font-family:var(--serif);font-size:1.08rem;font-weight:700;color:#fff;margin:2px 0 4px;">${esc(an.protagonist.emoji)} ${esc(an.protagonist.name)}</div>
+            <div style="font-size:0.84rem;line-height:1.42;color:var(--text);">${esc(an.protagonist.intro)}</div>
+          </div>
+          <div class="anatomy-card antag" style="animation-delay:0.15s;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.72rem;font-weight:800;color:#fbbf24;">${esc(an.antagonist.tag)}</span><span style="font-family:var(--hebrew);color:#fbbf24;">${esc(an.antagonist.he)}</span></div>
+            <div style="font-family:var(--serif);font-size:1.08rem;font-weight:700;color:#fff;margin:2px 0 4px;">${esc(an.antagonist.emoji)} ${esc(an.antagonist.name)}</div>
+            <div style="font-size:0.84rem;line-height:1.42;color:var(--text);">${esc(an.antagonist.intro)}</div>
+          </div>
+          ${allies.map((al, i) => `
+          <div class="anatomy-card ${al.kind === 'angel' ? 'angel' : 'ally'}" style="animation-delay:${(0.25 + i*0.1).toFixed(2)}s;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.72rem;font-weight:800;color:${al.kind === 'angel' ? '#5cb6e5' : '#4ade80'};">${esc(al.tag)}</span><span style="font-family:var(--hebrew);color:var(--gold);">${esc(al.he)}</span></div>
+            <div style="font-family:var(--serif);font-size:1.04rem;font-weight:700;color:#fff;margin:2px 0 4px;">${esc(al.emoji)} ${esc(al.name)}</div>
+            <div style="font-size:0.83rem;line-height:1.4;color:var(--text);">${esc(al.intro)}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+  } else if (s.kind === 'setting_patterns' && s.anatomy) {
+    const an = s.anatomy;
+    const stg = an.setting || {};
+    const capHtml = `
+      <div>
+        <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.12em;color:#5cb6e5;font-weight:800;">🗺 SETTING, HISTORICAL ERA &amp; HIDDEN TORAH PATTERNS</div>
+        <div style="font-family:var(--serif);font-size:1.45rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(stg.region || 'Biblical Land of Israel')}</div>
+      </div>
+      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.25rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">מְקוֹמוֹת וּדְפוּסִים</div>`;
+    document.getElementById('spotlightContent').innerHTML = `
+      <div class="sanctuary-reveal">
+        ${renderLivingScene(an.art || slideArt, 'clamp(120px, 14vh, 175px)', capHtml, '', 'margin-bottom:10px;')}
+        <div class="anatomy-grid" style="margin-top:0;margin-bottom:10px;">
+          <div class="anatomy-card angel">
+            <div style="font-size:0.72rem;font-weight:800;color:#5cb6e5;text-transform:uppercase;">📍 Geographic Area &amp; Journey</div>
+            <div style="font-size:0.9rem;font-weight:700;color:#fff;margin-top:3px;">${esc(stg.area)}</div>
+          </div>
+          <div class="anatomy-card protag">
+            <div style="font-size:0.72rem;font-weight:800;color:var(--gold);text-transform:uppercase;">⏳ Era &amp; Moment in Time</div>
+            <div style="font-size:0.88rem;color:#fff;margin-top:3px;"><strong>${esc(stg.era)}</strong><br><span class="muted" style="font-size:0.82rem;">${esc(stg.time_of_day)}</span></div>
+          </div>
+        </div>
+        <div class="today-box" style="padding:10px 14px;">
+          <h4 style="margin-bottom:5px;font-size:0.92rem;">🔁 Recurring Torah Patterns to Watch For</h4>
+          <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.48;">
+            ${(an.patterns || []).map(pt => `<li style="margin-bottom:4px;">${esc(pt)}</li>`).join('')}
+          </ul>
+        </div>
+      </div>`;
+  } else if (s.kind === 'character_scene' && s.scene) {
     const sc = s.scene;
     const stageHtml = `
       <div class="living-stage" style="height:clamp(145px, 18vh, 215px);margin-bottom:10px;">

@@ -1603,6 +1603,135 @@ HEBREW_WORDS = [
 ]
 
 
+# =============================================================================
+# STORY ANATOMY: PROTAGONIST, ANTAGONIST, ANGELS & FRIENDS, SETTING, ERA & PATTERNS
+# Powers the charming Right-Panel Cast Introductions & Literary Atlas Cards!
+# =============================================================================
+
+STORY_ANATOMY = {
+    "vayishlach": {
+        "title": "Parashat Vayishlach — Story Cast & Literary Atlas",
+        "he_title": "פרשת וישלח · דמויות, מלאכים ודפוסים",
+        "art": "/art/jacobs-ladder.jpg",
+        "protagonist": {
+            "name": "Jacob → Israel", "he": "יַעֲקֹב / יִשְׂרָאֵל", "emoji": "🏕", "tag": "⭐ Protagonist",
+            "intro": "Returning home after 20 years in exile — transforms from cautious survivor into 'Israel', one who wrestles with adversity and prevails.",
+        },
+        "antagonist": {
+            "name": "Esau & the Night Angel", "he": "עֵשָׂו וְשַׂר הַלַּיְלָה", "emoji": "⚔️", "tag": "⚡ Antagonist / Foil",
+            "intro": "Esau marches forward with 400 armed men carrying a 20-year grudge — mirrored spiritually by the mysterious angel wrestling Jacob at the Jabbok until dawn.",
+        },
+        "angels_and_allies": [
+            {"name": "Angels of Mahanaim", "he": "מַלְאֲכֵי אֱלֹהִים", "emoji": "✨", "kind": "angel", "tag": "✨ Angels", "intro": "Literal heavenly messengers whom Jacob sends ahead as ambassadors of peace to Esau (Rashi on Gen. 32:4)!"},
+            {"name": "Angel of the Jabbok", "he": "הַמַּלְאָךְ בַּיַּבֹּק", "emoji": "🌌", "kind": "angel", "tag": "✨ Angel", "intro": "The enigmatic nighttime adversary who injures Jacob's hip yet blesses him with the eternal name 'Israel' at sunrise."},
+            {"name": "Rachel, Leah & the 12 Children", "he": "רָחֵל, לֵאָה וְהַשְּׁבָטִים", "emoji": "💛", "kind": "ally", "tag": "💛 Family & Allies", "intro": "Jacob's devoted family crossing the Jabbok ford together — the living foundation of the Twelve Tribes of Israel."},
+        ],
+        "setting": {
+            "area": "Mahanaim → Jabbok River Ford → Peniel → Sukkot → Shechem → Road to Bethlehem",
+            "region": "Eastern Jordan Crossing into the Land of Canaan (Modern Jordan / Israel)",
+            "era": "Patriarchal Era · c. 1700 BCE (20 years after leaving Beersheba)",
+            "time_of_day": "Starts in fearful night shadows by the river — culminates at triumphant Dawn (Genesis 32:32)!",
+        },
+        "patterns": [
+            "🔁 Border Angels Pattern: Both when LEAVING Israel (Vayetzei) and RETURNING home (Vayishlach), angels greet Jacob at the threshold!",
+            "🔁 Three-Fold Strategy Pattern: Gifts (diplomacy) + Prayer (humility) + Readiness (courage) — Judaism's blueprint for facing any crisis.",
+            "🔁 Wounded Yet Blessed Pattern: Jacob walks away with a limp AND a sunrise ('The sun rose upon him') — scars and greatness coexist.",
+        ],
+    },
+    "vayetzei": {
+        "title": "Parashat Vayetzei — Story Cast & Literary Atlas",
+        "he_title": "פרשת ויצא · דמויות, מלאכים ודפוסים",
+        "art": "/art/jacobs-ladder.jpg",
+        "protagonist": {
+            "name": "Jacob (Ya'akov)", "he": "יַעֲקֹב", "emoji": "🏕", "tag": "⭐ Protagonist",
+            "intro": "A lone wanderer fleeing home with only a staff — builds a family of twelve tribes through twenty years of grit and faith.",
+        },
+        "antagonist": {
+            "name": "Laban the Aramean", "he": "לָבָן הָאֲרַמִּי", "emoji": "🎭", "tag": "⚡ Antagonist",
+            "intro": "Jacob's cunning uncle who switches brides in the dark and alters Jacob's wages ten times — testing Jacob's honesty and patience.",
+        },
+        "angels_and_allies": [
+            {"name": "Ladder Angels (Beit El)", "he": "מַלְאֲכֵי הַסֻּלָּם", "emoji": "✨", "kind": "angel", "tag": "✨ Angels", "intro": "Angels of Israel ascending while Diaspora angels descend to escort Jacob safely through exile (Rashi Gen. 28:12)."},
+            {"name": "Rachel & Leah", "he": "רָחֵל וְלֵאָה", "emoji": "💛", "kind": "ally", "tag": "💛 Allies & Matriarchs", "intro": "Two sisters of fierce compassion and loyalty — Rachel shares secret signs to protect Leah's dignity on her wedding night."},
+            {"name": "Angels of Mahanaim", "he": "מַחֲנֵה אֱלֹהִים", "emoji": "🕊", "kind": "angel", "tag": "✨ Angels", "intro": "Welcoming celestial escort greeting Jacob the moment he parts peacefully with Laban and turns toward home."},
+        ],
+        "setting": {
+            "area": "Beersheba → Mount Moriah / Beit El → Well of Haran → Mount Gilead (Gal-ed)",
+            "region": "Southern Canaan to Northern Mesopotamia (Paddan-Aram)",
+            "era": "Patriarchal Era · c. 1720–1700 BCE",
+            "time_of_day": "Sudden sunset on a stone pillow ('The sun set early for him' — Rashi) opening into a starlit ladder dream.",
+        },
+        "patterns": [
+            "🔁 Wellside Meeting Pattern: Just like Rebecca (Gen. 24) and later Zipporah (Ex. 2), destiny sparks beside a desert well of living water!",
+            "🔁 Measure-for-Measure (Midah k'Neged Midah): The brother who once used disguise meets Laban's disguise — teaching deep empathy.",
+            "🔁 Holiness in Exile Pattern: Even on a cold stone far from home, the Gate of Heaven stands open.",
+        ],
+    },
+    "default": {
+        "title": "Torah Story Cast, Angels, Setting & Patterns",
+        "he_title": "דמויות, מלאכים, מקומות ודפוסים בתורה",
+        "art": "/art/sacred-symbols.jpg",
+        "protagonist": {
+            "name": "The Seeker of Covenant", "he": "גִּבּוֹר הַפָּרָשָׁה", "emoji": "⭐", "tag": "⭐ Protagonist",
+            "intro": "Ordinary, deeply human figures — shepherds, sisters, dreamers — who answer 'Hineni' (Here I am) when history calls.",
+        },
+        "antagonist": {
+            "name": "Fear, Injustice & Empire", "he": "הַמִּכְשׁוֹל וְהַנִּסָּיוֹן", "emoji": "⚡", "tag": "⚡ Antagonist / Test",
+            "intro": "Whether Pharaoh, Laban, Goliath, or inner self-doubt, every obstacle in Torah exists to forge courage and clarity.",
+        },
+        "angels_and_allies": [
+            {"name": "Malachim (Angels)", "he": "מַלְאֲכֵי הַשָּׁרֵת", "emoji": "✨", "kind": "angel", "tag": "✨ Angels", "intro": "In Hebrew 'Malach' means Messenger — appearing at crossroads, burning bushes, and ladders to guide and protect."},
+            {"name": "Quiet Friends & Allies", "he": "רֵעִים וְשֻׁתָּפִים", "emoji": "💛", "kind": "ally", "tag": "💛 Allies", "intro": "Aaron beside Moses, Ruth beside Naomi, Jonathan beside David, Mordechai beside Esther — nobody walks alone in Torah!"},
+        ],
+        "setting": {
+            "area": "Fertile Crescent · Land of Israel, Egypt, Sinai Wilderness & Jerusalem",
+            "region": "Crossroads of the Ancient Near East",
+            "era": "Biblical Timeline · c. 1800 BCE – 450 BCE",
+            "time_of_day": "Torah days begin at Sunset and climb toward Dawn — light always emerges out of darkness.",
+        },
+        "patterns": [
+            "🔁 Rule of Three Pattern: Key Torah moments unfold in threes (3 visits, 3 preparations, 3 Patriarchs) to mark lasting truth.",
+            "🔁 Unexpected Hero Pattern: Younger siblings, humble shepherds, and quiet helpers consistently change history.",
+            "🔁 Exile → Awakening → Return: Every journey away from home deepens who we become when we return.",
+        ],
+    },
+}
+
+VERSE_CAST_MATCHERS = [
+    ("Jacob", "🏕 Jacob", "protagonist", ["jacob", "israel", "ya'akov"]),
+    ("Esau", "⚔️ Esau", "antagonist", ["esau", "seir", "edom"]),
+    ("Angels", "✨ Angels", "angel", ["angel", "messenger", "mahanaim", "host of god", "camp of god"]),
+    ("Rachel", "💛 Rachel", "ally", ["rachel"]),
+    ("Leah", "💛 Leah", "ally", ["leah"]),
+    ("Laban", "🎭 Laban", "antagonist", ["laban"]),
+    ("Joseph", "👑 Joseph", "protagonist", ["joseph"]),
+    ("Moses", "🌿 Moses", "protagonist", ["moses"]),
+    ("Aaron", "🕯 Aaron", "ally", ["aaron"]),
+    ("Miriam", "🥁 Miriam", "ally", ["miriam"]),
+    ("Pharaoh", "⚡ Pharaoh", "antagonist", ["pharaoh"]),
+    ("Abraham", "⛺ Abraham", "protagonist", ["abraham", "abram"]),
+    ("Isaac", "🌿 Isaac", "protagonist", ["isaac"]),
+    ("David", "🎵 David", "protagonist", ["david"]),
+    ("Ruth", "🌾 Ruth", "protagonist", ["ruth"]),
+]
+
+
+def detect_verse_cast(text: str) -> list:
+    low = " " + str(text or "").lower() + " "
+    found = []
+    for _key, label, role, kws in VERSE_CAST_MATCHERS:
+        if any(f" {kw}" in low or f"{kw}s" in low or f"{kw}'" in low for kw in kws):
+            found.append({"label": label, "role": role})
+        if len(found) >= 3:
+            break
+    return found
+
+
+def get_story_anatomy(parasha_slug: str = "") -> dict:
+    key = (parasha_slug or "").lower().replace(" ", "-")
+    return STORY_ANATOMY.get(key) or STORY_ANATOMY["default"]
+
+
 def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
     slug = (parasha_slug or "").lower()
     # Prioritize quizzes & animated character scenes matching THIS week's Parashah first!
@@ -1620,4 +1749,5 @@ def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
         "popups": POPUP_INSIGHTS,
         "featured_symbols": SYMBOLS[:6],
         "hebrew_words": HEBREW_WORDS[:8],
+        "story_anatomy": get_story_anatomy(slug),
     }
