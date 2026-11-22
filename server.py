@@ -187,7 +187,8 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             return
 
         if path == "/api/connect/messages":
-            self._send_json({"messages": community_hub.list_visitor_messages()})
+            msgs = community_hub.list_visitor_messages()
+            self._send_json({"messages": msgs, "count": len(msgs)})
             return
 
         if path == "/api/syndication/pack":
