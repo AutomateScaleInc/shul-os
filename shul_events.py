@@ -17,6 +17,8 @@ import urllib.request
 from datetime import datetime, timedelta
 
 import ai_engine
+import sacred_astronomy
+import sanctuary_rich_data
 import torah_db
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
@@ -167,6 +169,50 @@ def init_tables():
         conn.commit()
 
 
+def _compute_offline_shabbat_zmanim() -> dict:
+    """100% offline accurate Shabbat Candle Lighting, Havdalah, Zmanim table, Moon & Milestones via sacred_astronomy."""
+    now_local = datetime.now()
+    snap = sacred_astronomy.get_sacred_moment()
+    # Find upcoming Friday (weekday 4) & Saturday (weekday 5)
+    days_to_fri = (4 - now_local.weekday()) % 7
+    fri_dt = (now_local + timedelta(days=days_to_fri)).replace(hour=12, minute=0, second=0, microsecond=0)
+    sat_dt = fri_dt + timedelta(days=1)
+    try:
+        fri_snap = sacred_astronomy.get_sacred_moment(now_dt=fri_dt)
+        sat_snap = sacred_astronomy.get_sacred_moment(now_dt=sat_dt)
+    except Exception:
+        fri_snap, sat_snap = snap, snap
+
+    def _zmap(s):
+        return {z["key"]: z["time"] for z in s.get("zmanim", [])}
+
+    fz = _zmap(fri_snap)
+    sz = _zmap(sat_snap)
+    tz = _zmap(snap)
+    ms = (snap.get("year_context") or {}).get("milestones") or {}
+    return {
+        "city": snap["location"]["city"],
+        "hebrew_date": snap["hebrew_date"]["en_str"],
+        "hebrew_date_he": snap["hebrew_date"]["he_str"],
+        "friday_date": fri_dt.strftime("%a, %b %d, %Y"),
+        "candle_lighting": fz.get("candle_lighting", tz.get("candle_lighting", "")),
+        "havdalah": sz.get("tzeit", tz.get("tzeit", "")),
+        "zmanim_table": [
+            ("Alot HaShachar (Dawn)", tz.get("alot", "")),
+            ("Netz HaChamah (Sunrise)", tz.get("sunrise", "")),
+            ("Sof Zman Shema (GRA)", tz.get("shema_gra", "")),
+            ("Sof Zman Tefillah (GRA)", tz.get("tefillah_gra", "")),
+            ("Chatzot (Solar Midday)", tz.get("chatzot", "")),
+            ("Plag HaMincha", tz.get("plag_hamincha", "")),
+            ("Shkiah (Sunset)", tz.get("sunset", "")),
+            ("Tzeit HaKochavim (Nightfall)", tz.get("tzeit", "")),
+        ],
+        "moon": snap.get("moon", {}),
+        "next_rosh_chodesh": ms.get("next_rosh_chodesh"),
+        "upcoming_holidays": ms.get("upcoming_holidays") or [],
+    }
+
+
 def get_brussels_shabbat_and_holidays() -> dict:
     """Fetch live Brussels Shabbat candle-lighting, Havdalah, Hebrew date, and upcoming holidays from Hebcal (cached 6h)."""
     now = time.time()
@@ -236,6 +282,20 @@ def get_brussels_shabbat_and_holidays() -> dict:
     except Exception:
         if cached and cached.get("data"):
             return cached["data"]
+        try:
+            off = _compute_offline_shabbat_zmanim()
+            data["city"] = off["city"]
+            data["candle_lighting"] = off["candle_lighting"]
+            data["candle_date"] = off["friday_date"]
+            data["havdalah"] = off["havdalah"]
+            data["hebrew_date"] = off["hebrew_date"]
+            data["upcoming_holidays"] = [
+                {"title": h["name"], "hebrew": h["he"], "date": h["gregorian_date"], "category": "holiday", "memo": f"in {h['days_away']}d"}
+                for h in off["upcoming_holidays"][:6]
+            ]
+            data["source"] = "sacred_astronomy_offline"
+        except Exception:
+            pass
         return data
 
 
@@ -424,18 +484,39 @@ def export_subscribers_csv() -> str:
 
 
 def generate_weekly_mailing() -> dict:
-    """Auto-compose a ready-to-send Weekly Shul Mailing (HTML + Plain Text) combining Today's Parashah, Brussels Shabbat times, and Rabbi Michoel / theshul.eu events."""
+    """Auto-compose a ready-to-send Weekly Shul Mailing (HTML + Plain Text) combining Today's Parashah,
+    offline Brussels Zmanim & Shabbat times, Moon/Rosh Chodesh watch, 'In Today's Terms',
+    Hebrew Root of the Week, Shabbat Table Riddle, and Rabbi Michoel / theshul.eu events."""
     daily = torah_db.get_daily_portion()
     ev_bundle = list_events()
     sh = ev_bundle["shabbat_times"]
     p = daily["parasha"]
     events = ev_bundle["events"][:10]
     story = daily.get("matching_story")
+    offline_cel = _compute_offline_shabbat_zmanim()
+
+    # Pull weekly rich teaching, Hebrew Root (Shoresh), Story Anatomy, and Shabbat Table Riddle
+    p_slug = (p.get("slug") or p.get("en_name") or "").lower().replace(" ", "-")
+    story_slug = story["slug"] if story else ("05-jacobs-ladder-and-israel" if p_slug in ("vayetzei", "vayishlach") else "")
+    rich = sanctuary_rich_data.get_story_enrichment(story_slug)
+    anatomy = sanctuary_rich_data.get_story_anatomy(p_slug)
+    extras = sanctuary_rich_data.get_handsfree_show_extras(p_slug)
+    riddle = (extras.get("quizzes") or [None])[0]
+    hwords = sanctuary_rich_data.HEBREW_WORDS
+    week_idx = int(datetime.now().strftime("%W")) % len(hwords)
+    hword = hwords[week_idx] if hwords else None
+
+    city_short = (offline_cel.get("city") or "Brussels").split(",")[0]
+    candle_val = sh.get("candle_lighting") or offline_cel.get("candle_lighting") or ""
+    havdalah_val = sh.get("havdalah") or offline_cel.get("havdalah") or ""
+    hdate_val = sh.get("hebrew_date") or offline_cel.get("hebrew_date") or ""
 
     subject = f"Shabbat Shalom — Parashat {p['en_name']} ({p['he_name']}) · The European Synagogue (theshul.eu)"
-    candles_line = f"Candle Lighting (Brussels): {sh['candle_lighting']}" if sh.get("candle_lighting") else "Check theshul.eu for Brussels candle lighting times"
-    havdalah_line = f" | Shabbat Ends (Havdalah): {sh['havdalah']}" if sh.get("havdalah") else ""
-    hdate_line = f" · {sh['hebrew_date']}" if sh.get("hebrew_date") else ""
+    candles_line = f"Candle Lighting ({city_short}, {offline_cel['friday_date']}): {candle_val}" if candle_val else "Check theshul.eu for candle lighting times"
+    havdalah_line = f" | Shabbat Ends (Havdalah): {havdalah_val}" if havdalah_val else ""
+    hdate_line = f" · {hdate_val}" if hdate_val else ""
+    moon = offline_cel.get("moon") or {}
+    nrc = offline_cel.get("next_rosh_chodesh") or {}
 
     # Plain text newsletter
     txt_lines = [
@@ -450,7 +531,42 @@ def generate_weekly_mailing() -> dict:
         "THIS WEEK'S TORAH MESSAGE:",
         p["summary"],
         "",
+        f"APPLYING IT IN TODAY'S TERMS — {rich.get('today_title', 'Living Torah Today')}:",
     ]
+    for pt in (rich.get("today_points") or [])[:3]:
+        txt_lines.append(f"  * {pt}")
+    if anatomy and anatomy.get("patterns"):
+        txt_lines.append(f"  * Key Pattern: {anatomy['patterns'][0]}")
+    txt_lines.append("")
+
+    if hword:
+        txt_lines += [
+            f"HEBREW WORD OF THE WEEK: {hword['translit']} ({hword['word_he']} · {hword['pronounce']})",
+            f"  3-Letter Root (Shoresh): {' - '.join(hword.get('root', []))}  |  Meaning: {hword['meaning']}",
+            f"  Living It Today: {hword['today']}",
+            "",
+        ]
+
+    if riddle:
+        letters = ["A", "B", "C", "D"]
+        txt_lines.append(f"SHABBAT TABLE RIDDLE ({riddle['badge']}):")
+        txt_lines.append(f"  Q: {riddle['question']}")
+        for idx, opt in enumerate(riddle.get("options", [])):
+            txt_lines.append(f"     {letters[idx]}) {opt}")
+        ans_letter = letters[riddle["correct_idx"]] if riddle["correct_idx"] < len(letters) else "A"
+        txt_lines.append(f"  [Answer: {ans_letter} — {riddle['reveal_fact']} ({riddle['source_ref']})]")
+        txt_lines.append("")
+
+    txt_lines.append(f"HALACHIC ZMANIM ({city_short} · {offline_cel['hebrew_date']}):")
+    for z_name, z_time in offline_cel.get("zmanim_table", []):
+        if z_time:
+            txt_lines.append(f"  - {z_name}: {z_time}")
+    if moon:
+        txt_lines.append(f"  - Lunar Watch: {moon.get('phase_en', '')} ({moon.get('illumination_pct', '')}% illuminated)")
+    if nrc:
+        txt_lines.append(f"  - Next Rosh Chodesh: {nrc.get('month_en')} ({nrc.get('gregorian_date')}, in {nrc.get('days_away')} days)")
+    txt_lines.append("")
+
     if story:
         txt_lines += [f"SHABBAT TABLE STORY: {story['title']} ({story['he_title']})", story["subtitle"], ""]
     txt_lines.append("UPCOMING AT THE SHUL & RABBI MICHOEL'S PROGRAMS:")
@@ -458,10 +574,15 @@ def generate_weekly_mailing() -> dict:
         txt_lines.append(f"- {e['title']} ({e['event_date']} {e['event_time']}) — {e['location']}")
         if e.get("description"):
             txt_lines.append(f"  {e['description'][:200]}")
-    if sh.get("upcoming_holidays"):
+
+    hols_list = sh.get("upcoming_holidays") or [
+        {"date": h["gregorian_date"], "title": f"{h['name']} (in {h['days_away']}d)", "hebrew": h["he"]}
+        for h in offline_cel.get("upcoming_holidays", [])[:5]
+    ]
+    if hols_list:
         txt_lines.append("")
-        txt_lines.append("UPCOMING JEWISH CALENDAR DATES (BRUSSELS):")
-        for h in sh["upcoming_holidays"][:5]:
+        txt_lines.append(f"UPCOMING JEWISH CALENDAR DATES ({city_short.upper()}):")
+        for h in hols_list[:5]:
             txt_lines.append(f"- {h['date']}: {h['title']} ({h['hebrew']})")
     txt_lines += [
         "",
@@ -481,8 +602,54 @@ def generate_weekly_mailing() -> dict:
     )
     hol_html = "".join(
         f"<li style='margin:4px 0;'><strong>{html.escape(h['date'])}</strong> — {html.escape(h['title'])} ({html.escape(h['hebrew'])})</li>"
-        for h in (sh.get("upcoming_holidays") or [])[:5]
+        for h in hols_list[:5]
     )
+    today_pts_html = "".join(
+        f"<li style='margin:5px 0;'>{html.escape(pt)}</li>"
+        for pt in (rich.get("today_points") or [])[:3]
+    )
+    zman_rows = "".join(
+        f"<tr><td style='padding:5px 8px;border-bottom:1px solid #eee5d2;color:#333;font-size:13px;'>{html.escape(zn)}</td>"
+        f"<td style='padding:5px 8px;border-bottom:1px solid #eee5d2;color:#0f192d;font-weight:bold;text-align:right;font-size:13px;'>{html.escape(zt)}</td></tr>"
+        for zn, zt in offline_cel.get("zmanim_table", []) if zt
+    )
+    hword_html = ""
+    if hword:
+        root_badges = " &middot; ".join(
+            f"<span style='display:inline-block;padding:2px 8px;background:#0f192d;color:#e4bc69;border-radius:4px;font-weight:bold;'>{html.escape(ch)}</span>"
+            for ch in hword.get("root", [])
+        )
+        hword_html = f"""
+        <div style="background:#f4f7fc;border:1px solid #cdd8ea;border-radius:10px;padding:14px 18px;margin:16px 0;font-family:Arial,sans-serif;">
+          <div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#2c5282;font-weight:bold;">🔤 Hebrew Word &amp; Root of the Week</div>
+          <div style="margin:6px 0;font-size:18px;color:#0f192d;"><strong>{html.escape(hword['translit'])}</strong> · <span style="font-family:Georgia,serif;color:#8b5e14;font-size:21px;">{html.escape(hword['word_he'])}</span> <span style="font-size:13px;color:#555;">({html.escape(hword['pronounce'])})</span></div>
+          <div style="font-size:13px;margin-bottom:6px;">Shoresh: {root_badges} &nbsp;·&nbsp; <strong>{html.escape(hword['meaning'])}</strong></div>
+          <div style="font-size:13px;color:#333;line-height:1.5;">{html.escape(hword['today'])}</div>
+        </div>"""
+
+    riddle_html = ""
+    if riddle:
+        letters = ["A", "B", "C", "D"]
+        opts_html = "".join(
+            f"<li style='margin:4px 0;'><strong>{letters[idx]})</strong> {html.escape(opt)}</li>"
+            for idx, opt in enumerate(riddle.get("options", []))
+        )
+        ans_letter = letters[riddle["correct_idx"]] if riddle["correct_idx"] < len(letters) else "A"
+        riddle_html = f"""
+        <div style="background:#fdf8ec;border:1px solid #e4c98b;border-radius:10px;padding:14px 18px;margin:16px 0;font-family:Arial,sans-serif;">
+          <div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#8b5e14;font-weight:bold;">❓ Shabbat Table Riddle of the Week · {html.escape(riddle['badge'])}</div>
+          <p style="margin:8px 0 6px;font-weight:bold;color:#0f192d;font-size:14px;">{html.escape(riddle['question'])}</p>
+          <ul style="list-style:none;padding:0;margin:0 0 10px;font-size:13px;color:#333;">{opts_html}</ul>
+          <div style="background:#ffffff;border-left:3px solid #2f855a;padding:8px 12px;font-size:12.5px;color:#2d3748;">
+            <strong style="color:#2f855a;">Shabbat Table Answer ({ans_letter}):</strong> {html.escape(riddle['reveal_fact'])} <span style="color:#718096;">({html.escape(riddle['source_ref'])})</span>
+          </div>
+        </div>"""
+
+    lunar_banner = ""
+    if moon or nrc:
+        rc_txt = f" · Next Rosh Chodesh: <strong>{html.escape(nrc.get('month_en',''))}</strong> ({html.escape(nrc.get('gregorian_date',''))}, in {nrc.get('days_away','')}d)" if nrc else ""
+        lunar_banner = f"<div style='font-size:12.5px;color:#555;margin-top:6px;'>{html.escape(moon.get('emoji','🌙'))} {html.escape(moon.get('phase_en',''))} ({moon.get('illumination_pct','')}%){rc_txt}</div>"
+
     email_html = f"""<!DOCTYPE html>
 <html><body style="margin:0;padding:24px;background:#f5efe3;font-family:Georgia,serif;color:#1f2430;">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #d9c59b;border-radius:12px;overflow:hidden;">
@@ -493,6 +660,7 @@ def generate_weekly_mailing() -> dict:
   </td></tr>
   <tr><td style="background:#fbf5e6;padding:14px 28px;border-bottom:1px solid #e6dcc8;text-align:center;font-family:Arial,sans-serif;font-size:14px;">
     <strong>🕯 {html.escape(candles_line)}{html.escape(havdalah_line)}</strong>
+    {lunar_banner}
   </td></tr>
   <tr><td style="padding:22px 28px;line-height:1.65;font-size:15px;">
     <h2 style="margin:0 0 8px;color:#1b2a4a;font-size:19px;">This Week's Torah Portion</h2>
@@ -500,9 +668,18 @@ def generate_weekly_mailing() -> dict:
     <div style="background:#f9f4ea;border-left:4px solid #b8872c;padding:12px 16px;margin:14px 0;font-size:14px;">
       <strong>Today's Aliyah ({html.escape(daily['day_en'])} · {html.escape(daily['aliyah_en'])}):</strong> {html.escape(daily['aliyah_ref'])}
     </div>
+    <div style="background:#faf6ee;border:1px solid #e6dcc8;border-radius:10px;padding:14px 18px;margin:16px 0;">
+      <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#8b5e14;font-weight:bold;">✨ Applying It in Today's Terms</div>
+      <div style="font-size:16px;font-weight:bold;color:#1b2a4a;margin:4px 0 6px;">{html.escape(rich.get('today_title', 'Living Torah Today'))}</div>
+      <ul style="margin:0;padding-left:18px;font-family:Arial,sans-serif;font-size:13.5px;color:#333;">{today_pts_html}</ul>
+    </div>
+    {hword_html}
+    {riddle_html}
+    <h3 style="margin:20px 0 8px;color:#1b2a4a;font-size:16px;font-family:Arial,sans-serif;">☀ {html.escape(city_short)} Halachic Zmanim ({html.escape(offline_cel['hebrew_date'])})</h3>
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;border:1px solid #e6dcc8;border-radius:8px;margin-bottom:18px;">{zman_rows}</table>
     <h2 style="margin:22px 0 8px;color:#1b2a4a;font-size:19px;">Upcoming at The Shul &amp; Rabbi Michoel's Programs</h2>
     <table width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;">{ev_html}</table>
-    {f'<h3 style="margin:20px 0 6px;color:#1b2a4a;font-size:16px;">Upcoming Jewish Calendar (Brussels)</h3><ul style="font-family:Arial,sans-serif;font-size:14px;">{hol_html}</ul>' if hol_html else ''}
+    {f'<h3 style="margin:20px 0 6px;color:#1b2a4a;font-size:16px;">Upcoming Jewish Calendar ({html.escape(city_short)})</h3><ul style="font-family:Arial,sans-serif;font-size:14px;">{hol_html}</ul>' if hol_html else ''}
   </td></tr>
   <tr><td style="background:#0f192d;color:#b7c2d6;padding:16px 28px;text-align:center;font-family:Arial,sans-serif;font-size:12px;">
     <strong style="color:#e4bc69;">{html.escape(SHUL_INFO['name'])}</strong> · {html.escape(SHUL_INFO['address'])}<br>
