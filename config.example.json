@@ -1,7 +1,7 @@
 {
   "synagogue_name": "Torah Sanctuary · Synagogue Study Station",
   "ollama_url": "http://127.0.0.1:11434",
-  "ollama_model": "qwen2.5:1.5b",
+  "ollama_model": "qwen2.5:3b",
   "cloud_provider": "none",
   "cloud_model": "",
   "cloud_api_key": "",

@@ -20,7 +20,7 @@ CONFIG_PATH = BASE_DIR / "config.json"
 DEFAULT_CONFIG = {
     "synagogue_name": "The European Synagogue · Torah Sanctuary",
     "ollama_url": "http://127.0.0.1:11434",
-    "ollama_model": "qwen2.5:1.5b",
+    "ollama_model": "qwen2.5:3b",
     "cloud_provider": "none",  # none | openai | anthropic | gemini
     "cloud_model": "",
     "cloud_api_key": "",
@@ -296,14 +296,14 @@ def _stream_cloud_gemini(cfg: dict, system_prompt: str, messages: list):
 
 def _stream_ollama(cfg: dict, system_prompt: str, messages: list):
     url = cfg.get("ollama_url", "http://127.0.0.1:11434").rstrip("/") + "/api/chat"
-    model = cfg.get("ollama_model", "qwen2.5:1.5b")
-    # Keep local CPU prefill crisp on Sentinel's 2013 i5-4570R (compact RAG already packs every category cleanly!)
-    local_sys = system_prompt[:3100]
+    model = cfg.get("ollama_model", "qwen2.5:3b")
+    # Deep offline local reasoning: 4096 context window packs verbatim Tanakh + coinciding parallels + multi-commentator RAG + Haggadah/Siddur!
+    local_sys = system_prompt[:5200]
     payload = {
         "model": model,
         "stream": True,
         "keep_alive": "30m",
-        "options": {"temperature": 0.35, "num_ctx": 2048, "num_predict": 440},
+        "options": {"temperature": 0.35, "num_ctx": 4096, "num_predict": 900, "repeat_penalty": 1.12},
         "messages": [{"role": "system", "content": local_sys}] + messages,
     }
     req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json"})

@@ -18,6 +18,7 @@ import ai_engine
 import broadcast_hub
 import community_hub
 import sacred_astronomy
+import sacred_books
 import sacred_liturgy
 import sanctuary_rich_data
 import scripture_foundation
@@ -317,6 +318,22 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             p_slug = qs.get("parasha", [""])[0].strip()
             topic = qs.get("topic", [""])[0].strip()
             self._send_json(scripture_foundation.get_foundation_dossier(parasha_slug=p_slug, topic=topic))
+            return
+
+        if path == "/api/books/library":
+            self._send_json(sacred_books.get_books_library())
+            return
+
+        if path == "/api/admin/export-bundle":
+            cfg = dict(ai_engine.load_config())
+            cfg["cloud_api_key"] = ""  # Never export secret API keys
+            self._send_json({
+                "bundle_version": "shulos-1.0",
+                "license": "MIT",
+                "config": cfg,
+                "mesh_nodes": shul_mesh.list_nodes(probe=False),
+                "sponsorship_items": community_hub.list_sponsorship_items(),
+            })
             return
 
         if path == "/api/presentation":
@@ -804,6 +821,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
 
 
 def main():
+    try:
+        sacred_books.index_into_db()
+    except Exception:
+        pass
     broadcast_hub.start_tunnel_watchdog(port=PORT)
     srv = ThreadedHTTPServer((HOST, PORT), TorahHandler)
     print(f"Torah Sanctuary listening on http://{HOST}:{PORT}", flush=True)

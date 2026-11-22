@@ -1489,7 +1489,8 @@
   [data-theme="parchment"] #sponsorshipItemsAdmin [style*="color:#fff"],
   [data-theme="parchment"] #ltab-psalms [style*="color:#fff"],
   [data-theme="parchment"] #ltab-tefillin [style*="color:#fff"],
-  [data-theme="parchment"] #ltab-holidays [style*="color:#fff"] {
+  [data-theme="parchment"] #ltab-holidays [style*="color:#fff"],
+  [data-theme="parchment"] #ltab-books [style*="color:#fff"] {
     color: #1d1710 !important;
   }
   [data-theme="parchment"] .prayer-step [style*="color:#f3d796"],
@@ -2133,6 +2134,7 @@
           <button class="liturgy-tab" data-ltab="meals" onclick="switchLiturgyTab('meals')">🍞 Before &amp; After Dinner</button>
           <button class="liturgy-tab" data-ltab="songs" onclick="switchLiturgyTab('songs')">🎵 Sacred Songs &amp; Zemirot</button>
           <button class="liturgy-tab" data-ltab="holidays" onclick="switchLiturgyTab('holidays')">🏛 Holidays &amp; High Holidays</button>
+          <button class="liturgy-tab" data-ltab="books" onclick="switchLiturgyTab('books')">🍷 Haggadah &amp; Sacred Books</button>
         </div>
       </div>
 
@@ -2141,6 +2143,7 @@
       <div id="ltab-meals" class="liturgy-pane"><div class="card muted">Loading Before &amp; After Meal Blessings...</div></div>
       <div id="ltab-songs" class="liturgy-pane"><div class="card muted">Loading Sacred Songs &amp; Zemirot...</div></div>
       <div id="ltab-holidays" class="liturgy-pane"><div class="card muted">Loading Deep Holiday &amp; High Holiday Encyclopedia...</div></div>
+      <div id="ltab-books" class="liturgy-pane"><div class="card muted">Loading Complete Offline Passover Haggadah, Siddur, Five Megillot &amp; Classical Library...</div></div>
     </section>
 
     <section id="view-ask" class="view">
@@ -2418,8 +2421,10 @@
                 <div id="meshJoinHubUrl" style="font-family:monospace;font-size:0.82rem;color:var(--gold);word-break:break-all;margin:3px 0 8px;">Loading...</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="copyMeshJoinCmd()">📋 Copy Omarchy Join Cmd</button>
+                  <a class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;text-decoration:none;" href="/api/admin/export-bundle" download="shulos-synagogue-bundle.json">📦 Export Shul Bundle</a>
                   <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;" onclick="switchView('settings')">⚙ Mesh Settings</button>
                 </div>
+                <div class="muted" style="font-size:0.74rem;margin-top:6px;">Open Source (MIT License) · Turnkey <code>./install-omarchy-shul.sh</code> for any Chabad House, Synagogue, or Family Residence.</div>
               </div>
             </div>
             <pre id="meshJoinCmdPre" style="margin:10px 0 0;padding:10px;border-radius:10px;background:rgba(6,11,24,0.75);border:1px solid var(--border);color:#cbd5e1;font-size:0.74rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;"></pre>
@@ -5692,6 +5697,122 @@ let activeHolidaySlug = null;
 function switchLiturgyTab(tabKey) {
   document.querySelectorAll('#liturgyTabBar .liturgy-tab').forEach(b => b.classList.toggle('active', b.dataset.ltab === tabKey));
   document.querySelectorAll('#view-liturgy .liturgy-pane').forEach(p => p.classList.toggle('active', p.id === 'ltab-' + tabKey));
+  if (tabKey === 'books' && !window._sacredBooksLoaded) loadSacredBooksShelf();
+}
+
+async function loadSacredBooksShelf() {
+  window._sacredBooksLoaded = true;
+  const host = document.getElementById('ltab-books');
+  if (!host) return;
+  try {
+    const r = await fetch('/api/books/library');
+    const d = await r.json();
+    const hag = d.haggadah || {};
+    const sid = d.siddur_blessings || [];
+    const meg = d.five_megillot || [];
+    const cls = d.classical_reference_map || [];
+    host.innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="tier-badge-scripture">📜 100% OFFLINE SACRED BOOKS SHELF</span>
+            <h3 style="margin:5px 0 2px;font-family:var(--serif);color:var(--gold);font-size:1.35rem;">📜 The Five Megillot (Instant Full Verbatim Scrolls)</h3>
+          </div>
+        </div>
+        <div class="cards-grid">
+          ${meg.map(m => `
+            <div class="blessing-card" style="margin:0;cursor:pointer;" onclick="openMegillahBook('${esc(m.book_slug)}')">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                <span class="trait-pill">${esc(m.holiday)}</span>
+                <span class="muted" style="font-size:0.74rem;">${m.chapters_count || ''} ch · ${m.verses_count || ''} v</span>
+              </div>
+              <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.22rem;margin-top:6px;">${esc(m.he)}</div>
+              <strong style="color:#fff;font-size:1rem;">${esc(m.title)}</strong>
+              <div class="muted" style="font-size:0.82rem;margin-top:4px;">${esc(m.summary)}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+          <div>
+            <h3 style="margin:0;font-family:var(--serif);color:var(--gold);font-size:1.35rem;">🍷 ${esc(hag.title || 'Passover Haggadah')} · <span style="font-family:var(--hebrew);">${esc(hag.he_title || '')}</span></h3>
+            <div class="muted" style="font-size:0.84rem;">Complete 14/15-step Seder order — Hebrew, Transliteration, English &amp; Studio Audio (indexed offline for local AI too!)</div>
+          </div>
+          <button class="btn-secondary" onclick="quickAsk('Compare the Passover Haggadah Four Children and Dayenu with their primary verified Exodus & Deuteronomy sources.', 'scholar')">🤖 Discuss Haggadah with Local AI</button>
+        </div>
+        ${(hag.steps || []).map(st => `
+          <div class="prayer-step">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <span class="trait-pill" style="margin-right:6px;">STEP ${st.step}</span>
+                <strong style="color:#fff;font-family:var(--serif);font-size:1.08rem;">${esc(st.name)}</strong>
+                <span class="muted" style="font-size:0.84rem;"> — ${esc(st.meaning)}</span>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(st.he)}</span>
+                <button class="btn-primary" style="padding:3px 9px;font-size:0.74rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(st.hebrew)}">🔊 Hebrew</button>
+                <button class="btn-secondary" style="padding:3px 9px;font-size:0.74rem;" onclick="speakText(this.dataset.en, null, 'en')" data-en="${esc(st.name + '. ' + st.english)}">🔊 English</button>
+              </div>
+            </div>
+            <div class="muted" style="font-size:0.76rem;margin-top:3px;">📜 ${esc(st.source)}</div>
+            <div class="b-he" style="font-size:1.18rem;">${esc(st.hebrew)}</div>
+            <div class="b-tr">${esc(st.translit)}</div>
+            <div class="b-en">${esc(st.english)}</div>
+            ${st.note ? `<div style="margin-top:6px;font-size:0.82rem;color:#f3d796;border-left:2px solid var(--gold);padding-left:9px;">💡 ${esc(st.note)}</div>` : ''}
+          </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 6px;font-family:var(--serif);color:var(--gold);font-size:1.35rem;">🕯 Complete Siddur &amp; Essential Blessings Handbook</h3>
+        <p class="muted" style="margin:0 0 12px;font-size:0.86rem;">Friday Night Kiddush, Havdalah, Mourner's Kaddish (full transliteration), Traveler's Prayer, Mi Sheberach Healing Prayer, Shehecheyanu, Candles, Mezuzah, Bedtime Shema &amp; Amidah Roadmap.</p>
+        ${sid.map(b => `
+          <div class="blessing-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <span class="trait-pill" style="margin-right:6px;">${esc(b.category)}</span>
+                <strong style="color:#fff;font-size:1.05rem;">${esc(b.title)}</strong>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.12rem;">${esc(b.he_title)}</span>
+                <button class="btn-primary" style="padding:3px 9px;font-size:0.74rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(b.hebrew)}">🔊 Hebrew</button>
+                <button class="btn-secondary" style="padding:3px 9px;font-size:0.74rem;" onclick="speakText(this.dataset.en, null, 'en')" data-en="${esc(b.title + '. ' + b.english)}">🔊 English</button>
+              </div>
+            </div>
+            <div class="muted" style="font-size:0.78rem;margin-top:4px;">⏰ ${esc(b.when)} · 📜 ${esc(b.source)}</div>
+            <div class="b-he" style="font-size:1.18rem;">${esc(b.hebrew)}</div>
+            <div class="b-tr">${esc(b.translit)}</div>
+            <div class="b-en">${esc(b.english)}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <span class="tier-badge-interp">⚖️ TIER 2 · CLASSICAL RABBINIC REFERENCE MAP (NON-EXCLUSIVE)</span>
+          <h3 style="margin:0;font-family:var(--serif);color:var(--gold);">Mishnah · Talmud Bavli · Rambam · Shulchan Aruch</h3>
+        </div>
+        <div class="cards-grid">
+          ${cls.map(c => `
+            <div class="blessing-card" style="margin:0;">
+              <div style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(c.he)}</div>
+              <strong style="color:#fff;">${esc(c.title)}</strong>
+              <div class="muted" style="font-size:0.84rem;margin-top:5px;">${esc(c.desc)}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } catch (e) {
+    host.innerHTML = '<div class="card muted">Could not load Sacred Books library.</div>';
+  }
+}
+
+async function openMegillahBook(bookSlug) {
+  switchView('reader');
+  if (!booksCache.length) await loadBooks();
+  const sel = document.getElementById('bookSelect');
+  if (sel && bookSlug) {
+    sel.value = bookSlug;
+    loadBookChapters(bookSlug, 1);
+  }
 }
 
 async function loadLiturgy(force = false) {

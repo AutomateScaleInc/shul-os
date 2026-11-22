@@ -221,6 +221,13 @@ class TestDatabaseAndRAG(unittest.TestCase):
         self.assertEqual(voice_engine.detect_language("In the beginning", "auto"), "en")
         self.assertIn("אֲדֹנָי", voice_engine.clean_for_speech("בָּרוּךְ אַתָּה ה׳", lang="he"))
 
+        import sacred_books
+        lib = sacred_books.get_books_library()
+        self.assertGreaterEqual(len(lib["haggadah"]["steps"]), 14)
+        self.assertGreaterEqual(len(lib["siddur_blessings"]), 10)
+        self.assertEqual(len(lib["five_megillot"]), 5)
+        self.assertGreaterEqual(sacred_books.index_into_db(), 3)
+
         ps23 = sacred_liturgy.get_psalm_chapter(23)
         self.assertEqual(ps23["chapter"], 23)
         self.assertEqual(ps23["verses_count"], 6)
@@ -271,6 +278,8 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/liturgy/psalm?chapter=24",
             "/api/holidays",
             "/api/foundation?parasha=vayishlach",
+            "/api/books/library",
+            "/api/admin/export-bundle",
             "/api/shul/events",
             "/api/shul/mailing",
             "/api/scribe/status",
