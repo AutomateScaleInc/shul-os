@@ -6,6 +6,7 @@ data/torah.db-wal
 data/torah.db-shm
 data/kiosk-profile/
 data/weekly_parasha_cache.json
+data/*_cache.json
 voice/
 *.log
 .DS_Store
