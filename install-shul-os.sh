@@ -97,8 +97,34 @@ RestartSec=3
 WantedBy=default.target
 EOF
 
+# 7. Install nightly Shabbat-safe Fleet Auto-Updater timer (03:30 AM local)
+cat > "$HOME/.config/systemd/user/shul-os-update.service" << EOF
+[Unit]
+Description=Shul.OS Shabbat-Safe Fleet Auto-Updater
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=$INSTALL_DIR
+ExecStart=/usr/bin/python3 $INSTALL_DIR/shul_updater.py --apply
+EOF
+
+cat > "$HOME/.config/systemd/user/shul-os-update.timer" << EOF
+[Unit]
+Description=Daily Shabbat-Safe Shul.OS Fleet Update Check (03:30 AM)
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=600
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
 systemctl --user daemon-reload
 systemctl --user enable --now torah-sanctuary.service
+systemctl --user enable --now shul-os-update.timer || true
 
 echo "✅ Shul.OS is LIVE at http://127.0.0.1:8080"
 echo "🚀 Instant recovery anytime: press Super+Space and launch 'Shul.OS', or run 'shul-os'"

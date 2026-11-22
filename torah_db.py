@@ -562,6 +562,12 @@ def get_weekly_parasha() -> dict:
             approx_idx = max(1, min(54, approx_idx))
             row = dict(conn.execute("SELECT * FROM parashiyot WHERE order_num = ?", (approx_idx,)).fetchone())
 
+    if not live_daf_yomi:
+        try:
+            import sacred_books as _sb
+            live_daf_yomi = _sb.get_daily_daf_yomi(today_iso)["label"]
+        except Exception:
+            pass
     result = {
         **row,
         "date": live_date,
@@ -659,7 +665,11 @@ def get_daily_portion(day_index: int = None, target_date: str = None) -> dict:
             parasha = dict(all_p[(cur_i + week_offset) % len(all_p)])
             parasha["aliyot"] = []
             parasha["live_haftarah"] = parasha.get("haftarah_ref", "")
-            parasha["daf_yomi"] = ""
+            try:
+                import sacred_books as _sb
+                parasha["daf_yomi"] = _sb.get_daily_daf_yomi(ref_date.isoformat())["label"]
+            except Exception:
+                parasha["daf_yomi"] = ""
             parasha["tanakh_929"] = ""
 
     he_for_date = _sa.gregorian_to_hebrew(ref_date)

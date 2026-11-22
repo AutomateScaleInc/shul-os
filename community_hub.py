@@ -165,6 +165,20 @@ def init_tables():
             opt_in_updates INTEGER NOT NULL DEFAULT 1,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
+
+        CREATE TABLE IF NOT EXISTS community_dedications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            kind TEXT NOT NULL DEFAULT 'yahrzeit',
+            honoree_name TEXT NOT NULL,
+            hebrew_date_label TEXT NOT NULL DEFAULT '',
+            hebrew_month INTEGER NOT NULL DEFAULT 0,
+            hebrew_day INTEGER NOT NULL DEFAULT 0,
+            submitted_by TEXT NOT NULL DEFAULT '',
+            phone TEXT NOT NULL DEFAULT '',
+            message TEXT NOT NULL DEFAULT '',
+            active INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
         """)
         cnt = conn.execute("SELECT COUNT(*) FROM sponsorship_items").fetchone()[0]
         if cnt == 0:
@@ -308,6 +322,62 @@ def record_pledge(payload: dict) -> dict:
         "webhook_forwarded": forwarded,
         "checkout_url": checkout_url,
     }
+
+
+def list_dedications(active_only: bool = True, limit: int = 40) -> list:
+    init_tables()
+    with get_conn() as conn:
+        q = "SELECT * FROM community_dedications"
+        if active_only:
+            q += " WHERE active = 1"
+        q += " ORDER BY id DESC LIMIT ?"
+        rows = conn.execute(q, (int(limit),)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def add_dedication(payload: dict) -> dict:
+    init_tables()
+    kind = (payload.get("kind") or "yahrzeit").strip().lower()
+    if kind not in ("yahrzeit", "kiddush", "refuah", "simcha"):
+        kind = "yahrzeit"
+    honoree = (payload.get("honoree_name") or "").strip()
+    if not honoree:
+        raise ValueError("Please enter the honoree or loved one's name.")
+    he_label = (payload.get("hebrew_date_label") or "").strip()
+    h_month = int(payload.get("hebrew_month") or 0)
+    h_day = int(payload.get("hebrew_day") or 0)
+    submitted_by = (payload.get("submitted_by") or "").strip()
+    phone = (payload.get("phone") or "").strip()
+    message = (payload.get("message") or "").strip()
+    if not message:
+        if kind == "yahrzeit":
+            message = f"May the memory of {honoree} be an eternal blessing (Yehi Zichram Baruch)."
+        elif kind == "refuah":
+            message = f"May {honoree} be blessed with a complete healing of body and soul (Refuah Shleimah)."
+        elif kind == "kiddush":
+            message = f"This week's Shabbat Kiddush is warmly sponsored in honor of {honoree}."
+        else:
+            message = f"Mazal Tov and warm blessings from our entire community to {honoree}!"
+    with get_conn() as conn:
+        cur = conn.execute(
+            """
+            INSERT INTO community_dedications
+            (kind, honoree_name, hebrew_date_label, hebrew_month, hebrew_day, submitted_by, phone, message, active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+            """,
+            (kind, honoree, he_label, h_month, h_day, submitted_by, phone, message),
+        )
+        conn.commit()
+        row = conn.execute("SELECT * FROM community_dedications WHERE id = ?", (cur.lastrowid,)).fetchone()
+        return {"ok": True, "dedication": dict(row)}
+
+
+def delete_dedication(ded_id: int) -> bool:
+    init_tables()
+    with get_conn() as conn:
+        cur = conn.execute("DELETE FROM community_dedications WHERE id = ?", (int(ded_id),))
+        conn.commit()
+        return cur.rowcount > 0
 
 
 def list_pledges(limit: int = 30) -> list:

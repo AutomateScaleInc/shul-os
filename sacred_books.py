@@ -18,6 +18,7 @@ Also indexes its rich texts directly into `torah.db` FTS5 so the local offline O
 can perform deep, broad-based logical synthesis even when completely unplugged from the internet.
 """
 
+from datetime import date, datetime
 import json
 import torah_db
 
@@ -282,7 +283,13 @@ CLASSICAL_SHELF_MAP = [
         "title": "Babylonian Talmud (Talmud Bavli · c. 500 CE)",
         "he": "תַּלְמוּד בַּבְלִי",
         "tier": "CITED_INTERPRETATION",
-        "desc": "Multi-generational debates of the Amoraim analyzing the Mishnah—preserving BOTH majority rulings AND minority dissenting views so learners always see diverse perspectives rather than single-voice dogma.",
+        "desc": "Compiled in the academies of Babylonia (Sura & Pumbedita) across 37 tractates (~2.5M words). Preserves expansive dialectical debates of BOTH majority rulings AND minority views; serves as the primary halachic authority worldwide.",
+    },
+    {
+        "title": "Jerusalem Talmud (Talmud Yerushalmi · c. 350–400 CE)",
+        "he": "תַּלְמוּד יְרוּשַׁלְמִי",
+        "tier": "CITED_INTERPRETATION",
+        "desc": "Compiled earlier in the Land of Israel (mainly Tiberias & Caesarea) across 39 tractates—uniquely including the entire agricultural Order of Zeraim (laws of the Land of Israel: Peah, Terumot, Shevi'it) plus Tractate Shekalim (studied in the Daf Yomi cycle!). Concise, brisk, and rich in Eretz Yisrael traditions.",
     },
     {
         "title": "Rambam · Mishneh Torah (14 Books · c. 1180 CE)",
@@ -298,9 +305,176 @@ CLASSICAL_SHELF_MAP = [
     },
 ]
 
+TWIN_TALMUDS_GUIDE = {
+    "title": "The Twin Talmuds: Babylonian (Bavli) & Jerusalem (Yerushalmi)",
+    "he_title": "תַּלְמוּד בַּבְלִי וְתַלְמוּד יְרוּשַׁלְמִי",
+    "summary": "Both Talmuds analyze the same Mishnah (c. 200 CE) from two great centers of Jewish life—Babylonia and the Land of Israel—preserving vibrant debate rather than single-voice dogma (Tier 2 Cited Interpretations).",
+    "comparison": [
+        {
+            "aspect": "Place & Era",
+            "bavli": "Babylonia (Sura, Pumbedita, Nehardea) · Redacted c. 500 CE",
+            "yerushalmi": "Land of Israel (Tiberias, Sepphoris, Caesarea) · Redacted c. 350–400 CE",
+        },
+        {
+            "aspect": "Tractates & Scope",
+            "bavli": "37 tractates (covers Moed, Nashim, Nezikin, Kodashim + Berakhot & Niddah)",
+            "yerushalmi": "39 tractates (uniquely covers ALL 11 tractates of Zeraim — agricultural laws of Israel + Shekalim!)",
+        },
+        {
+            "aspect": "Language & Style",
+            "bavli": "Eastern Aramaic + Hebrew · Expansive back-and-forth reasoning ('Shakla v'Tarya')",
+            "yerushalmi": "Western Galilean Aramaic + Hebrew · Terse, direct, concise legal rulings & vivid Eretz Yisrael stories",
+        },
+        {
+            "aspect": "Halachic Role",
+            "bavli": "Primary binding halachic authority in later codes (Rambam, Shulchan Aruch) because it was redacted later",
+            "yerushalmi": "Indispensable witness to earlier Land-of-Israel rulings, agricultural mitzvot, and parallel Aggadah",
+        },
+    ],
+    "famous_yerushalmi_teachings": [
+        {
+            "ref": "Talmud Yerushalmi, Nedarim 9:4",
+            "title": "Love Your Neighbor — The Great Principle of the Torah",
+            "text": "Rabbi Akiva taught: 'Love your neighbor as yourself' (Leviticus 19:18) is the great encompassing principle of Torah. Ben Azzai cited an even broader universal principle: 'This is the book of the generations of humanity — in the likeness of God He made them' (Genesis 5:1).",
+        },
+        {
+            "ref": "Talmud Yerushalmi, Peah 1:1",
+            "title": "Why Charity & Torah Study Have No Upper Limit",
+            "text": "Expands on the Mishnah of Peah (leaving corners of the field for the poor) — emphasizing that dignity, welcoming guests, visiting the sick, and peacemaking bear fruit both in this world and forever.",
+        },
+        {
+            "ref": "Talmud Yerushalmi, Shekalim 1:1–8:4",
+            "title": "The Jerusalem Tractate Studied in Every Daf Yomi Cycle!",
+            "text": "Because no Babylonian Gemara exists on Tractate Shekalim (the half-shekel communal offering that made rich and poor equal), the worldwide Daf Yomi cycle studies the Jerusalem Talmud's Shekalim right inside the Bavli cycle!",
+        },
+        {
+            "ref": "Talmud Yerushalmi, Berakhot 9:1",
+            "title": "God Is as Close as a Whisper",
+            "text": "Contrasts a human ruler—whose guards keep petitioners far away—with the Holy One: 'A person enters a synagogue, stands behind a pillar, and whispers a silent prayer, and God hears it immediately.'",
+        },
+    ],
+}
+
+# Exact 14th Daf Yomi Cycle (started Jan 5, 2020 — 2,711 folios)
+# Tuple: (en_name, he_name, seder, last_folio, has_yerushalmi, theme)
+DAF_YOMI_TRACTATES = [
+    ("Berakhot", "ברכות", "Zeraim", 64, True, "Blessings, Shema, Amidah, gratitude & daily mindfulness"),
+    ("Shabbat", "שבת", "Moed", 157, True, "Sacred rest, 39 creative labors, candles, hospitality & Oneg Shabbat"),
+    ("Eruvin", "עירובין", "Moed", 105, True, "Shared courtyards, community boundaries & Shabbat harmony"),
+    ("Pesachim", "פסחים", "Moed", 121, True, "Passover, chametz, matzah, the Seder night & liberation"),
+    ("Shekalim", "שקלים", "Moed", 22, True, "Jerusalem Talmud tractate! The equal half-shekel communal contribution"),
+    ("Yoma", "יומא", "Moed", 88, True, "Yom Kippur, Temple service, repentance (Teshuvah) & forgiveness"),
+    ("Sukkah", "סוכה", "Moed", 56, True, "Sukkot booths, Four Species, joy & dwelling under clouds of faith"),
+    ("Beitzah", "ביצה", "Moed", 40, True, "Festival joy, preparing holiday meals & Yom Tov laws"),
+    ("Rosh Hashanah", "ראש השנה", "Moed", 35, True, "New Years, lunar calendar sanctification, Shofar & renewal"),
+    ("Taanit", "תענית", "Moed", 31, True, "Prayers for rain, fast days, community solidarity & hope"),
+    ("Megillah", "מגילה", "Moed", 32, True, "Purim, Scroll of Esther, public Torah reading & synagogue sanctity"),
+    ("Moed Katan", "מועד קטן", "Moed", 29, True, "Intermediate festival days (Chol HaMoed) & comforting mourners"),
+    ("Chagigah", "חגיגה", "Moed", 27, True, "Pilgrimage festivals, joy of gathering & mystical Ma'aseh Bereshit"),
+    ("Yevamot", "יבמות", "Nashim", 122, True, "Family continuity, marriage laws & compassion for vulnerable spouses"),
+    ("Ketubot", "כתובות", "Nashim", 112, True, "The marriage contract (Ketubah), mutual dignity & household rights"),
+    ("Nedarim", "נדרים", "Nashim", 91, True, "Sacred power of spoken vows, integrity & releasing hasty oaths"),
+    ("Nazir", "נזיר", "Nashim", 66, True, "Voluntary vows of spiritual restraint & balanced devotion"),
+    ("Sotah", "סוטה", "Nashim", 49, True, "Trust in marriage, Hebrew liturgy, blessings & historical heroism"),
+    ("Gittin", "גיטין", "Nashim", 90, True, "Legal documents, pathways of peace (Darkei Shalom) & Jerusalem's fall"),
+    ("Kiddushin", "קידושין", "Nashim", 82, True, "Betrothal, honoring parents, teaching a trade & character"),
+    ("Bava Kamma", "בבא קמא", "Nezikin", 119, True, "Civil responsibility, preventing harm & restoring damages fairly"),
+    ("Bava Metzia", "בבא מציעא", "Nezikin", 119, True, "Lost & found, fair wages, honest business & avoiding verbal hurt"),
+    ("Bava Batra", "בבא בתרא", "Nezikin", 176, True, "Neighbor privacy, community charity (Tzedakah) & inheritance"),
+    ("Sanhedrin", "סנהדרין", "Nezikin", 113, True, "Justice, courts of law, human dignity ('saving one life saves a world')"),
+    ("Makkot", "מכות", "Nezikin", 24, True, "Truthful witnesses, cities of refuge & the 613 mitzvot distilled"),
+    ("Shevuot", "שבועות", "Nezikin", 49, True, "Oaths, courtroom truthfulness & integrity in financial pledges"),
+    ("Avodah Zarah", "עבודה זרה", "Nezikin", 76, True, "Navigating a diverse world with ethical clarity & Jewish identity"),
+    ("Horayot", "הוריות", "Nezikin", 14, True, "Leadership accountability, humility & correcting public errors"),
+    ("Zevachim", "זבחים", "Kodashim", 120, False, "Temple offerings, intention (Kavanah) & drawing near to the Divine"),
+    ("Menachot", "מנחות", "Kodashim", 110, False, "Grain offerings, Tzitzit, Tefillin & Mezuzah sacred scribal laws"),
+    ("Chullin", "חולין", "Kodashim", 142, False, "Kosher ethics, humane care, gratitude & elevating everyday meals"),
+    ("Bekhorot", "בכורות", "Kodashim", 61, False, "Firstborn sanctification, Pidyon HaBen & honoring new beginnings"),
+    ("Arakhin", "ערכין", "Kodashim", 34, False, "Valuing every human soul equally regardless of wealth, plus Jubilee ethics & guarding speech (Lashon Hara)"),
+    ("Temurah", "תמורה", "Kodashim", 34, False, "Stewardship of dedicated gifts & constancy of sacred commitments"),
+    ("Keritot", "כריתות", "Kodashim", 28, False, "Spiritual accountability, atonement & returning through Teshuvah"),
+    ("Meilah", "מעילה", "Kodashim", 37, False, "Respecting sacred communal funds (with Kinnim, Tamid & Middot)"),
+    ("Niddah", "נדה", "Tohorot", 73, True, "Family sanctity, renewal & rhythms of sacred home life"),
+]
+
+
+def _to_hebrew_folio(n: int) -> str:
+    ones = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"]
+    tens = ["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"]
+    hundreds = ["", "ק", "ר"]
+    if n <= 0:
+        return str(n)
+    rem = n
+    out = hundreds[rem // 100] if rem < 300 else ""
+    rem %= 100
+    if rem == 15:
+        out += "טו"
+    elif rem == 16:
+        out += "טז"
+    else:
+        out += tens[rem // 10] + ones[rem % 10]
+    return (out + "׳") if len(out) == 1 else (out[:-1] + "״" + out[-1])
+
+
+def get_daily_daf_yomi(target_date_str: str = "") -> dict:
+    """Compute exact worldwide 14th Cycle Daf Yomi folio offline + Yerushalmi cross-reference."""
+    if target_date_str:
+        try:
+            d = datetime.strptime(target_date_str[:10], "%Y-%m-%d").date()
+        except Exception:
+            d = date.today()
+    else:
+        d = date.today()
+    total_folios = sum(t[3] - 1 for t in DAF_YOMI_TRACTATES)  # 2,711
+    epoch = date(2020, 1, 5)
+    cycle_num = 14 + ((d - epoch).days // total_folios)
+    idx = (d - epoch).days % total_folios
+    rem = idx
+    en_name, he_name, seder, last_f, has_y, theme = DAF_YOMI_TRACTATES[0]
+    folio = 2
+    for row in DAF_YOMI_TRACTATES:
+        cnt = row[3] - 1
+        if rem < cnt:
+            en_name, he_name, seder, last_f, has_y, theme = row
+            folio = rem + 2
+            break
+        rem -= cnt
+    he_folio = _to_hebrew_folio(folio)
+    if en_name == "Shekalim":
+        yerushalmi_note = "✨ Unique Milestone: Tractate Shekalim in the Daf Yomi cycle IS the Jerusalem Talmud (Talmud Yerushalmi), since no Babylonian Gemara exists on Shekalim!"
+    elif has_y:
+        yerushalmi_note = f"📜 Parallel Jerusalem Talmud Exists: Talmud Yerushalmi also has a full Tractate {en_name} ({he_name}) reflecting earlier Land-of-Israel debates from Tiberias & Caesarea!"
+    else:
+        yerushalmi_note = f"📜 Bavli Exclusive (Seder {seder}): No surviving Jerusalem Talmud exists for Order {seder} ({en_name}) — the Babylonian Talmud is our primary Talmudic witness here."
+    return {
+        "date": d.isoformat(),
+        "cycle_number": cycle_num,
+        "cycle_day": idx + 1,
+        "total_folios": total_folios,
+        "percent_complete": round(((idx + 1) / total_folios) * 100.0, 1),
+        "tractate_en": en_name,
+        "tractate_he": he_name,
+        "seder": seder,
+        "folio": folio,
+        "folio_he": he_folio,
+        "total_tractate_folios": last_f,
+        "display_en": f"{en_name} {folio}",
+        "display_he": f"{he_name} {he_folio}",
+        "label": f"{en_name} {folio} ({he_name} {he_folio})",
+        "theme": theme,
+        "has_yerushalmi_parallel": has_y,
+        "yerushalmi_note": yerushalmi_note,
+        "tier": "CITED_INTERPRETATION",
+        "ask_prompt": (
+            f"Teach today's Daf Yomi page — Talmud Bavli {en_name} {folio} ({theme}). "
+            f"Distinguish Primary Verified Tanakh verses cited from Talmudic interpretations, "
+            f"compare any parallel Jerusalem Talmud (Yerushalmi) perspective if relevant, and share one practical takeaway for today."
+        ),
+    }
+
 
 def get_books_library() -> dict:
-    """Return the complete offline Sacred Books, Haggadah, Siddur, Five Megillot & Reference library."""
+    """Return the complete offline Sacred Books, Haggadah, Siddur, Five Megillot, Daf Yomi & Twin Talmuds library."""
     megillot = []
     try:
         with torah_db.get_conn() as conn:
@@ -328,6 +502,15 @@ def get_books_library() -> dict:
         "siddur_blessings": SIDDUR_ESSENTIAL_BLESSINGS,
         "five_megillot": megillot,
         "classical_reference_map": CLASSICAL_SHELF_MAP,
+        "twin_talmuds": TWIN_TALMUDS_GUIDE,
+        "daf_yomi": get_daily_daf_yomi(),
+        "daf_yomi_tractates": [
+            {
+                "en": t[0], "he": t[1], "seder": t[2], "folios": t[3],
+                "has_yerushalmi": t[4], "theme": t[5],
+            }
+            for t in DAF_YOMI_TRACTATES
+        ],
     }
 
 
@@ -365,12 +548,14 @@ def index_into_db() -> int:
         (
             "offline-classical-rabbinic-reference-map",
             "liturgy_book",
-            "Classical Rabbinic Library Map — Mishnah, Talmud Bavli, Rambam & Shulchan Aruch",
+            "Classical Rabbinic Library Map — Mishnah, Talmud Bavli, Talmud Yerushalmi, Rambam & Shulchan Aruch",
             "סִפְרִיַּת חֲזַ״ל",
-            "How Tier 2 Cited Traditions (Mishnah, Talmud, Codes) relate to Tier 1 Primary Verified Tanakh Scripture",
+            "How Tier 2 Cited Traditions (Mishnah, Babylonian & Jerusalem Talmuds, Codes) relate to Tier 1 Primary Verified Tanakh Scripture",
             "Deuteronomy 17:8-11; Pirkei Avot 1:1",
-            "\n\n".join(f"{c['title']} ({c['he']}) [{c['tier']}]: {c['desc']}" for c in CLASSICAL_SHELF_MAP),
-            "Jewish learning cherishes debate: the Talmud records differing sages side by side so we never mistake one interpretation for the entire ocean of Torah.",
+            "\n\n".join(f"{c['title']} ({c['he']}) [{c['tier']}]: {c['desc']}" for c in CLASSICAL_SHELF_MAP)
+            + "\n\nTwin Talmuds (Bavli vs. Yerushalmi): "
+            + " ".join(f"{t['ref']} — {t['title']}: {t['text']}" for t in TWIN_TALMUDS_GUIDE["famous_yerushalmi_teachings"]),
+            "Jewish learning cherishes debate: both the Babylonian Talmud (Bavli) and the Jerusalem Talmud (Yerushalmi) record differing sages side by side so we never mistake one interpretation for the entire ocean of Torah.",
         ),
     ]
     inserted = 0

@@ -19,6 +19,10 @@ CONFIG_PATH = BASE_DIR / "config.json"
 
 DEFAULT_CONFIG = {
     "synagogue_name": "The European Synagogue · Torah Sanctuary",
+    "rabbi_name": "Rabbi Michoel Rosenblum",
+    "rabbi_whatsapp": "",
+    "shul_website": "https://www.theshul.eu",
+    "shul_address": "Rue Froissart 109, 1040 Brussels",
     "ollama_url": "http://127.0.0.1:11434",
     "ollama_model": "qwen2.5:3b",
     "cloud_provider": "none",  # none | openai | anthropic | gemini
@@ -34,6 +38,8 @@ DEFAULT_CONFIG = {
     "max_sanctuary_volume": 0.42,
     "scribe_enabled": True,
     "scribe_online_ingest": True,
+    "auto_update_enabled": True,
+    "update_repo_url": "https://github.com/AutomateScaleInc/shul-os",
     "broadcast_public_base_url": "",
     "broadcast_follow_url": "",
     "public_sanctuary_url": "",

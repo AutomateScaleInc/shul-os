@@ -23,7 +23,7 @@ SOURCE_STANDARD_SUMMARY = {
         {
             "id": "CITED_INTERPRETATION",
             "badge": "⚖️ Cited Interpretation (Non-Exclusive)",
-            "rule": "Talmudic (Bavli) & classical rabbinic sources cited by tractate/folio or author and explicitly treated as interpretations alongside differing perspectives.",
+            "rule": "Talmudic (Babylonian Bavli & Jerusalem Yerushalmi) and classical rabbinic sources cited by tractate/folio or author and explicitly treated as interpretations alongside differing perspectives.",
         },
         {
             "id": "CONTEXT_REFLECTION",
@@ -66,6 +66,13 @@ FOUNDATION_ENTRIES = {
                 "lens": "Esau's Kiss — Debate Between Sages",
                 "position": "Rashi cites a Midrashic tradition noting the dots over 'and he kissed him' (Genesis 33:4) as questioning Esau's sincerity, yet also records Rabbi Yannai's dissenting view that Esau kissed Jacob with genuine wholehearted compassion.",
                 "counter_or_other_lens": "Ibn Ezra & Netziv take the plain wording seriously: Jacob's humility genuinely softened Esau's heart, proving that brotherhood can heal even after 20 years of estrangement.",
+            },
+            {
+                "source": "Talmud Yerushalmi, Berakhot 9:1 & Nedarim 9:4 (Jerusalem Talmud)",
+                "tier": "CITED_INTERPRETATION",
+                "lens": "Land of Israel Talmudic Parallel (Yerushalmi)",
+                "position": "The Jerusalem Talmud (compiled earlier in Tiberias, c. 350–400 CE) emphasizes direct whispered intimacy in prayer (Berakhot 9:1) and Rabbi Akiva's call to 'Love your neighbor as yourself' alongside Ben Azzai's universal dignity of every human being (Nedarim 9:4).",
+                "counter_or_other_lens": "Paired alongside the Babylonian Talmud (Bavli, c. 500 CE) to give learners BOTH great Talmudic traditions rather than a single lens.",
             },
         ],
     },

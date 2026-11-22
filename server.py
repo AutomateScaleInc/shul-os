@@ -26,6 +26,7 @@ import sanctuary_rich_data
 import scripture_foundation
 import shul_events
 import shul_mesh
+import shul_updater
 import torah_db
 import torah_scribe
 import voice_engine
@@ -88,6 +89,14 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             try:
                 iid = int(qs.get("id", ["0"])[0])
                 ok = community_hub.delete_sponsorship_item(iid)
+                self._send_json({"ok": ok})
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+        if parsed.path == "/api/dedications":
+            try:
+                did = int(qs.get("id", ["0"])[0])
+                ok = community_hub.delete_dedication(did)
                 self._send_json({"ok": ok})
             except Exception as e:
                 self._send_json({"error": str(e)}, status=400)
@@ -260,11 +269,37 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             base_u = community_hub.get_public_base_url(self.headers.get("Host", ""))
             self._send_json({
                 "synagogue_name": cfg.get("synagogue_name", shul_events.SHUL_INFO["name"]),
+                "rabbi_name": cfg.get("rabbi_name", "Rabbi Michoel Rosenblum"),
+                "rabbi_whatsapp": cfg.get("rabbi_whatsapp", ""),
+                "shul_address": cfg.get("shul_address", "Rue Froissart 109, 1040 Brussels"),
+                "shul_website": cfg.get("shul_website", shul_events.SHUL_INFO["website"]),
                 "give_url": base_u + "/give",
                 "watch_url": base_u + "/watch",
                 "tunnel_live": base_u.startswith("https://"),
                 "checkout_url": cfg.get("donation_checkout_url", shul_events.SHUL_INFO["website"]),
                 "items": community_hub.list_sponsorship_items(),
+                "dedications": community_hub.list_dedications(active_only=True, limit=10),
+            })
+            return
+
+        if path == "/api/dedications":
+            deds = community_hub.list_dedications(active_only=False, limit=40)
+            self._send_json({"dedications": deds, "count": len(deds)})
+            return
+
+        if path == "/api/system/update-status":
+            local_only = qs.get("local", ["0"])[0] in ("1", "true", "yes")
+            if local_only:
+                self._send_json(shul_updater.get_local_version())
+            else:
+                self._send_json(shul_updater.check_for_updates())
+            return
+
+        if path == "/api/talmud/daf-yomi":
+            dt_str = qs.get("date", [""])[0].strip()
+            self._send_json({
+                "daf_yomi": sacred_books.get_daily_daf_yomi(dt_str),
+                "twin_talmuds": sacred_books.TWIN_TALMUDS_GUIDE,
             })
             return
 
@@ -858,6 +893,20 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 pass
             self._send_json({"ok": True, "synagogue_name": cfg.get("synagogue_name"), "cloud_provider": cfg.get("cloud_provider")})
+            return
+
+        if path == "/api/dedications":
+            body = self._read_json_body()
+            try:
+                self._send_json(community_hub.add_dedication(body))
+            except Exception as e:
+                self._send_json({"error": str(e)}, status=400)
+            return
+
+        if path == "/api/system/update-now":
+            body = self._read_json_body()
+            force = bool(body.get("force", False))
+            self._send_json(shul_updater.apply_update(force=force, restart_service=True))
             return
 
         if path == "/api/ask":

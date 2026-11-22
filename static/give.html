@@ -109,9 +109,11 @@
     <div class="live-bar" id="liveBar">Loading this week's Parashah &amp; Shabbat times...</div>
     <div class="quick-actions">
       <a class="btn-gold" href="#pledgeForm">💛 Sponsor Now</a>
+      <a class="btn-outline" href="#dedicationCard">🕯 Yahrzeit &amp; Honor Plaque</a>
       <a class="btn-outline" href="#connectCard">💬 Connect &amp; Message</a>
+      <a class="btn-outline" id="rabbiWaBtn" href="#" target="_blank" rel="noopener" style="display:none;border-color:rgba(74,222,128,0.6);color:#86efac;">💬 WhatsApp Rabbi</a>
       <a class="btn-outline" href="/watch">📺 Live Screen</a>
-      <a class="btn-outline" href="/under-the-hood" style="border-color:rgba(228,188,105,0.65);color:#fde68a;">🚀 Get This OS for Your Shul</a>
+      <a class="btn-outline" href="/under-the-hood" style="border-color:rgba(228,188,105,0.65);color:#fde68a;">🚀 Get Shul.OS</a>
     </div>
   </div>
 
@@ -156,6 +158,30 @@
     </div>
   </div>
 
+  <!-- COMMUNITY YAHRZEIT MEMORIAL & KIDDUSH / SIMCHA / REFUAH PLAQUE -->
+  <div class="pledge-card" id="dedicationCard" style="border-color:rgba(228,188,105,0.65);">
+    <div class="kicker">🕯 LIVE SANCTUARY PLAQUE · YAHRZEIT, KIDDUSH &amp; REFUAH SHLEIMAH</div>
+    <h2 style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Place a Dedication on the Shul.OS Screen</h2>
+    <p class="sub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Light a virtual <em>Ner Neshama</em> Yahrzeit memorial, honor a Shabbat Kiddush, celebrate a Simcha, or add a name for healing (<em>Refuah Shleimah</em>) — displayed gracefully in the gold Community Chronicle plaque on our synagogue screen.</p>
+    <label for="dKind">Dedication Type</label>
+    <select id="dKind" style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(8,15,30,0.85);color:#fff;font-size:0.95rem;margin-bottom:11px;">
+      <option value="yahrzeit">🕯 In Loving Memory (Yahrzeit · Ner Neshama)</option>
+      <option value="kiddush">🥂 Shabbat Kiddush Honor</option>
+      <option value="refuah">💚 Prayer for Healing (Refuah Shleimah)</option>
+      <option value="simcha">🎉 Simcha / Mazal Tov Announcement</option>
+    </select>
+    <label for="dHonoree">Honoree / Loved One's Name (English or Hebrew) *</label>
+    <input type="text" id="dHonoree" placeholder="e.g. Eliezer ben Avraham (ז״ל) or The Levy Family">
+    <label for="dDate">Hebrew Date or Occasion (optional)</label>
+    <input type="text" id="dDate" placeholder="e.g. 15 Kislev · This Shabbat · Birthday">
+    <label for="dBy">Dedicated By (optional)</label>
+    <input type="text" id="dBy" placeholder="e.g. Sarah &amp; Family">
+    <label for="dMsg">Short Dedication Note (optional)</label>
+    <textarea id="dMsg" rows="2" placeholder="Optional blessing or loving remembrance..."></textarea>
+    <button type="button" class="btn-gold" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitDedication()">🕯 Place on Shul.OS Dedication Plaque</button>
+    <div id="dedStatus" style="font-size:0.86rem;margin-top:9px;"></div>
+  </div>
+
   <!-- DIRECT CONNECT & MESSAGING WITH RABBI MICHOEL / THE SHUL -->
   <div class="pledge-card" id="connectCard" style="border-color:rgba(92,182,229,0.58);">
     <div class="kicker" style="color:var(--accent);">💬 DIRECT SHUL CONNECT · MESSAGING &amp; PRAYER REQUESTS</div>
@@ -184,7 +210,7 @@
   <footer>
     <div style="margin-bottom:10px;padding:12px 14px;border-radius:14px;background:rgba(228,188,105,0.08);border:1px solid rgba(228,188,105,0.34);">
       <strong style="color:var(--gold);">🌱 Want This Living Torah OS for Your Synagogue, Chabad House, or Home?</strong><br>
-      <span style="font-size:0.8rem;">100% Open Source (MIT) · Runs on any spare computer · Links into the encrypted Shul Mesh.</span><br>
+      <span style="font-size:0.8rem;">100% Open Source (MIT) · Runs on any spare computer · Links into the encrypted Shul.OS Mesh.</span><br>
       <div style="margin-top:8px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <a class="btn-gold" style="padding:7px 13px;font-size:0.8rem;" href="/download/shul-os.tar.gz" download="shul-os.tar.gz">⬇️ Download Shul.OS</a>
         <a class="btn-outline" style="padding:7px 12px;font-size:0.8rem;" href="/under-the-hood">✨ Under the Hood Deck</a>
@@ -226,6 +252,15 @@ async function initGivePage() {
     const dToday = await rToday.json();
     items = dItems.items || [];
     if (dItems.synagogue_name) document.getElementById('shulName').textContent = dItems.synagogue_name.toUpperCase();
+    if (dItems.rabbi_whatsapp) {
+      const cleanWa = String(dItems.rabbi_whatsapp).replace(/[^\d]/g, '');
+      const waBtn = document.getElementById('rabbiWaBtn');
+      if (waBtn && cleanWa.length >= 7) {
+        waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Shalom Rabbi! Reaching out from the Shul.OS sanctuary screen.')}`;
+        waBtn.textContent = `💬 WhatsApp ${dItems.rabbi_name ? dItems.rabbi_name.split(' ').slice(0,2).join(' ') : 'Rabbi'}`;
+        waBtn.style.display = 'inline-flex';
+      }
+    }
     const p = dToday.parasha || {};
     const sh = dToday.shabbat_times || {};
     document.getElementById('liveBar').innerHTML = `
@@ -314,6 +349,40 @@ async function submitConnect() {
   } catch (e) {
     st.style.color = '#fca5a5';
     st.textContent = 'Connection error — please try again.';
+  }
+}
+
+async function submitDedication() {
+  const st = document.getElementById('dedStatus');
+  st.textContent = '';
+  const honoree = document.getElementById('dHonoree').value.trim();
+  if (!honoree) {
+    st.style.color = '#fca5a5';
+    st.textContent = 'Please enter the name to honor or remember.';
+    return;
+  }
+  try {
+    const r = await fetch('/api/dedications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: document.getElementById('dKind').value,
+        honoree_name: honoree,
+        hebrew_date_label: document.getElementById('dDate').value.trim(),
+        submitted_by: document.getElementById('dBy').value.trim(),
+        message: document.getElementById('dMsg').value.trim(),
+      }),
+    });
+    const d = await r.json();
+    if (!d.ok) { st.style.color = '#fca5a5'; st.textContent = d.error || 'Could not save dedication.'; return; }
+    st.style.color = '#4ade80';
+    st.textContent = `🕯 Added! "${honoree}" will now appear in the gold Community Heritage Plaque on the Shul.OS screen.`;
+    document.getElementById('dHonoree').value = '';
+    document.getElementById('dDate').value = '';
+    document.getElementById('dMsg').value = '';
+  } catch (e) {
+    st.style.color = '#fca5a5';
+    st.textContent = 'Network error — please try again.';
   }
 }
 

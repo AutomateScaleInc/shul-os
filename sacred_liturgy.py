@@ -1222,6 +1222,31 @@ def get_community_heritage() -> dict:
     # Interleave Birthday -> In Memoriam -> Community Fact -> Wit so rotation feels rich & varied!
     buckets = {k: [x for x in ranked if x["kind"] == k] for k in ("birthday", "memoriam", "community", "wit")}
     ordered = []
+    # 0. Prioritize active Community Yahrzeits, Kiddush Honors, Refuah & Simcha dedications first!
+    try:
+        import community_hub
+        deds = community_hub.list_dedications(active_only=True, limit=12)
+        badge_map = {
+            "yahrzeit": ("🕯 COMMUNITY YAHRZEIT · ז״ל", "In Loving Memory · Ner Neshama"),
+            "kiddush": ("🥂 SHABBAT KIDDUSH HONOR", "Sponsored by Our Community"),
+            "refuah": ("💚 REFUAH SHLEIMAH", "Community Prayer for Healing"),
+            "simcha": ("🎉 COMMUNITY SIMCHA", "Mazal Tov from The Shul!"),
+        }
+        for d in deds:
+            b_lbl, sub_default = badge_map.get(d.get("kind"), ("🕯 COMMUNITY HONOR", "The European Synagogue"))
+            by = f"Dedicated by {d['submitted_by']}" if d.get("submitted_by") else sub_default
+            ordered.append({
+                "kind": "memoriam" if d.get("kind") == "yahrzeit" else "community",
+                "badge": b_lbl,
+                "title": d.get("honoree_name", ""),
+                "date_label": d.get("hebrew_date_label") or he.get("en_str", "This Week"),
+                "subtitle": by,
+                "text": d.get("message", ""),
+                "is_community_dedication": True,
+            })
+    except Exception:
+        pass
+
     for i in range(max(len(v) for v in buckets.values())):
         for k in ("birthday", "memoriam", "community", "wit"):
             if i < len(buckets[k]):

@@ -2375,6 +2375,31 @@
             <div id="visitorMessagesAdmin" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.8rem;" class="muted"></div>
           </div>
 
+          <!-- 🕯 COMMUNITY YAHRZEITS, KIDDUSH HONORS & REFUAH DEDICATIONS -->
+          <div class="card" style="border-color:rgba(228,188,105,0.48);">
+            <h3 style="margin:0 0 6px;color:var(--gold);">🕯 Live Yahrzeit &amp; Kiddush Dedication Plaque</h3>
+            <p class="muted" style="font-size:0.82rem;margin:0 0 10px;">Active dedications appear gracefully in the gold Community Heritage Plaque on the main screen (congregants can also submit via the lobby QR).</p>
+            <div id="dedicationsAdmin" style="font-size:0.82rem;margin-bottom:10px;" class="muted">Loading dedications...</div>
+            <details>
+              <summary style="cursor:pointer;color:var(--gold);font-weight:700;font-size:0.84rem;">+ Add Yahrzeit, Kiddush, Refuah or Simcha</summary>
+              <div style="display:grid;gap:6px;margin-top:8px;">
+                <select id="admDedKind">
+                  <option value="yahrzeit">🕯 In Loving Memory (Yahrzeit · ז״ל)</option>
+                  <option value="kiddush">🥂 Shabbat Kiddush Honor</option>
+                  <option value="refuah">💚 Refuah Shleimah (Healing Prayer)</option>
+                  <option value="simcha">🎉 Simcha / Mazal Tov</option>
+                </select>
+                <input class="form-input" id="admDedName" placeholder="Honoree / Loved One's Name">
+                <div style="display:flex;gap:6px;">
+                  <input class="form-input" id="admDedDate" placeholder="Hebrew Date / Occasion" style="flex:1;">
+                  <input class="form-input" id="admDedBy" placeholder="Dedicated By" style="flex:1;">
+                </div>
+                <input class="form-input" id="admDedMsg" placeholder="Short blessing or remembrance note (optional)">
+                <button class="btn-primary" onclick="addDedicationAdminUi()">🕯 Publish to Screen Plaque</button>
+              </div>
+            </details>
+          </div>
+
           <div class="card">
             <h3>Join The Shul Mailing List</h3>
             <p class="muted" style="font-size:0.85rem;margin-bottom:10px;">Receive weekly Parashah insights, Brussels Shabbat times, and Rabbi Michoel's upcoming events from <strong>theshul.eu</strong>.</p>
@@ -2758,6 +2783,19 @@
             </div>
             <p class="muted" style="font-size:0.84rem;margin:0;">Link Synagogues, Chabad Houses &amp; Family Residences over encrypted WireGuard Mesh + Shul.OS Studio Camera with automatic per-city Shabbat Stillness protection.</p>
           </div>
+
+          <div class="card" style="margin-bottom:0;border-color:rgba(228,188,105,0.48);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+              <h3 style="margin:0;color:var(--gold);">🔄 Shul.OS Fleet Auto-Updater</h3>
+              <span class="comm-badge" id="updaterVersionBadge">Checking...</span>
+            </div>
+            <p class="muted" style="font-size:0.83rem;margin:0 0 10px;">Every Shul.OS machine shares one open-source <code>main</code> branch while keeping your building's <code>config.json</code> &amp; local library completely untouched. Automatically pauses on Shabbat &amp; Yom Tov.</p>
+            <div id="updaterStatusBox" class="muted" style="font-size:0.82rem;margin-bottom:10px;">Loading build version...</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-secondary" onclick="checkShulUpdates()">🔍 Check for Updates</button>
+              <button class="btn-primary" id="btnApplyUpdate" onclick="applyShulUpdate()">⬆️ Update Shul.OS Now</button>
+            </div>
+          </div>
         </div>
 
         <div class="card" style="margin-bottom:0;">
@@ -2766,7 +2804,7 @@
           <div class="settings-stack">
 
             <div class="settings-section">
-              <div class="settings-section-title">🏛️ Synagogue Identity &amp; Sacred Sky Location</div>
+              <div class="settings-section-title">🏛️ Synagogue Identity, Rabbi Launch Kit &amp; Sacred Sky Location</div>
               <div class="settings-row-2">
                 <label class="settings-field">Synagogue / Station Name
                   <input class="form-input" id="cfgSynName">
@@ -2778,6 +2816,22 @@
                     <option value="residence">🏠 Family Residence</option>
                     <option value="mobile">📡 Mobile / Outreach Kiosk</option>
                   </select>
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Rabbi / Host Name
+                  <input class="form-input" id="cfgRabbiName" placeholder="e.g. Rabbi Michoel Rosenblum">
+                </label>
+                <label class="settings-field">Rabbi WhatsApp (1-Tap QR Connect)
+                  <input class="form-input" id="cfgRabbiWa" placeholder="e.g. +32 470 ...">
+                </label>
+              </div>
+              <div class="settings-row-2">
+                <label class="settings-field">Synagogue Street Address
+                  <input class="form-input" id="cfgShulAddr" placeholder="e.g. Rue Froissart 109, 1040 Brussels">
+                </label>
+                <label class="settings-field">Synagogue Website
+                  <input class="form-input" id="cfgShulWeb" placeholder="https://www.theshul.eu">
                 </label>
               </div>
               <label class="settings-field">Sacred Sky Location Preset (Sun, Moon &amp; Exact Halachic Zmanim)
@@ -2839,6 +2893,7 @@
               <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam</label>
+              <label class="settings-check"><input type="checkbox" id="cfgAutoUpdate" checked> Shabbat-Safe Fleet Auto-Update: Pull open-source Shul.OS improvements nightly (pauses for Shabbat)</label>
             </div>
 
             <div class="settings-section">
@@ -6478,7 +6533,72 @@ async function loadSacredBooksShelf() {
     const sid = d.siddur_blessings || [];
     const meg = d.five_megillot || [];
     const cls = d.classical_reference_map || [];
+    const daf = d.daf_yomi || null;
+    const twin = d.twin_talmuds || null;
+    const dafTracts = d.daf_yomi_tractates || [];
+    const dafCardHtml = daf ? `
+      <div class="card" style="border-color:rgba(228,188,105,0.55);background:linear-gradient(150deg, rgba(20,33,62,0.94), rgba(11,19,38,0.96));">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+          <div>
+            <span class="tier-badge-interp">📖 TODAY'S DAF YOMI · CYCLE ${daf.cycle_number} · DAY ${daf.cycle_day.toLocaleString()} / ${daf.total_folios.toLocaleString()} (${daf.percent_complete}%)</span>
+            <h3 style="margin:6px 0 3px;font-family:var(--serif);color:var(--gold);font-size:1.5rem;">
+              ${esc(daf.display_en)} &nbsp;·&nbsp; <span style="font-family:var(--hebrew);">${esc(daf.display_he)}</span>
+            </h3>
+            <div class="muted" style="font-size:0.86rem;">Order (Seder): <strong>${esc(daf.seder)}</strong> · Folio ${daf.folio} of ${daf.total_tractate_folios} · ${esc(daf.theme)}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-primary" onclick="quickAsk(this.dataset.q, 'scholar')" data-q="${esc(daf.ask_prompt)}">🤖 Teach Today's Daf</button>
+            <button class="btn-secondary" onclick="quickAsk('Compare the Babylonian Talmud (Bavli) and the Jerusalem Talmud (Yerushalmi) — history, unique tractates, and famous teachings.', 'scholar')">⚖️ Compare Bavli vs. Yerushalmi</button>
+          </div>
+        </div>
+        <div style="height:6px;border-radius:999px;background:rgba(228,188,105,0.16);overflow:hidden;margin-bottom:10px;">
+          <div style="height:100%;width:${daf.percent_complete}%;background:linear-gradient(90deg, var(--gold), var(--accent));"></div>
+        </div>
+        <div style="padding:9px 13px;border-radius:10px;background:rgba(92,182,229,0.1);border:1px solid rgba(92,182,229,0.32);font-size:0.84rem;color:#dcecff;margin-bottom:14px;">
+          ${esc(daf.yerushalmi_note)}
+        </div>
+        ${twin ? `
+          <h4 style="margin:0 0 8px;color:var(--gold);font-family:var(--serif);font-size:1.12rem;">⚖️ ${esc(twin.title)} · <span style="font-family:var(--hebrew);">${esc(twin.he_title)}</span></h4>
+          <p class="muted" style="font-size:0.84rem;margin:0 0 10px;">${esc(twin.summary)}</p>
+          <div style="overflow-x:auto;margin-bottom:12px;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.83rem;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(228,188,105,0.34);color:var(--gold);text-align:left;">
+                  <th style="padding:7px 8px;">Dimension</th>
+                  <th style="padding:7px 8px;">Babylonian Talmud (Bavli · תַּלְמוּד בַּבְלִי)</th>
+                  <th style="padding:7px 8px;">Jerusalem Talmud (Yerushalmi · תַּלְמוּד יְרוּשַׁלְמִי)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(twin.comparison || []).map(row => `
+                  <tr style="border-bottom:1px solid rgba(228,188,105,0.12);">
+                    <td style="padding:7px 8px;font-weight:700;color:var(--accent);white-space:nowrap;">${esc(row.aspect)}</td>
+                    <td style="padding:7px 8px;">${esc(row.bavli)}</td>
+                    <td style="padding:7px 8px;">${esc(row.yerushalmi)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="cards-grid" style="margin-bottom:12px;">
+            ${(twin.famous_yerushalmi_teachings || []).map(yt => `
+              <div class="blessing-card" style="margin:0;">
+                <span class="trait-pill" style="font-size:0.7rem;">${esc(yt.ref)}</span>
+                <div style="font-weight:700;color:#fff;margin:5px 0 4px;font-size:0.94rem;">${esc(yt.title)}</div>
+                <div class="muted" style="font-size:0.82rem;line-height:1.48;">${esc(yt.text)}</div>
+              </div>`).join('')}
+          </div>` : ''}
+        <details>
+          <summary style="cursor:pointer;color:var(--gold);font-weight:700;font-size:0.84rem;">📚 Explore All 37 Daf Yomi Tractates (Blue Dot = Parallel Jerusalem Talmud Exists)</summary>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+            ${dafTracts.map(t => `
+              <button class="btn-secondary" style="padding:5px 10px;font-size:0.78rem;${t.en === daf.tractate_en ? 'border-color:var(--gold);color:var(--gold);background:rgba(228,188,105,0.15);' : ''}" onclick="quickAsk('Give a warm, structured overview of Talmud Tractate ${esc(t.en)} (${esc(t.theme)})${t.has_yerushalmi ? ' — noting how both Babylonian Bavli and Jerusalem Yerushalmi approach it.' : '.'}', 'scholar')">
+                ${t.has_yerushalmi ? '<span style="color:#5cb6e5;">●</span> ' : ''}${esc(t.en)} <span style="opacity:0.72;">(${t.folios})</span>
+              </button>`).join('')}
+          </div>
+        </details>
+      </div>` : '';
     host.innerHTML = `
+      ${dafCardHtml}
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
           <div>
@@ -6556,7 +6676,7 @@ async function loadSacredBooksShelf() {
       <div class="card">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
           <span class="tier-badge-interp">⚖️ TIER 2 · CLASSICAL RABBINIC REFERENCE MAP (NON-EXCLUSIVE)</span>
-          <h3 style="margin:0;font-family:var(--serif);color:var(--gold);">Mishnah · Talmud Bavli · Rambam · Shulchan Aruch</h3>
+          <h3 style="margin:0;font-family:var(--serif);color:var(--gold);">Mishnah · Talmud Bavli · Talmud Yerushalmi · Rambam · Shulchan Aruch</h3>
         </div>
         <div class="cards-grid">
           ${cls.map(c => `
@@ -7145,10 +7265,16 @@ async function triggerScribe(mission) {
 async function loadSettings() {
   await loadHealth();
   loadScribeStatus();
+  loadUpdaterStatus();
   if (!Object.keys(cityPresetsCache).length) await loadCelestial();
   const r = await fetch('/api/config');
   const c = (await r.json()).config || {};
   document.getElementById('cfgSynName').value = c.synagogue_name || 'The European Synagogue · Torah Sanctuary';
+  if (document.getElementById('cfgRabbiName')) document.getElementById('cfgRabbiName').value = c.rabbi_name || 'Rabbi Michoel Rosenblum';
+  if (document.getElementById('cfgRabbiWa')) document.getElementById('cfgRabbiWa').value = c.rabbi_whatsapp || '';
+  if (document.getElementById('cfgShulAddr')) document.getElementById('cfgShulAddr').value = c.shul_address || 'Rue Froissart 109, 1040 Brussels';
+  if (document.getElementById('cfgShulWeb')) document.getElementById('cfgShulWeb').value = c.shul_website || 'https://www.theshul.eu';
+  if (document.getElementById('cfgAutoUpdate')) document.getElementById('cfgAutoUpdate').checked = c.auto_update_enabled !== false;
   if (document.getElementById('cfgMeshType')) document.getElementById('cfgMeshType').value = c.mesh_node_type || 'synagogue';
   if (document.getElementById('cfgMeshCam')) document.getElementById('cfgMeshCam').value = c.mesh_camera_url || '';
   if (document.getElementById('cfgMeshAutoRecv')) document.getElementById('cfgMeshAutoRecv').checked = c.mesh_auto_receive !== false;
@@ -7183,6 +7309,11 @@ async function saveSettings() {
   const preset = cityPresetsCache[presetKey] || {};
   const payload = {
     synagogue_name: document.getElementById('cfgSynName').value.trim() || 'The European Synagogue · Torah Sanctuary',
+    rabbi_name: document.getElementById('cfgRabbiName') ? document.getElementById('cfgRabbiName').value.trim() : 'Rabbi Michoel Rosenblum',
+    rabbi_whatsapp: document.getElementById('cfgRabbiWa') ? document.getElementById('cfgRabbiWa').value.trim() : '',
+    shul_address: document.getElementById('cfgShulAddr') ? document.getElementById('cfgShulAddr').value.trim() : '',
+    shul_website: document.getElementById('cfgShulWeb') ? document.getElementById('cfgShulWeb').value.trim() : 'https://www.theshul.eu',
+    auto_update_enabled: document.getElementById('cfgAutoUpdate') ? document.getElementById('cfgAutoUpdate').checked : true,
     location: {
       city: document.getElementById('cfgLocCity').value.trim() || 'Brussels, Belgium',
       lat: parseFloat(document.getElementById('cfgLocLat').value) || 50.8503,
@@ -7221,6 +7352,115 @@ async function saveSettings() {
     loadCelestial();
     loadToday(null);
   }
+}
+
+async function loadUpdaterStatus() {
+  const badge = document.getElementById('updaterVersionBadge');
+  const box = document.getElementById('updaterStatusBox');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/system/update-status?local=1');
+    const d = await r.json();
+    if (badge) badge.textContent = d.short_sha ? `Build ${d.short_sha}` : 'Standalone';
+    box.innerHTML = `
+      <div><strong>Installed Build:</strong> <code>${esc(d.short_sha || 'tarball')}</code> (${esc(d.branch || 'main')}) · ${esc(d.commit_msg || '')}</div>
+      <div style="margin-top:3px;"><strong>Repository:</strong> <a href="${esc(d.repo_url || '')}" target="_blank" style="color:var(--accent);">${esc(d.repo_url || '')}</a> · ${d.shabbat_stillness ? '🕯 Shabbat Stillness Active (auto-updates paused)' : '✅ Ready for Shabbat-safe updates'}</div>`;
+  } catch (e) {
+    box.textContent = 'Offline build info unavailable.';
+  }
+}
+
+async function checkShulUpdates() {
+  const badge = document.getElementById('updaterVersionBadge');
+  const box = document.getElementById('updaterStatusBox');
+  if (box) box.textContent = '🔍 Checking GitHub main branch for newer Shul.OS builds...';
+  try {
+    const r = await fetch('/api/system/update-status');
+    const d = await r.json();
+    if (badge) badge.textContent = d.update_available ? `⬆️ ${d.behind_count || 1} Update Ready` : `✅ Up to Date (${d.short_sha})`;
+    box.innerHTML = d.update_available
+      ? `<div style="color:#4ade80;font-weight:700;">✨ New Shul.OS build available: <code>${esc(d.latest_short_sha)}</code> — ${esc(d.latest_msg || '')}</div><div style="margin-top:3px;">Current: <code>${esc(d.short_sha)}</code> · Tap <strong>Update Shul.OS Now</strong> to apply cleanly while keeping your config &amp; library intact.</div>`
+      : `<div>✅ <strong>Up to Date!</strong> Running <code>${esc(d.short_sha || 'latest')}</code> (${esc(d.commit_msg || '')}).${d.error ? ` <span class="muted">(${esc(d.error)})</span>` : ''}</div>`;
+  } catch (e) {
+    if (box) box.textContent = 'Could not reach GitHub (Shul.OS keeps running 100% offline!).';
+  }
+}
+
+async function applyShulUpdate() {
+  const box = document.getElementById('updaterStatusBox');
+  if (box) box.textContent = '⬆️ Pulling latest Shul.OS improvements (preserving config.json & torah.db)...';
+  try {
+    const r = await fetch('/api/system/update-now', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ force: true }),
+    });
+    const d = await r.json();
+    if (d.ok && d.updated) {
+      box.innerHTML = `<div style="color:#4ade80;font-weight:700;">✨ ${esc(d.message)} Refreshing automatically in 5s...</div>`;
+      setTimeout(() => window.location.reload(), 5200);
+    } else if (d.ok) {
+      box.innerHTML = `<div>✅ ${esc(d.message || 'Already up to date.')}</div>`;
+    } else {
+      box.innerHTML = `<div style="color:#fca5a5;">${esc(d.reason || 'Update could not be applied.')}</div>`;
+    }
+  } catch (e) {
+    if (box) box.textContent = 'Update request failed — node remains safe and online.';
+  }
+}
+
+async function loadDedicationsAdmin() {
+  const box = document.getElementById('dedicationsAdmin');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/dedications');
+    const d = await r.json();
+    const list = d.dedications || [];
+    if (!list.length) {
+      box.innerHTML = '<div class="muted">No active Yahrzeits or Kiddush honors yet — add one below or scan the lobby QR!</div>';
+      return;
+    }
+    const icons = { yahrzeit: '🕯', kiddush: '🥂', refuah: '💚', simcha: '🎉' };
+    box.innerHTML = list.map(it => `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:9px;background:rgba(228,188,105,0.06);border:1px solid rgba(228,188,105,0.22);margin-bottom:6px;">
+        <div style="min-width:0;">
+          <strong style="color:#fff;">${icons[it.kind] || '🕯'} ${esc(it.honoree_name)}</strong>
+          ${it.hebrew_date_label ? `<span class="comm-badge" style="margin-left:5px;">${esc(it.hebrew_date_label)}</span>` : ''}
+          <div class="muted" style="font-size:0.76rem;margin-top:2px;">${it.submitted_by ? 'By ' + esc(it.submitted_by) + ' · ' : ''}${esc(it.message)}</div>
+        </div>
+        <button class="tool-btn" style="padding:2px 7px;font-size:0.72rem;flex-shrink:0;" onclick="deleteDedicationUi(${it.id})" title="Remove dedication">✕</button>
+      </div>`).join('');
+  } catch (e) {
+    box.textContent = 'Could not load dedications.';
+  }
+}
+
+async function addDedicationAdminUi() {
+  const name = (document.getElementById('admDedName')?.value || '').trim();
+  if (!name) return;
+  await fetch('/api/dedications', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      kind: document.getElementById('admDedKind')?.value || 'yahrzeit',
+      honoree_name: name,
+      hebrew_date_label: (document.getElementById('admDedDate')?.value || '').trim(),
+      submitted_by: (document.getElementById('admDedBy')?.value || '').trim(),
+      message: (document.getElementById('admDedMsg')?.value || '').trim(),
+    }),
+  });
+  document.getElementById('admDedName').value = '';
+  document.getElementById('admDedDate').value = '';
+  document.getElementById('admDedBy').value = '';
+  document.getElementById('admDedMsg').value = '';
+  loadDedicationsAdmin();
+  if (typeof loadHeritagePlaque === 'function') loadHeritagePlaque();
+}
+
+async function deleteDedicationUi(id) {
+  await fetch('/api/dedications?id=' + id, { method: 'DELETE' });
+  loadDedicationsAdmin();
+  if (typeof loadHeritagePlaque === 'function') loadHeritagePlaque();
 }
 
 // =============================================================================
@@ -7360,6 +7600,7 @@ async function transmitAllChannels() {
 }
 
 async function loadSponsorshipManager() {
+  loadDedicationsAdmin();
   try {
     const [rIt, rPl, rMsg] = await Promise.all([fetch('/api/give/items'), fetch('/api/give/pledges'), fetch('/api/connect/messages')]);
     const dIt = await rIt.json();
@@ -7927,12 +8168,29 @@ function closeFoundationModal() {
 // Verified Source Foundation Dossier Renderer (Tier 1 Primary Scripture Parallels vs. Tier 2 Multi-Lens Talmud & Sages)
 async function loadFoundationDossier(parashaSlug = '') {
   try {
-    const r = await fetch('/api/foundation?parasha=' + encodeURIComponent(parashaSlug || ''));
+    const [r, rDaf] = await Promise.all([
+      fetch('/api/foundation?parasha=' + encodeURIComponent(parashaSlug || '')),
+      fetch('/api/talmud/daf-yomi'),
+    ]);
     const d = await r.json();
+    const dafWrap = await rDaf.json();
+    const daf = dafWrap.daf_yomi || null;
     const titleEl = document.getElementById('foundationSummaryTitle');
     if (titleEl && d.topic) titleEl.textContent = d.topic;
     const body = document.getElementById('foundationPanelBody');
     if (!body) return;
+    const dafStrip = daf ? `
+      <div style="margin-top:14px;padding:12px 15px;border-radius:12px;background:linear-gradient(145deg, rgba(228,188,105,0.11), rgba(92,182,229,0.08));border:1px solid rgba(228,188,105,0.42);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">📖 TODAY'S DAF YOMI (CYCLE ${daf.cycle_number}) · TWIN TALMUDS (BAVLI &amp; YERUSHALMI)</div>
+          <div style="font-family:var(--serif);font-size:1.06rem;color:#fff;font-weight:700;margin-top:2px;">${esc(daf.display_en)} &nbsp;·&nbsp; <span style="font-family:var(--hebrew);color:var(--gold);">${esc(daf.display_he)}</span> <span class="muted" style="font-size:0.82rem;font-weight:400;">(${esc(daf.seder)} · ${esc(daf.theme)})</span></div>
+          <div class="muted" style="font-size:0.78rem;margin-top:3px;">${esc(daf.yerushalmi_note)}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn-primary" style="padding:6px 11px;font-size:0.78rem;" onclick="closeFoundationModal(); quickAsk(this.dataset.q, 'scholar')" data-q="${esc(daf.ask_prompt)}">🤖 Teach Today's Daf</button>
+          <button class="btn-secondary" style="padding:6px 11px;font-size:0.78rem;" onclick="closeFoundationModal(); switchView('liturgy'); switchLiturgyTab('books')">📚 Twin Talmuds Guide →</button>
+        </div>
+      </div>` : '';
     body.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;">
         <div class="settings-section">
@@ -7958,7 +8216,7 @@ async function loadFoundationDossier(parashaSlug = '') {
         <div class="settings-section">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
             <span class="tier-badge-interp">⚖️ TIER 2 · CITED INTERPRETATIONS (NON-EXCLUSIVE)</span>
-            <span class="muted" style="font-size:0.74rem;">Talmud &amp; Sages — multiple lenses compared</span>
+            <span class="muted" style="font-size:0.74rem;">Bavli, Yerushalmi &amp; Sages — multiple lenses compared</span>
           </div>
           ${(d.interpretations || []).map(it => `
             <div style="padding:10px 12px;border-radius:10px;background:rgba(92,182,229,0.07);border:1px solid rgba(92,182,229,0.3);">
@@ -7972,7 +8230,7 @@ async function loadFoundationDossier(parashaSlug = '') {
               </div>
             </div>`).join('')}
         </div>
-      </div>`;
+      </div>${dafStrip}`;
   } catch (e) {}
 }
 

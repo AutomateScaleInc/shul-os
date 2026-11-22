@@ -232,7 +232,18 @@ class TestDatabaseAndRAG(unittest.TestCase):
         self.assertGreaterEqual(len(lib["haggadah"]["steps"]), 14)
         self.assertGreaterEqual(len(lib["siddur_blessings"]), 10)
         self.assertEqual(len(lib["five_megillot"]), 5)
+        self.assertGreaterEqual(len(lib["classical_reference_map"]), 5)
+        self.assertTrue(any("Yerushalmi" in c["title"] for c in lib["classical_reference_map"]))
+        daf = sacred_books.get_daily_daf_yomi("2026-11-22")
+        self.assertEqual(daf["display_en"], "Arakhin 5")
+        self.assertEqual(daf["total_folios"], 2711)
+        self.assertGreaterEqual(len(lib["twin_talmuds"]["famous_yerushalmi_teachings"]), 4)
         self.assertGreaterEqual(sacred_books.index_into_db(), 3)
+
+        import shul_updater
+        vinfo = shul_updater.get_local_version()
+        self.assertIn("short_sha", vinfo)
+        self.assertIn("shabbat_stillness", vinfo)
 
         ps23 = sacred_liturgy.get_psalm_chapter(23)
         self.assertEqual(ps23["chapter"], 23)
@@ -272,7 +283,10 @@ class TestLiveHTTP(unittest.TestCase):
             "/embed.js",
             "/api/give/qr.svg",
             "/api/give/items",
+            "/api/dedications",
             "/api/connect/messages",
+            "/api/system/update-status?local=1",
+            "/api/talmud/daf-yomi",
             "/api/syndication/pack",
             "/api/today",
             "/api/today?date=2026-11-15",
