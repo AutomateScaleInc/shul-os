@@ -368,7 +368,17 @@ def get_weekly_parasha() -> dict:
     live_date = time.strftime("%Y-%m-%d")
 
     try:
-        req = urllib.request.Request("https://www.sefaria.org/api/calendars", headers={"User-Agent": "TorahSanctuary/1.0"})
+        lt = time.localtime()
+        in_il = False
+        cfg_p = BASE_DIR / "config.json"
+        if cfg_p.exists():
+            try:
+                in_il = bool((json.loads(cfg_p.read_text(encoding="utf-8")).get("location") or {}).get("in_israel", False))
+            except Exception:
+                pass
+        diaspora = 0 if in_il else 1
+        cal_url = f"https://www.sefaria.org/api/calendars?year={lt.tm_year}&month={lt.tm_mon}&day={lt.tm_mday}&diaspora={diaspora}"
+        req = urllib.request.Request(cal_url, headers={"User-Agent": "TorahSanctuary/1.0"})
         with urllib.request.urlopen(req, timeout=4) as r:
             cal = json.loads(r.read().decode("utf-8"))
         live_date = cal.get("date", live_date)
