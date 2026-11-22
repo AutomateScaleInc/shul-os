@@ -2338,47 +2338,22 @@ def select_daily_visual_theme(parasha_key: str = "", day_index: int = 0, date_is
     # Compute a stable week seed from parasha slug so different weeks get different galleries too!
     week_seed = sum((i + 1) * ord(ch) for i, ch in enumerate(slug or "torah"))
 
-    # Day 0 uses the parasha's primary artwork (or week-seeded art); Days 1..6 choose distinct thematic paintings!
-    chosen_art = ""
-    if d_idx == 0 and primary_art and primary_art in ALL_ILLUMINATED_ARTS:
-        chosen_art = primary_art
-    elif d_idx == 6:
-        # Shabbat always crowns the week with Shabbat / Temple / Sacred Symbols light
-        shabbat_pool = ["/art/creation-shabbat.jpg", "/art/solomon-temple.jpg", "/art/sacred-symbols.jpg"]
-        chosen_art = shabbat_pool[week_seed % len(shabbat_pool)]
-    else:
-        # Check if THIS specific Aliyah's text strongly evokes a painting different from primary_art
-        low = (aliyah_text or "").lower()
-        keyword_map = [
-            ("/art/exodus-sea.jpg", ("sea", "water", "river", "jabbok", "jordan", "waves", "ford")),
-            ("/art/burning-bush.jpg", ("fire", "flame", "bush", "altar", "smoke", "burn")),
-            ("/art/noah-rainbow.jpg", ("ark", "flood", "rain", "rainbow", "dove", "covenant")),
-            ("/art/joseph-egypt.jpg", ("egypt", "pharaoh", "dream", "coat", "prison", "grain")),
-            ("/art/sinai-tablets.jpg", ("mount", "sinai", "command", "law", "statute", "tablet")),
-            ("/art/ruth-harvest.jpg", ("field", "harvest", "wheat", "flock", "sheep", "shepherd", "pasture")),
-            ("/art/david-harp.jpg", ("song", "harp", "sing", "psalm", "praise", "music", "dance")),
-            ("/art/solomon-temple.jpg", ("sanctuary", "tabernacle", "temple", "gold", "menorah", "priest")),
-            ("/art/elijah-horeb.jpg", ("angel", "wrestl", "dawn", "whisper", "cave", "prophet")),
-            ("/art/promised-land.jpg", ("canaan", "hebron", "shechem", "beth-el", "land", "inherit", "journey")),
-            ("/art/esther-shushan.jpg", ("palace", "king", "crown", "queen", "banquet", "royal")),
-            ("/art/abraham-stars.jpg", ("star", "heaven", "night", "tent", "blessing", "seed")),
-            ("/art/jerusalem-scroll.jpg", ("jerusalem", "zion", "scroll", "gate", "peace", "shalom")),
-        ]
-        # Deterministic unique pool per day so advancing Sun->Mon->Tue->Wed->Thu->Fri->Sha NEVER repeats!
-        rotated_idx = (week_seed + d_idx * 3) % len(ALL_ILLUMINATED_ARTS)
-        candidate = ALL_ILLUMINATED_ARTS[rotated_idx]
-        if candidate == primary_art:
-            candidate = ALL_ILLUMINATED_ARTS[(rotated_idx + 1) % len(ALL_ILLUMINATED_ARTS)]
+    # Day 0 uses the parasha's primary artwork; Day 6 (Shabbat) crowns the week;
+    # Days 1..5 draw from a strictly non-repeating pool of distinct illuminated paintings!
+    shabbat_pool = ["/art/creation-shabbat.jpg", "/art/solomon-temple.jpg", "/art/sacred-symbols.jpg"]
+    shabbat_art = shabbat_pool[week_seed % len(shabbat_pool)]
+    day0_art = primary_art if (primary_art in ALL_ILLUMINATED_ARTS and primary_art != shabbat_art) else ALL_ILLUMINATED_ARTS[week_seed % len(ALL_ILLUMINATED_ARTS)]
 
-        # Prefer a content-matched art if it differs from primary_art and day 0's default
-        for art_path, kws in keyword_map:
-            if art_path != primary_art and any(kw in low for kw in kws):
-                # Mix with d_idx so two consecutive days with 'land' still vary cleanly
-                if (sum(ord(c) for c in art_path) + d_idx) % 2 == 0:
-                    chosen_art = art_path
-                    break
-        if not chosen_art:
-            chosen_art = candidate or _DAY_FALLBACK_ARTS[d_idx]
+    if d_idx == 0:
+        chosen_art = day0_art
+    elif d_idx == 6:
+        chosen_art = shabbat_art
+    else:
+        mid_pool = [a for a in ALL_ILLUMINATED_ARTS if a not in (day0_art, shabbat_art)]
+        # Rotate pool by week_seed so every week has a fresh gallery, and step cleanly by d_idx so Mon..Fri NEVER repeat!
+        offset = week_seed % len(mid_pool)
+        rotated = mid_pool[offset:] + mid_pool[:offset]
+        chosen_art = rotated[(d_idx - 1) * 2 % len(rotated)]
 
     return {
         "art": chosen_art,
