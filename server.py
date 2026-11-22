@@ -367,7 +367,14 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error(404, "Art not found")
                 return
             body = art_p.read_bytes()
-            ctype = "image/png" if fname.endswith(".png") else "image/jpeg"
+            if fname.endswith(".svg"):
+                ctype = "image/svg+xml; charset=utf-8"
+            elif fname.endswith(".png"):
+                ctype = "image/png"
+            elif fname.endswith(".webp"):
+                ctype = "image/webp"
+            else:
+                ctype = "image/jpeg"
             self.send_response(200)
             self.send_header("Content-Type", ctype)
             self.send_header("Cache-Control", "public, max-age=86400")

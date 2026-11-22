@@ -56,50 +56,63 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 12px 22px;
+    gap: 10px;
+    padding: 7px 18px;
+    min-height: 48px;
     background: var(--bg-elev);
     border-bottom: 1px solid var(--border);
   }
   .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 9px;
+    flex-shrink: 0;
   }
   .brand-emblem {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    background: var(--gold-soft);
-    border: 1px solid var(--border-strong);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
     display: grid; place-items: center;
-    color: var(--gold);
-    font-size: 1.35rem;
+    flex-shrink: 0;
   }
+  .brand-emblem img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .brand h1 {
     font-family: var(--serif);
-    font-size: 1.25rem;
+    font-size: 1.08rem;
     font-weight: 700;
     color: var(--gold);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
   }
   .brand .sub {
-    font-size: 0.78rem;
+    font-size: 0.66rem;
     color: var(--text-muted);
+    letter-spacing: 0.04em;
+    opacity: 0.78;
+    line-height: 1.15;
+    white-space: nowrap;
   }
   nav {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    min-width: 0;
   }
+  nav::-webkit-scrollbar { display: none; }
   nav button {
     background: transparent;
     color: var(--text-muted);
     border: 1px solid transparent;
-    padding: 8px 14px;
+    padding: 5px 9px;
     border-radius: 999px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.16s ease;
   }
   nav button:hover { background: var(--bg-hover); color: var(--text); }
@@ -111,33 +124,42 @@
   .hdr-tools {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
+    flex-shrink: 0;
   }
   .tool-btn {
     background: var(--bg-card);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 6px 11px;
+    padding: 4px 8px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.84rem;
+    font-size: 0.76rem;
     font-weight: 600;
+    white-space: nowrap;
   }
   .tool-btn:hover { border-color: var(--border-strong); background: var(--bg-hover); }
   .status-pill {
-    font-size: 0.76rem;
-    padding: 5px 10px;
+    font-size: 0.7rem;
+    padding: 4px 8px;
     border-radius: 999px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     color: var(--text-muted);
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
   }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); display: inline-block; flex-shrink: 0; }
 
   main {
     overflow-y: auto;
-    padding: 22px 26px;
+    padding: 14px 22px;
+  }
+  @media (min-width: 981px) {
+    main.view-today-lock {
+      overflow-y: hidden;
+      padding: 10px 22px 10px;
+    }
   }
   .view { display: none; max-width: 1220px; margin: 0 auto; }
   .view.active { display: block; }
@@ -382,19 +404,36 @@
   }
   .ch-pill.active { background: var(--gold); color: #0e1422; border-color: var(--gold); font-weight: 700; }
 
-  /* TODAY'S DAILY READING & SANCTUARY SCROLL */
+  /* TODAY'S DAILY READING & ZERO-SCROLL FIT-TO-VIEWPORT STAGE */
+  .unified-day-bar {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .day-nav-cap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
   .day-strip {
+    flex: 1 1 auto;
+    min-width: 0;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 0;
   }
-  @media (max-width: 980px) { .day-strip { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); } }
+  @media (max-width: 980px) {
+    .unified-day-bar { flex-wrap: wrap; }
+    .day-strip { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  }
   .day-pill {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 9px 10px;
+    border-radius: 10px;
+    padding: 6px 8px;
     cursor: pointer;
     text-align: left;
     color: var(--text);
@@ -406,27 +445,37 @@
     border-color: var(--gold);
     box-shadow: 0 0 0 1px var(--gold);
   }
-  .day-pill .d-top { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; color: var(--gold); }
-  .day-pill .d-ref { font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .day-pill .d-top { display: flex; justify-content: space-between; font-size: 0.73rem; font-weight: 700; color: var(--gold); }
+  .day-pill .d-ref { font-size: 0.69rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .today-grid {
     display: grid;
     grid-template-columns: 1.55fr 1fr;
-    gap: 18px;
+    gap: 16px;
     align-items: stretch;
+    height: calc(100vh - 186px);
   }
-  @media (max-width: 980px) { .today-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .today-grid { grid-template-columns: 1fr; height: auto; } }
   .spotlight-card {
     background: linear-gradient(160deg, var(--bg-card), var(--bg-elev));
     border: 1px solid var(--border-strong);
     border-radius: 18px;
-    padding: 26px 28px;
+    padding: 18px 22px 14px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: calc(100vh - 295px);
+    height: 100%;
+    min-height: 0;
     position: relative;
     overflow: hidden;
   }
+  #spotlightContent {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding-right: 2px;
+  }
+  #spotlightContent::-webkit-scrollbar { display: none; }
   .spot-progress {
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: rgba(228, 188, 105, 0.14);
@@ -485,10 +534,21 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 16px;
-    max-height: calc(100vh - 295px);
-    overflow-y: auto;
+    padding: 14px 16px;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
+  #dailyStreamList {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  #dailyStreamList::-webkit-scrollbar { display: none; }
   .stream-item {
     padding: 11px 12px;
     border-radius: 10px;
@@ -1873,37 +1933,37 @@
 <div class="app">
   <header>
     <div class="brand">
-      <div class="brand-emblem">✡</div>
+      <div class="brand-emblem"><img src="/art/shul-logo.svg" alt="Shul.OS"></div>
       <div>
-        <h1 id="siteTitle">Torah Sanctuary</h1>
-        <div class="sub">Powered by <strong>Shul.OS</strong> · Tanakh · Classical Commentaries · Torah Stories</div>
+        <h1 id="siteTitle">Shul.OS</h1>
+        <div class="sub" id="siteSub">Ohel Eliezer · Brussels</div>
       </div>
     </div>
     <nav id="mainNav">
-      <button class="active" data-view="today">Today's Reading</button>
-      <button data-view="sky">🌙 Sky &amp; Zmanim</button>
-      <button data-view="liturgy">🙏 Prayers &amp; Holidays</button>
-      <button data-view="stories">Torah Stories</button>
-      <button data-view="characters">Characters</button>
-      <button data-view="symbols">Symbols &amp; Art</button>
-      <button data-view="ask">Ask &amp; Interpret</button>
+      <button class="active" data-view="today">Today</button>
+      <button data-view="sky">🌙 Sky</button>
+      <button data-view="liturgy">🙏 Prayers &amp; Books</button>
+      <button data-view="stories">Stories</button>
+      <button data-view="characters">Cast</button>
+      <button data-view="symbols">Symbols</button>
+      <button data-view="ask">Ask AI</button>
       <button data-view="parasha">Parashah</button>
       <button data-view="reader">Tanakh</button>
-      <button data-view="shul">Shul &amp; Mailings</button>
-      <button data-view="mesh">🌐 Shul Mesh</button>
+      <button data-view="shul">Shul</button>
+      <button data-view="mesh">🌐 Mesh</button>
       <button data-view="history">History</button>
-      <button data-view="settings">Settings</button>
-      <button type="button" onclick="window.open('/under-the-hood','_blank')" title="Open the Under the Hood Presentation &amp; Self-Replication Guide">✨ Under the Hood</button>
+      <button data-view="settings" title="Settings">⚙</button>
+      <button type="button" onclick="window.open('/under-the-hood','_blank')" title="Under the Hood Deck &amp; Download Shul.OS">✨ Deck</button>
     </nav>
     <div class="hdr-tools">
-      <button class="btn-primary" style="padding:6px 12px;font-size:0.84rem;" onclick="openPresentation('parasha','')" title="Launch Full-Screen Presentation for Rabbi & Community">🎬 Present</button>
-      <button class="tool-btn" style="border-color:var(--gold);color:var(--gold);font-weight:700;" onclick="openGiveModal()" title="Scan QR to Connect Your Phone & Sponsor The Shul">💛 Sponsor / QR</button>
-      <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Talk to Torah Sanctuary (Offline Local Whisper + Deep Narrator Voice)">🎙 Talk</button>
-      <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹ Stop Voice</button>
+      <button class="btn-primary" style="padding:4px 9px;font-size:0.76rem;" onclick="openPresentation('parasha','')" title="Full-Screen Presentation">🎬 Present</button>
+      <button class="tool-btn" style="border-color:var(--gold);color:var(--gold);font-weight:700;" onclick="openGiveModal()" title="Scan QR to Connect &amp; Sponsor">💛 QR</button>
+      <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Voice Ask">🎙</button>
+      <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹</button>
       <button class="tool-btn" onclick="adjustFont(-0.1)" title="Smaller text">A-</button>
       <button class="tool-btn" onclick="adjustFont(0.1)" title="Larger text">A+</button>
       <button class="tool-btn" onclick="toggleTheme()" id="themeBtn">Parchment</button>
-      <div class="status-pill" id="statusPill"><span class="dot"></span><span>Loading...</span></div>
+      <div class="status-pill" id="statusPill" title="Local Offline AI Status"><span class="dot"></span><span>3b</span></div>
     </div>
   </header>
 
@@ -1929,63 +1989,52 @@
     </div>
   </div>
 
-  <main>
-    <!-- 0. TODAY'S DAILY TORAH READING (LIVING SANCTUARY SHOWCASE) -->
+  <main id="appMain" class="view-today-lock">
+    <!-- 0. TODAY'S DAILY TORAH READING (ZERO-SCROLL FIT-TO-VIEWPORT SHOWCASE) -->
     <section id="view-today" class="view active">
-      <div id="dateTravelBar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:7px 12px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('prev_week')" title="Jump back 1 full week (previous Parashah)">⏮ -1 Wk</button>
-          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('prev')" title="Previous day">◀ Prev Day</button>
-          <input type="date" id="dateTravelInput" class="form-input" style="padding:3px 8px;font-size:0.8rem;width:auto;" onchange="if(this.value) loadToday(null, this.value)" title="Pick any past or future date">
-          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('next')" title="Next day">Next Day ▶</button>
-          <button class="tool-btn" style="padding:4px 9px;font-size:0.78rem;" onclick="travelDate('next_week')" title="Jump forward 1 full week (next Parashah)">+1 Wk ⏭</button>
+      <div class="unified-day-bar">
+        <div class="day-nav-cap">
+          <button class="tool-btn" style="padding:5px 7px;" onclick="travelDate('prev_week')" title="Previous Week">⏮</button>
+          <button class="tool-btn" style="padding:5px 7px;" onclick="travelDate('prev')" title="Previous Day">◀</button>
+          <input type="date" id="dateTravelInput" class="form-input" style="padding:3px 6px;font-size:0.74rem;width:116px;" onchange="if(this.value) loadToday(null, this.value)" title="Pick any date">
         </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span id="dateTravelHeb" style="font-size:0.8rem;color:var(--gold);font-weight:700;"></span>
-          <button class="btn-primary" id="dateTravelTodayBtn" style="display:none;padding:4px 10px;font-size:0.76rem;" onclick="loadToday(null, null)">↩ Back to Today</button>
+        <div class="day-strip" id="dayStrip"></div>
+        <div class="day-nav-cap">
+          <button class="tool-btn" style="padding:5px 7px;" onclick="travelDate('next')" title="Next Day">▶</button>
+          <button class="tool-btn" style="padding:5px 7px;" onclick="travelDate('next_week')" title="Next Week">⏭</button>
+          <button class="btn-primary" id="dateTravelTodayBtn" style="display:none;padding:5px 8px;font-size:0.74rem;" onclick="loadToday(null, null)" title="Return to Today">↩ Today</button>
         </div>
       </div>
-      <div class="day-strip" id="dayStrip"></div>
       <div class="today-grid">
         <div class="spotlight-card" id="spotlightCard">
           <div class="spot-progress"><div class="spot-progress-bar" id="spotProgressBar"></div></div>
           <div id="spotlightContent">
             <div class="muted">Loading today's Torah portion...</div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-top:12px;border-top:1px solid var(--border);">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <button class="btn-secondary" onclick="stepSlide(-1)">◀ Prev</button>
-              <button class="btn-secondary" id="spotPauseBtn" onclick="toggleSpotPause()">⏸ Pause</button>
-              <button class="btn-secondary" onclick="stepSlide(1)">Next ▶</button>
-              <span class="muted" id="spotCounter" style="font-size:0.84rem;margin-left:6px;"></span>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid var(--border);flex-shrink:0;">
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="btn-secondary" style="padding:6px 10px;font-size:0.8rem;" onclick="stepSlide(-1)">◀ Prev</button>
+              <button class="btn-secondary" style="padding:6px 10px;font-size:0.8rem;" id="spotPauseBtn" onclick="toggleSpotPause()">⏸ Pause</button>
+              <button class="btn-secondary" style="padding:6px 10px;font-size:0.8rem;" onclick="stepSlide(1)">Next ▶</button>
+              <span class="muted" id="spotCounter" style="font-size:0.78rem;margin-left:4px;"></span>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="spotActions"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <button class="btn-secondary" style="padding:6px 10px;font-size:0.8rem;border-color:rgba(92,182,229,0.5);" onclick="openFoundationModal()" title="Compare Tier 1 Verified Scripture Parallels &amp; Tier 2 Cited Talmudic Interpretations">📜 Sources &amp; Talmud</button>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;" id="spotActions"></div>
+            </div>
           </div>
         </div>
         <div class="daily-stream">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div>
-              <h3 id="streamTitle" style="margin:0;font-family:var(--serif);color:var(--gold);">Today's Aliyah</h3>
-              <div id="streamSub" class="muted" style="font-size:0.8rem;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-shrink:0;">
+            <div style="min-width:0;">
+              <h3 id="streamTitle" style="margin:0;font-family:var(--serif);color:var(--gold);font-size:1.05rem;">Today's Aliyah</h3>
+              <div id="streamSub" class="muted" style="font-size:0.76rem;"></div>
             </div>
-            <button class="tool-btn" onclick="switchView('ask')">Ask a Question →</button>
+            <button class="tool-btn" onclick="switchView('ask')">Ask AI →</button>
           </div>
           <div id="dailyStreamList"></div>
         </div>
       </div>
-
-      <!-- VERIFIED SOURCE FOUNDATION PANEL: PRIMARY SCRIPTURE PARALLELS vs. CITED MULTI-LENS INTERPRETATIONS -->
-      <details class="card" id="foundationCard" style="margin-top:16px;margin-bottom:0;border-color:rgba(228,188,105,0.42);">
-        <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;list-style:none;">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span class="tier-badge-scripture">📜 Verified Scripture Parallels</span>
-            <span class="tier-badge-interp">⚖️ Cited Talmud &amp; Multi-Lens Interpretations</span>
-            <strong style="font-family:var(--serif);color:var(--gold);font-size:1.0rem;" id="foundationSummaryTitle">Source Foundation Standard · Compare Verbatim Scripture &amp; Classical Views</strong>
-          </div>
-          <span class="muted" style="font-size:0.8rem;">Expand Sources &amp; Perspectives ▾</span>
-        </summary>
-        <div id="foundationPanelBody" style="margin-top:14px;" class="muted">Loading verified coinciding scripture &amp; cited interpretations...</div>
-      </details>
     </section>
 
     <!-- 0A. SACRED CELESTIAL, SUN, MOON & JEWISH YEAR OBSERVATORY -->
@@ -2639,6 +2688,23 @@
   </footer>
 </div>
 
+<!-- VERIFIED SOURCE FOUNDATION MODAL (TIER 1 SCRIPTURE PARALLELS vs. TIER 2 CITED TALMUDIC LENSES) -->
+<div class="coach-backdrop" id="foundationModal" onclick="if(event.target===this) closeFoundationModal()">
+  <div class="coach-card" style="max-width:960px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          <span class="tier-badge-scripture">📜 Tier 1 · Verified Scripture Parallels</span>
+          <span class="tier-badge-interp">⚖️ Tier 2 · Cited Talmud &amp; Multi-Lens Interpretations</span>
+        </div>
+        <h2 style="margin:2px 0 0;font-family:var(--serif);color:var(--gold);" id="foundationSummaryTitle">Source Foundation Standard</h2>
+      </div>
+      <button class="tool-btn" onclick="closeFoundationModal()">✕ Close</button>
+    </div>
+    <div id="foundationPanelBody" class="muted">Loading verified coinciding scripture &amp; cited interpretations...</div>
+  </div>
+</div>
+
 <!-- GUIDED TEFILLIN "SAY IT WITH ME" REPEAT-AFTER-ME COACH MODAL -->
 <div class="coach-backdrop" id="tefillinCoachModal" onclick="if(event.target===this) closeTefillinCoach()">
   <div class="coach-card">
@@ -3281,6 +3347,8 @@ function switchView(name) {
   currentViewName = name;
   document.querySelectorAll('#mainNav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  const mainEl = document.getElementById('appMain');
+  if (mainEl) mainEl.classList.toggle('view-today-lock', name === 'today');
   if (name === 'today' && !dailyData) loadToday();
   drawMarginStages();
   if (name === 'sky') loadCelestial();
@@ -4475,13 +4543,24 @@ function renderSpotlight() {
   }
   acts.innerHTML = actHtml;
 
-  // Highlight and smoothly scroll active item into view ONLY inside desktop's right-hand daily stream (never hijack phone scroll!)
+  // Highlight and smoothly auto-glide active item into view inside #dailyStreamList (zero ugly scrollbar, zero mouse needed!)
   document.querySelectorAll('.stream-item').forEach((el, i) => el.classList.toggle('active', i === spotIdx));
   const activeEl = document.getElementById('stream-item-' + spotIdx);
-  const streamBox = document.querySelector('.daily-stream');
-  if (activeEl && streamBox && window.innerWidth > 820) {
-    const topPos = activeEl.offsetTop - streamBox.offsetTop - 90;
-    streamBox.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+  const streamList = document.getElementById('dailyStreamList');
+  if (activeEl && streamList && window.innerWidth > 820) {
+    const topPos = activeEl.offsetTop - streamList.offsetTop - 70;
+    streamList.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+  }
+  // If spotlight slide content slightly overflows its locked display frame, smoothly auto-glide down after a 3.2s reading breath!
+  const spotBody = document.getElementById('spotlightContent');
+  if (spotBody && window.innerWidth > 820) {
+    spotBody.scrollTop = 0;
+    const overflow = spotBody.scrollHeight - spotBody.clientHeight;
+    if (overflow > 12) {
+      showBeatTimers.push(setTimeout(() => {
+        spotBody.scrollTo({ top: overflow, behavior: 'smooth' });
+      }, 3400));
+    }
   }
 }
 
@@ -5563,10 +5642,18 @@ async function loadHealth() {
   try {
     const r = await fetch('/api/health');
     const d = await r.json();
-    document.getElementById('siteTitle').textContent = d.synagogue_name || 'Torah Sanctuary';
+    document.getElementById('siteTitle').textContent = 'Shul.OS';
+    const subEl = document.getElementById('siteSub');
+    if (subEl) {
+      const rawName = String(d.synagogue_name || 'Ohel Eliezer · Brussels').replace(/·\s*Torah Sanctuary/i, '').trim();
+      subEl.textContent = rawName.length > 28 ? 'Ohel Eliezer · Brussels' : rawName;
+    }
     const pill = document.getElementById('statusPill');
-    const aiState = d.cloud_configured ? `Hybrid (${d.cloud_provider} + Local)` : (d.ollama.model_ready ? `Offline AI Ready (${d.ollama.target_model})` : 'Offline Library Active');
-    pill.innerHTML = `<span class="dot" style="background:${d.ollama.model_ready || d.cloud_configured ? 'var(--ok)' : 'var(--gold)'}"></span><span>${esc(aiState)}</span>`;
+    const shortModel = String((d.ollama && d.ollama.target_model) || '3b').replace(/^qwen2\.5:/i, '');
+    const shortLabel = d.cloud_configured ? d.cloud_provider : (d.ollama.model_ready ? shortModel : 'Offline');
+    const fullTip = d.cloud_configured ? `Hybrid AI (${d.cloud_provider} + Local)` : (d.ollama.model_ready ? `Offline AI Ready (${d.ollama.target_model})` : 'Offline Library Active');
+    pill.title = fullTip;
+    pill.innerHTML = `<span class="dot" style="background:${d.ollama.model_ready || d.cloud_configured ? 'var(--ok)' : 'var(--gold)'}"></span><span>${esc(shortLabel)}</span>`;
     const hd = document.getElementById('healthDetails');
     if (hd) {
       hd.innerHTML = `
@@ -7330,6 +7417,15 @@ async function runCoachLoop(token) {
       break;
     }
   }
+}
+
+function openFoundationModal() {
+  const m = document.getElementById('foundationModal');
+  if (m) m.classList.add('open');
+}
+function closeFoundationModal() {
+  const m = document.getElementById('foundationModal');
+  if (m) m.classList.remove('open');
 }
 
 // Verified Source Foundation Dossier Renderer (Tier 1 Primary Scripture Parallels vs. Tier 2 Multi-Lens Talmud & Sages)
