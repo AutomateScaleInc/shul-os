@@ -2950,7 +2950,7 @@ function updateBackgroundIllustrations(slide) {
   const left = document.getElementById('bgSceneLeft');
   const right = document.getElementById('bgSceneRight');
   if (!left || !right) return;
-  const art = String((slide && slide.art) || '').toLowerCase();
+  const art = String((slide && slide.art) || (dailyData && dailyData.rich && dailyData.rich.art) || '').toLowerCase();
   const kind = (slide && slide.kind) || 'verse';
 
   let leftSvg = '';
@@ -4285,12 +4285,19 @@ function renderSpotlight() {
         <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying Today's Portion in Today's Terms</h4>
         <ul style="margin:0;padding-left:18px;font-size:0.88rem;line-height:1.45;">${rich.today_points.map(pt => `<li>${esc(pt)}</li>`).join('')}</ul>
       </div>` : '';
+    const dayAccent = rich.day_accent || '#f3d796';
+    const dayMood = rich.day_mood || '';
+    const spotCard = document.getElementById('spotlightCard');
+    if (spotCard) {
+      spotCard.style.borderColor = rich.day_border || '';
+      spotCard.style.boxShadow = rich.day_glow ? `0 16px 44px rgba(0,0,0,0.42), 0 0 28px ${rich.day_glow}` : '';
+    }
     const capHtml = `
       <div>
-        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:#f3d796;font-weight:700;">${esc(s.kicker)}</div>
-        <div style="font-family:var(--serif);font-size:1.55rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.title)}</div>
+        <div style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.1em;color:${esc(dayAccent)};font-weight:800;">${esc(s.kicker)}${dayMood ? ' · ' + esc(dayMood) : ''}</div>
+        <div style="font-family:var(--serif);font-size:1.52rem;color:#fff;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,0.75);">${esc(s.title)}</div>
       </div>
-      <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.3rem;text-shadow:0 2px 10px rgba(0,0,0,0.7);">${esc(s.he_kicker || '')}</div>`;
+      <div style="font-family:var(--hebrew);color:${esc(dayAccent)};font-size:1.3rem;text-shadow:0 2px 10px rgba(0,0,0,0.75);">${esc(s.he_kicker || '')}</div>`;
     const nextSl = dailyData.slides[(spotIdx + 1) % dailyData.slides.length];
     const popKicker = nextSl && nextSl.kind === 'quiz' ? '❓ COMING UP NEXT' : (nextSl && nextSl.kind === 'character_scene' ? '🎭 NEXT SCENE' : '💡 SANCTUARY SPARK');
     const popMsg = nextSl && (nextSl.kind === 'quiz' || nextSl.kind === 'character_scene' || nextSl.kind === 'hebrew_word')

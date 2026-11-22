@@ -737,20 +737,25 @@ def get_daily_portion(day_index: int = None, target_date: str = None) -> dict:
 
     day_en, day_he, aliyah_en, aliyah_he = DAILY_LABELS[idx]
     aliyah_ref = daily_refs[idx] if idx < len(daily_refs) else parasha["ref"]
+    first_v = enriched_verses[0] if enriched_verses else None
+    day_focus_en = parasha["summary"]
+    if first_v and idx > 0:
+        fv_snip = (first_v["en_text"][:220].rsplit(" ", 1)[0] + "...") if len(first_v["en_text"]) > 220 else first_v["en_text"]
+        day_focus_en = f"Opening {aliyah_en} ({first_v['ref']}): “{fv_snip}”"
 
-    # Build reverent spotlight slides & scrolling sanctuary marquee messages for TODAY's portion
+    # Build reverent spotlight slides & scrolling sanctuary marquee messages for THIS day's portion
     slides = [
         {
             "kind": "banner",
-            "kicker": f"{day_en} · {aliyah_en}",
+            "kicker": f"{day_en} · {aliyah_en} · {he_for_date.get('en_str', '')}",
             "he_kicker": f"{day_he} · {aliyah_he}",
-            "title": f"Parashat {parasha['en_name']}",
+            "title": f"Parashat {parasha['en_name']} — {aliyah_en}",
             "he_title": f"פרשת {parasha['he_name']}",
             "ref": aliyah_ref,
-            "en_text": parasha["summary"],
-            "he_text": f"קריאת היום: {aliyah_ref}",
-            "commentator": "Weekly Parashah & Daily Aliyah",
-            "commentary": f"Full Portion: {parasha['ref']}  ·  Haftarah: {parasha.get('live_haftarah') or parasha['haftarah_ref']}"
+            "en_text": day_focus_en,
+            "he_text": f"קריאת {day_he}: {aliyah_ref}",
+            "commentator": f"{parasha['en_name']} · Weekly Overview & Daily Aliyah",
+            "commentary": f"{parasha['summary']}  ·  Full Portion: {parasha['ref']}  ·  Haftarah: {parasha.get('live_haftarah') or parasha['haftarah_ref']}"
             + (f"  ·  Daf Yomi: {parasha['daf_yomi']}" if parasha.get("daf_yomi") else ""),
         }
     ]

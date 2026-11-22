@@ -420,8 +420,20 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 chars_s = next((sl.get("characters", []) for sl in p_slides if sl.get("type") == "characters"), [])
                 syms_s = next((sl.get("symbols", []) for sl in p_slides if sl.get("type") == "symbols"), [])
                 today_s = next((sl.get("points", []) for sl in p_slides if sl.get("type") == "today"), [])
+                aliyah_blob = " ".join((sl.get("en_text") or "") for sl in (daily.get("slides") or [])[:5])
+                day_vis = sanctuary_rich_data.select_daily_visual_theme(
+                    parasha_key=p_key,
+                    day_index=daily.get("selected_day_index", 0),
+                    date_iso=daily.get("selected_date", ""),
+                    primary_art=p_pres.get("art") or "/art/sacred-symbols.jpg",
+                    aliyah_text=aliyah_blob,
+                )
                 daily["rich"] = {
-                    "art": p_pres.get("art") or "/art/sacred-symbols.jpg",
+                    "art": day_vis["art"],
+                    "day_mood": day_vis["day_mood"],
+                    "day_accent": day_vis["day_accent"],
+                    "day_glow": day_vis["day_glow"],
+                    "day_border": day_vis["day_border"],
                     "characters": [{"slug": c.get("slug", ""), "name": c.get("name", ""), "he_name": c.get("he_name", "")} for c in chars_s[:3]],
                     "symbols": [{"slug": s.get("slug", ""), "name": s.get("name", ""), "he_name": s.get("he_name", "")} for s in syms_s[:3]],
                     "today_points": today_s[:2],

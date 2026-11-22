@@ -2286,3 +2286,105 @@ def get_handsfree_show_extras(parasha_slug: str = "") -> dict:
         "hebrew_words": HEBREW_WORDS[:8],
         "story_anatomy": get_story_anatomy(slug),
     }
+
+
+ALL_ILLUMINATED_ARTS = [
+    "/art/jacobs-ladder.jpg",
+    "/art/abraham-stars.jpg",
+    "/art/burning-bush.jpg",
+    "/art/exodus-sea.jpg",
+    "/art/sinai-tablets.jpg",
+    "/art/jerusalem-scroll.jpg",
+    "/art/creation-shabbat.jpg",
+    "/art/noah-rainbow.jpg",
+    "/art/joseph-egypt.jpg",
+    "/art/promised-land.jpg",
+    "/art/ruth-harvest.jpg",
+    "/art/david-harp.jpg",
+    "/art/solomon-temple.jpg",
+    "/art/elijah-horeb.jpg",
+    "/art/esther-shushan.jpg",
+    "/art/sacred-symbols.jpg",
+]
+
+DAY_VISUAL_PALETTES = [
+    {"mood": "Dawn Awakening · Day 1 of Creation (Light)", "accent": "#e4bc69", "glow": "rgba(228,188,105,0.22)", "border": "rgba(228,188,105,0.58)"},
+    {"mood": "Journey & Calling · Day 2 (Firmament)", "accent": "#60a5fa", "glow": "rgba(96,165,250,0.22)", "border": "rgba(96,165,250,0.56)"},
+    {"mood": "Ki Tov · Doubly Blessed · Day 3", "accent": "#f59e0b", "glow": "rgba(245,158,11,0.22)", "border": "rgba(245,158,11,0.58)"},
+    {"mood": "Celestial Luminaries · Day 4 (Sun & Moon)", "accent": "#2dd4bf", "glow": "rgba(45,212,191,0.22)", "border": "rgba(45,212,191,0.55)"},
+    {"mood": "Living Abundance · Day 5 (Blessing)", "accent": "#4ade80", "glow": "rgba(74,222,128,0.20)", "border": "rgba(74,222,128,0.54)"},
+    {"mood": "Erev Shabbat · Preparing the Sanctuary · Day 6", "accent": "#f472b6", "glow": "rgba(244,114,182,0.20)", "border": "rgba(244,114,182,0.55)"},
+    {"mood": "Shabbat Shalom · Crown of Sacred Rest · Day 7", "accent": "#fde047", "glow": "rgba(253,224,71,0.25)", "border": "rgba(253,224,71,0.68)"},
+]
+
+# Guaranteed 7 distinct artworks per week (never the same hero painting two days in a row!)
+_DAY_FALLBACK_ARTS = [
+    "/art/jacobs-ladder.jpg",
+    "/art/abraham-stars.jpg",
+    "/art/elijah-horeb.jpg",
+    "/art/sinai-tablets.jpg",
+    "/art/promised-land.jpg",
+    "/art/jerusalem-scroll.jpg",
+    "/art/creation-shabbat.jpg",
+]
+
+
+def select_daily_visual_theme(parasha_key: str = "", day_index: int = 0, date_iso: str = "", primary_art: str = "", aliyah_text: str = "") -> dict:
+    """Select a DISTINCT illuminated painting + color atmosphere for every day & week so advancing days always looks fresh!"""
+    d_idx = max(0, min(6, int(day_index or 0)))
+    pal = DAY_VISUAL_PALETTES[d_idx]
+    slug = (parasha_key or "").lower().replace(" ", "-")
+
+    # Compute a stable week seed from parasha slug so different weeks get different galleries too!
+    week_seed = sum((i + 1) * ord(ch) for i, ch in enumerate(slug or "torah"))
+
+    # Day 0 uses the parasha's primary artwork (or week-seeded art); Days 1..6 choose distinct thematic paintings!
+    chosen_art = ""
+    if d_idx == 0 and primary_art and primary_art in ALL_ILLUMINATED_ARTS:
+        chosen_art = primary_art
+    elif d_idx == 6:
+        # Shabbat always crowns the week with Shabbat / Temple / Sacred Symbols light
+        shabbat_pool = ["/art/creation-shabbat.jpg", "/art/solomon-temple.jpg", "/art/sacred-symbols.jpg"]
+        chosen_art = shabbat_pool[week_seed % len(shabbat_pool)]
+    else:
+        # Check if THIS specific Aliyah's text strongly evokes a painting different from primary_art
+        low = (aliyah_text or "").lower()
+        keyword_map = [
+            ("/art/exodus-sea.jpg", ("sea", "water", "river", "jabbok", "jordan", "waves", "ford")),
+            ("/art/burning-bush.jpg", ("fire", "flame", "bush", "altar", "smoke", "burn")),
+            ("/art/noah-rainbow.jpg", ("ark", "flood", "rain", "rainbow", "dove", "covenant")),
+            ("/art/joseph-egypt.jpg", ("egypt", "pharaoh", "dream", "coat", "prison", "grain")),
+            ("/art/sinai-tablets.jpg", ("mount", "sinai", "command", "law", "statute", "tablet")),
+            ("/art/ruth-harvest.jpg", ("field", "harvest", "wheat", "flock", "sheep", "shepherd", "pasture")),
+            ("/art/david-harp.jpg", ("song", "harp", "sing", "psalm", "praise", "music", "dance")),
+            ("/art/solomon-temple.jpg", ("sanctuary", "tabernacle", "temple", "gold", "menorah", "priest")),
+            ("/art/elijah-horeb.jpg", ("angel", "wrestl", "dawn", "whisper", "cave", "prophet")),
+            ("/art/promised-land.jpg", ("canaan", "hebron", "shechem", "beth-el", "land", "inherit", "journey")),
+            ("/art/esther-shushan.jpg", ("palace", "king", "crown", "queen", "banquet", "royal")),
+            ("/art/abraham-stars.jpg", ("star", "heaven", "night", "tent", "blessing", "seed")),
+            ("/art/jerusalem-scroll.jpg", ("jerusalem", "zion", "scroll", "gate", "peace", "shalom")),
+        ]
+        # Deterministic unique pool per day so advancing Sun->Mon->Tue->Wed->Thu->Fri->Sha NEVER repeats!
+        rotated_idx = (week_seed + d_idx * 3) % len(ALL_ILLUMINATED_ARTS)
+        candidate = ALL_ILLUMINATED_ARTS[rotated_idx]
+        if candidate == primary_art:
+            candidate = ALL_ILLUMINATED_ARTS[(rotated_idx + 1) % len(ALL_ILLUMINATED_ARTS)]
+
+        # Prefer a content-matched art if it differs from primary_art and day 0's default
+        for art_path, kws in keyword_map:
+            if art_path != primary_art and any(kw in low for kw in kws):
+                # Mix with d_idx so two consecutive days with 'land' still vary cleanly
+                if (sum(ord(c) for c in art_path) + d_idx) % 2 == 0:
+                    chosen_art = art_path
+                    break
+        if not chosen_art:
+            chosen_art = candidate or _DAY_FALLBACK_ARTS[d_idx]
+
+    return {
+        "art": chosen_art,
+        "day_mood": pal["mood"],
+        "day_accent": pal["accent"],
+        "day_glow": pal["glow"],
+        "day_border": pal["border"],
+        "day_index": d_idx,
+    }
