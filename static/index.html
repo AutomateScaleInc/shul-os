@@ -355,14 +355,95 @@
     background: var(--gold-soft); color: var(--gold); border: 1px solid var(--border);
   }
   .comm-drawer {
-    background: var(--bg-elev);
+    background: linear-gradient(155deg, rgba(13,22,42,0.96), rgba(9,16,32,0.96));
+    border: 1px solid rgba(228,188,105,0.34);
     border-left: 3px solid var(--gold);
-    border-radius: 0 10px 10px 0;
-    padding: 14px 16px;
-    margin: 6px 0 14px;
+    border-radius: 0 14px 14px 0;
+    padding: 16px 18px;
+    margin: 8px 0 16px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.34);
   }
-  .comm-item { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .comm-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .comm-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 10px 0 14px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(228,188,105,0.18);
+  }
+  .comm-tab {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(228,188,105,0.24);
+    color: var(--muted);
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .comm-tab:hover { border-color: var(--gold); color: var(--text); }
+  .comm-tab.active {
+    background: linear-gradient(135deg, rgba(228,188,105,0.24), rgba(228,188,105,0.1));
+    border-color: var(--gold); color: var(--gold);
+    box-shadow: 0 2px 10px rgba(228,188,105,0.14);
+  }
+  .comm-card-list { display: grid; gap: 12px; }
+  .comm-item {
+    background: rgba(16,27,51,0.72);
+    border: 1px solid rgba(228,188,105,0.2);
+    border-radius: 13px;
+    padding: 14px 17px;
+  }
+  .comm-card-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    margin-bottom: 9px; flex-wrap: wrap;
+  }
+  .comm-author-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.74rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--gold); background: rgba(228,188,105,0.12);
+    border: 1px solid rgba(228,188,105,0.34); padding: 3px 10px; border-radius: 999px;
+  }
+  .comm-lemma {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px;
+    margin: 0 0 8px; padding: 6px 11px; border-radius: 9px;
+    background: rgba(228,188,105,0.09); border-left: 2.5px solid var(--gold);
+  }
+  .comm-lemma-he {
+    font-family: var(--hebrew); direction: rtl; font-size: 1.06rem; font-weight: 700; color: var(--gold);
+  }
+  .comm-lemma-en {
+    font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 0.9rem; color: #fff4d8;
+  }
+  .comm-prose {
+    display: grid; gap: 8px; max-width: 68ch;
+    font-family: var(--serif); font-size: 0.96rem; line-height: 1.64; color: #e8eef8;
+  }
+  .comm-prose p { margin: 0; }
+  .comm-prose p.comm-alt {
+    padding-left: 11px; border-left: 2px solid rgba(92,182,229,0.45); color: #dce8f8;
+  }
+  .comm-cite {
+    display: inline-block; font-family: var(--sans); font-size: 0.72rem; font-weight: 700;
+    color: var(--accent); background: rgba(92,182,229,0.12);
+    border: 1px solid rgba(92,182,229,0.28); border-radius: 6px;
+    padding: 0 6px; margin: 0 2px; vertical-align: 1px; line-height: 1.45;
+  }
+  .comm-he-box {
+    margin-top: 10px; padding: 10px 13px; border-radius: 10px;
+    background: rgba(7,13,27,0.55); border: 1px solid rgba(228,188,105,0.18);
+    font-family: var(--hebrew); direction: rtl; text-align: right;
+    font-size: 1.04rem; line-height: 1.8; color: #f3dfb0;
+  }
+  .comm-more-btn {
+    background: none; border: 1px solid rgba(228,188,105,0.34); color: var(--gold);
+    border-radius: 999px; padding: 3px 10px; font-size: 0.74rem; font-weight: 700;
+    cursor: pointer; margin-top: 8px; display: inline-flex; align-items: center; gap: 5px;
+    transition: all 0.16s ease;
+  }
+  .comm-more-btn:hover { background: rgba(228,188,105,0.14); border-color: var(--gold); }
+  [data-theme="parchment"] .comm-drawer { background: #fbf4e4; border-color: rgba(154,105,24,0.38); }
+  [data-theme="parchment"] .comm-item { background: #fffdf8; border-color: rgba(154,105,24,0.25); }
+  [data-theme="parchment"] .comm-lemma { background: rgba(154,105,24,0.08); }
+  [data-theme="parchment"] .comm-lemma-en { color: #5b3b06; }
+  [data-theme="parchment"] .comm-prose { color: #2a2117; }
+  [data-theme="parchment"] .comm-prose p.comm-alt { color: #3d3020; }
+  [data-theme="parchment"] .comm-he-box { background: #f6ecda; color: #5c3c08; }
 
   /* CARDS GRID */
   .cards-grid {
@@ -519,16 +600,27 @@
     margin-bottom: 12px;
   }
   .spot-comm {
-    background: var(--gold-soft);
+    background: linear-gradient(145deg, rgba(228,188,105,0.1), rgba(14,24,46,0.72));
+    border: 1px solid rgba(228,188,105,0.28);
     border-left: 3px solid var(--gold);
-    border-radius: 0 12px 12px 0;
+    border-radius: 0 13px 13px 0;
     padding: 11px 15px;
-    margin-bottom: 12px;
-    font-size: 0.93rem;
+    margin-bottom: 10px;
+    font-size: 0.92rem;
+  }
+  .spot-comm .c-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
   }
   .spot-comm .c-label {
-    font-weight: 700; color: var(--gold); font-size: 0.84rem;
-    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+    font-weight: 800; color: var(--gold); font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0;
+  }
+  .spot-comm .comm-prose { font-size: 0.91rem; line-height: 1.54; gap: 6px; }
+  .spot-comm .comm-lemma { margin: 0 0 6px; padding: 4px 9px; }
+  [data-theme="parchment"] .spot-comm {
+    background: linear-gradient(145deg, #fffaf0, #f7ebd3);
+    border-color: rgba(154,105,24,0.34);
   }
   .daily-stream {
     background: var(--bg-card);
@@ -2809,6 +2901,21 @@
   </footer>
 </div>
 
+<!-- SPACIOUS CLASSICAL COMMENTARY READER MODAL (TABBED RASHI · RAMBAN · IBN EZRA · SFORNO · MIDRASH) -->
+<div class="coach-backdrop" id="commReaderModal" onclick="if(event.target===this) closeCommReaderModal()">
+  <div class="coach-card" style="max-width:860px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;flex-shrink:0;">
+      <div>
+        <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);">📚 CLASSICAL COMMENTARY STUDIO · STRUCTURED READING</div>
+        <h2 style="margin:3px 0 0;font-family:var(--serif);color:var(--gold);" id="commReaderTitle">Classical Commentators</h2>
+      </div>
+      <button class="tool-btn" onclick="closeCommReaderModal()">✕ Close</button>
+    </div>
+    <div id="commReaderVerse" style="font-family:var(--serif);font-size:0.95rem;color:var(--muted);padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);margin-bottom:10px;flex-shrink:0;display:none;"></div>
+    <div id="commReaderBody" style="overflow-y:auto;padding-right:6px;flex:1 1 auto;">Loading commentaries...</div>
+  </div>
+</div>
+
 <!-- VERIFIED SOURCE FOUNDATION MODAL (TIER 1 SCRIPTURE PARALLELS vs. TIER 2 CITED TALMUDIC LENSES) -->
 <div class="coach-backdrop" id="foundationModal" onclick="if(event.target===this) closeFoundationModal()">
   <div class="coach-card" style="max-width:960px;">
@@ -4630,6 +4737,18 @@ function renderSpotlight() {
     const popMsg = nextSl && (nextSl.kind === 'quiz' || nextSl.kind === 'character_scene' || nextSl.kind === 'hebrew_word')
       ? `${nextSl.title} — get ready!`
       : ((rich.today_points && rich.today_points[0]) || 'Every verse connects ancient Torah wisdom to life right now.');
+    const parseVerseRef = (refStr) => {
+      const m = String(refStr || '').trim().match(/^(.+?)\s+(\d+):(\d+)$/);
+      if (!m) return null;
+      return { bookSlug: m[1].toLowerCase().replace(/\s+/g, '-'), ch: Number(m[2]), v: Number(m[3]) };
+    };
+    const vRefParts = s.kind === 'verse' ? parseVerseRef(s.ref || s.title) : null;
+    const commMoreBtn = vRefParts
+      ? `<button class="comm-more-btn" style="margin-top:0;" onclick="openVerseCommentaryReader('${esc(vRefParts.bookSlug)}', ${vRefParts.ch}, ${vRefParts.v}, '${esc(s.ref || s.title)}', this.dataset.vtxt)" data-vtxt="${esc(s.en_text || '')}">📖 All Commentators</button>`
+      : '';
+    const commBodyHtml = s.commentary
+      ? (s.kind === 'story' ? renderMarkdown(s.commentary) : formatClassicalCommentary(s.commentary, { compact: s.kind === 'verse', maxChars: 290 }))
+      : '';
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
         ${slideArt ? `<div style="position:relative;">${renderLivingScene(slideArt, 'clamp(135px, 16vh, 210px)', capHtml, "openPresentation('parasha','')", 'margin-bottom:10px;cursor:pointer;')}<div class="mid-popin" id="midPopIn"><div class="mp-k">${esc(popKicker)}</div><div class="mp-v">${esc(popMsg.slice(0, 105))}</div></div></div>` : `
@@ -4640,7 +4759,7 @@ function renderSpotlight() {
         <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
         ${s.he_text ? `<div class="spot-he-wrap"><div class="verse-micro-badge" title="Illuminated Verse Emblem">${getVerseMicroEmblem(s)}</div><div class="spot-he" style="margin:0;flex:1;">${esc(s.he_text)}</div></div>` : ''}
         <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
-        ${s.commentary ? `<div class="spot-comm"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div><div>${s.kind === 'story' ? renderMarkdown(s.commentary) : esc(s.commentary)}</div></div>` : ''}
+        ${s.commentary ? `<div class="spot-comm"><div class="c-head"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div>${commMoreBtn}</div>${commBodyHtml}</div>` : ''}
         ${todayHint}
         ${richBar}
       </div>`;
@@ -4672,15 +4791,16 @@ function renderSpotlight() {
     const topPos = activeEl.offsetTop - streamList.offsetTop - 70;
     streamList.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
   }
-  // If spotlight slide content slightly overflows its locked display frame, smoothly auto-glide down after a 3.2s reading breath!
+  // If spotlight slide content ever slightly overflows its display frame, gently glide (cancels on user wheel/touch!)
   const spotBody = document.getElementById('spotlightContent');
   if (spotBody && window.innerWidth > 820) {
+    if (window._spotGlideRaf) { cancelAnimationFrame(window._spotGlideRaf); window._spotGlideRaf = 0; }
     spotBody.scrollTop = 0;
     const overflow = spotBody.scrollHeight - spotBody.clientHeight;
-    if (overflow > 12) {
+    if (overflow > 16) {
       showBeatTimers.push(setTimeout(() => {
-        spotBody.scrollTo({ top: overflow, behavior: 'smooth' });
-      }, 3400));
+        smoothGlideElement(spotBody, overflow, Math.min(6200, Math.max(2600, overflow * 22)));
+      }, 3600));
     }
   }
 }
@@ -5083,6 +5203,268 @@ async function selectBook(slug, ch) {
   renderVerseRows(document.getElementById('chapterVerses'), d.book.slug, d.verses || []);
 }
 
+function smoothGlideElement(el, targetTop, durationMs) {
+  if (!el) return;
+  let cancelled = false;
+  const cancel = () => {
+    cancelled = true;
+    if (window._spotGlideRaf) { cancelAnimationFrame(window._spotGlideRaf); window._spotGlideRaf = 0; }
+    el.removeEventListener('wheel', cancel);
+    el.removeEventListener('touchstart', cancel);
+    el.removeEventListener('pointerdown', cancel);
+  };
+  el.addEventListener('wheel', cancel, { passive: true, once: true });
+  el.addEventListener('touchstart', cancel, { passive: true, once: true });
+  el.addEventListener('pointerdown', cancel, { passive: true, once: true });
+  const startTop = el.scrollTop;
+  const delta = targetTop - startTop;
+  if (Math.abs(delta) < 4) return;
+  const t0 = performance.now();
+  const step = (now) => {
+    if (cancelled) return;
+    const p = Math.min(1, (now - t0) / durationMs);
+    const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    el.scrollTop = startTop + delta * ease;
+    if (p < 1) window._spotGlideRaf = requestAnimationFrame(step);
+  };
+  window._spotGlideRaf = requestAnimationFrame(step);
+}
+
+function _titleCaseLemma(s) {
+  const minor = new Set(['a','an','and','as','at','by','for','from','in','into','of','on','or','the','to','unto','with']);
+  return s.toLowerCase().split(/\s+/).map((w, i) => {
+    if (i > 0 && minor.has(w)) return w;
+    return w.replace(/^([\[("']?)([a-z])/, (_, pre, ch) => pre + ch.toUpperCase());
+  }).join(' ');
+}
+
+function formatClassicalCommentary(rawText, opts = {}) {
+  const compact = Boolean(opts.compact);
+  const maxChars = opts.maxChars || (compact ? 290 : 0);
+  let text = String(rawText || '').replace(/\s+/g, ' ').trim();
+  if (!text) return '<div class="muted">(Hebrew only)</div>';
+
+  // 1. Extract opening Dibbur HaMatchil (Hebrew catchwords and/or ALL-CAPS English lemma)
+  let lemmaHe = '';
+  let lemmaEn = '';
+  const heM = text.match(/^([\u0590-\u05FF][\u0590-\u05FF\s.,׳״"'\-…]{1,48})(?:\s+means\s+|\s*[,—–\-:]\s*|\s+(?=[A-Z]))/);
+  if (heM) {
+    lemmaHe = heM[1].trim().replace(/[,—–\-:]+$/, '');
+    text = text.slice(heM[0].length).trim();
+  }
+  const enM = text.match(/^([A-Z][A-Z\s,'’.\[\]\-]{4,85}?)(?:\s*\((?:Heb\.|Lit\.)[^)]{1,60}\))?\s*(?:[—–\-]+|\.\s+)/);
+  if (enM && /[A-Z]{3}/.test(enM[1])) {
+    lemmaEn = _titleCaseLemma(enM[1].trim().replace(/[—–\-:.]+$/, ''));
+    text = text.slice(enM[0].length).trim();
+  }
+  text = text.replace(/^[—–\-:,.\s]+/, '').trim();
+
+  // 2. Break dense wall-of-text into airy editorial beats & discourse shifts
+  const rawChunks = text
+    .split(/(?=\b(?:Another explanation:|Alternatively[,:]|A second explanation:|Similarly,|Therefore,|However,|Know that |But the Sages |Our Sages (?:say|teach|comment)))/i)
+    .map(c => c.trim())
+    .filter(Boolean);
+
+  const paragraphs = [];
+  rawChunks.forEach(chunk => {
+    const isAlt = /^(?:Another explanation|Alternatively|A second explanation)/i.test(chunk);
+    if (chunk.length <= 240) {
+      paragraphs.push({ text: chunk, alt: isAlt });
+      return;
+    }
+    const sentences = chunk.match(/[^.!?]+(?:[.!?]+["”’)]*|$)/g) || [chunk];
+    let buf = '';
+    let firstInChunk = true;
+    sentences.forEach(sent => {
+      const s = sent.trim();
+      if (!s) return;
+      if (buf && (buf.length + s.length + 1) > 235) {
+        paragraphs.push({ text: buf, alt: isAlt && firstInChunk });
+        buf = s;
+        firstInChunk = false;
+      } else {
+        buf = buf ? (buf + ' ' + s) : s;
+      }
+    });
+    if (buf) paragraphs.push({ text: buf, alt: isAlt && firstInChunk });
+  });
+
+  // 3. Highlight inline Talmudic / Midrashic / Scriptural citations as subtle badges
+  const decorateCitations = (plain) => {
+    let h = esc(plain);
+    h = h.replace(
+      /\(([^()]{2,48}?(?:\d+[ab]|\d+:\d+(?:[:\-]\d+)?|Rabbah|Tanchuma|Midrash|Berakhot|Shabbat|Yevamot|Sanhedrin|Pesachim|Rosh Hashanah|Sotah|Megillah|Bava|Ketubot|Kiddushin|Chullin|Nedarim|Gittin|Avot)[^()]{0,24})\)/gi,
+      '<span class="comm-cite">$1</span>'
+    );
+    return h;
+  };
+
+  let shown = paragraphs;
+  let truncated = false;
+  if (compact && maxChars > 0) {
+    shown = [];
+    let total = 0;
+    for (const p of paragraphs) {
+      if (shown.length >= 2) { truncated = true; break; }
+      if (total + p.text.length <= maxChars || shown.length === 0) {
+        const clipped = (shown.length === 0 && p.text.length > maxChars + 40)
+          ? p.text.slice(0, maxChars).replace(/\s+\S*$/, '') + '…'
+          : p.text;
+        if (clipped !== p.text) truncated = true;
+        shown.push({ text: clipped, alt: p.alt });
+        total += clipped.length;
+      } else {
+        truncated = true;
+        break;
+      }
+    }
+  }
+
+  let html = '';
+  if (lemmaHe || lemmaEn) {
+    html += `<div class="comm-lemma">
+      ${lemmaHe ? `<span class="comm-lemma-he">${esc(lemmaHe)}</span>` : ''}
+      ${lemmaEn ? `<span class="comm-lemma-en">“${esc(lemmaEn)}”</span>` : ''}
+    </div>`;
+  }
+  html += `<div class="comm-prose">${shown.map(p => `<p class="${p.alt ? 'comm-alt' : ''}">${decorateCitations(p.text)}</p>`).join('')}</div>`;
+  if (truncated && !opts.hideHint) {
+    html += `<div class="muted" style="font-size:0.74rem;margin-top:5px;">✦ Tap <strong>All Commentators</strong> above to read the complete commentary in full.</div>`;
+  }
+  return html;
+}
+
+function renderTabbedCommentaries(container, verseRef, comms, opts = {}) {
+  if (!container) return;
+  const list = comms || [];
+  if (!list.length) {
+    container.innerHTML = '<div class="muted" style="padding:10px 0;">No verse-linked Torah commentary stored for this verse — click "Ask Scholar" for an interactive explanation grounded in Tanakh!</div>';
+    return;
+  }
+  // Group by commentator preserving classical order (Rashi first!)
+  const order = ['Rashi', 'Ramban', 'Ibn Ezra', 'Sforno', 'Or HaChaim', 'Rashbam', 'Kli Yakar', 'Chizkuni'];
+  const groups = new Map();
+  list.forEach(c => {
+    const name = c.commentator || 'Classical Sages';
+    if (!groups.has(name)) groups.set(name, []);
+    groups.get(name).push(c);
+  });
+  const sortedNames = Array.from(groups.keys()).sort((a, b) => {
+    const ia = order.findIndex(k => a.toLowerCase().includes(k.toLowerCase()));
+    const ib = order.findIndex(k => b.toLowerCase().includes(k.toLowerCase()));
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+
+  const tabsWrap = document.createElement('div');
+  tabsWrap.className = 'comm-tabs';
+  const cardsWrap = document.createElement('div');
+  cardsWrap.className = 'comm-card-list';
+
+  let activeTab = sortedNames[0];
+  const renderCards = (selected) => {
+    activeTab = selected;
+    tabsWrap.querySelectorAll('.comm-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === selected));
+    const items = selected === '__all__' ? list : (groups.get(selected) || []);
+    cardsWrap.innerHTML = '';
+    items.forEach((c, idx) => {
+      const card = document.createElement('div');
+      card.className = 'comm-item';
+      const rawEn = String(c.en_text || '').trim();
+      const isLong = rawEn.length > 480;
+      const head = document.createElement('div');
+      head.className = 'comm-card-head';
+      head.innerHTML = `<span class="comm-author-pill">📜 ${esc(c.commentator || 'Classical Sages')}</span>`;
+      if (c.he_text) {
+        const heBtn = document.createElement('button');
+        heBtn.className = 'comm-more-btn';
+        heBtn.style.marginTop = '0';
+        heBtn.textContent = 'עברית · Hebrew';
+        heBtn.onclick = () => {
+          const hb = card.querySelector('.comm-he-box');
+          if (hb) hb.style.display = hb.style.display === 'none' ? 'block' : 'none';
+        };
+        head.appendChild(heBtn);
+      }
+      card.appendChild(head);
+
+      const body = document.createElement('div');
+      body.innerHTML = formatClassicalCommentary(rawEn, { compact: isLong && selected === '__all__', maxChars: 340, hideHint: true });
+      card.appendChild(body);
+
+      if (isLong && selected === '__all__') {
+        let expanded = false;
+        const expBtn = document.createElement('button');
+        expBtn.className = 'comm-more-btn';
+        expBtn.textContent = 'Read Full Commentary ↓';
+        expBtn.onclick = () => {
+          expanded = !expanded;
+          body.innerHTML = formatClassicalCommentary(rawEn, { compact: !expanded, maxChars: 340, hideHint: true });
+          expBtn.textContent = expanded ? 'Show Summary ↑' : 'Read Full Commentary ↓';
+        };
+        card.appendChild(expBtn);
+      }
+      if (c.he_text) {
+        const heBox = document.createElement('div');
+        heBox.className = 'comm-he-box';
+        heBox.style.display = 'none';
+        heBox.textContent = c.he_text;
+        card.appendChild(heBox);
+      }
+      cardsWrap.appendChild(card);
+    });
+  };
+
+  sortedNames.forEach(name => {
+    const cnt = groups.get(name).length;
+    const btn = document.createElement('button');
+    btn.className = 'comm-tab';
+    btn.dataset.tab = name;
+    btn.textContent = `${name}${cnt > 1 ? ` (${cnt})` : ''}`;
+    btn.onclick = () => renderCards(name);
+    tabsWrap.appendChild(btn);
+  });
+  if (sortedNames.length > 1) {
+    const allBtn = document.createElement('button');
+    allBtn.className = 'comm-tab';
+    allBtn.dataset.tab = '__all__';
+    allBtn.textContent = `All (${list.length})`;
+    allBtn.onclick = () => renderCards('__all__');
+    tabsWrap.appendChild(allBtn);
+  }
+
+  container.innerHTML = '';
+  container.appendChild(tabsWrap);
+  container.appendChild(cardsWrap);
+  renderCards(activeTab);
+}
+
+async function openVerseCommentaryReader(bookSlug, chapter, verse, refLabel, verseText) {
+  const m = document.getElementById('commReaderModal');
+  const t = document.getElementById('commReaderTitle');
+  const vBox = document.getElementById('commReaderVerse');
+  const body = document.getElementById('commReaderBody');
+  if (!m || !body) return;
+  if (t) t.textContent = `${refLabel || (bookSlug + ' ' + chapter + ':' + verse)} — Classical Commentators`;
+  if (vBox) {
+    if (verseText) { vBox.textContent = `“${verseText}”`; vBox.style.display = 'block'; }
+    else vBox.style.display = 'none';
+  }
+  body.innerHTML = '<div class="muted" style="padding:14px 0;">Loading Rashi, Ramban, Ibn Ezra, Sforno &amp; Midrash...</div>';
+  m.classList.add('open');
+  try {
+    const r = await fetch(`/api/commentary?book=${encodeURIComponent(bookSlug)}&chapter=${chapter}&verse=${verse}`);
+    const d = await r.json();
+    renderTabbedCommentaries(body, refLabel, d.commentaries || []);
+  } catch (e) {
+    body.innerHTML = '<div class="muted">Could not load commentaries for this verse.</div>';
+  }
+}
+
+function closeCommReaderModal() {
+  const m = document.getElementById('commReaderModal');
+  if (m) m.classList.remove('open');
+}
+
 function renderVerseRows(container, bookSlug, verses) {
   container.innerHTML = '';
   verses.forEach(v => {
@@ -5102,21 +5484,14 @@ function renderVerseRows(container, bookSlug, verses) {
       drawer.innerHTML = '<div class="muted">Loading Rashi, Ramban, Ibn Ezra &amp; Sforno...</div>';
       const r = await fetch(`/api/commentary?book=${encodeURIComponent(bookSlug)}&chapter=${v.chapter}&verse=${v.verse}`);
       const d = await r.json();
-      let chtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-        <strong style="color:var(--gold);">${esc(v.ref)} — Classical Commentators</strong>
-        <div style="display:flex;gap:8px;">
+      drawer.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <strong style="color:var(--gold);font-family:var(--serif);font-size:1.05rem;">${esc(v.ref)} — Classical Commentators</strong>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-primary" style="padding:5px 11px;font-size:0.8rem;" onclick="quickAsk('Explain ${esc(v.ref)} in depth with Rashi, Ramban, and PaRDeS.', 'scholar')">📖 Ask Scholar</button>
           <button class="btn-secondary" style="padding:5px 11px;font-size:0.8rem;" onclick="quickAsk('Tell the story and family lesson behind ${esc(v.ref)}.', 'storyteller')">✨ Story Mode</button>
         </div>
-      </div>`;
-      if (!(d.commentaries || []).length) {
-        chtml += '<div class="muted">No verse-linked Torah commentary stored for this verse — click "Ask Scholar" above for an interactive explanation grounded in Tanakh!</div>';
-      } else {
-        d.commentaries.forEach(c => {
-          chtml += `<div class="comm-item"><div style="font-weight:700;color:var(--accent);margin-bottom:3px;">${esc(c.commentator)}</div><div>${esc(c.en_text || '(Hebrew only)')}</div>${c.he_text ? `<div class="he" style="font-size:0.98rem;margin-top:4px;opacity:0.88;">${esc(c.he_text)}</div>` : ''}</div>`;
-        });
-      }
-      drawer.innerHTML = chtml;
+      </div><div class="comm-drawer-body"></div>`;
+      renderTabbedCommentaries(drawer.querySelector('.comm-drawer-body'), v.ref, d.commentaries || []);
     });
     wrap.appendChild(row);
     wrap.appendChild(drawer);
@@ -5717,8 +6092,8 @@ function renderPresSlide() {
       <div style="margin-top:16px;">
         ${(s.items || []).map((it, idx) => `
           <div class="pres-point" style="animation:sanctuaryReveal 0.5s ease ${(idx*0.1).toFixed(2)}s both;">
-            <div style="color:#5cb6e5;font-weight:700;font-size:0.95rem;margin-bottom:4px;">${esc(it.author)} ${it.ref ? '· ' + esc(it.ref) : ''}</div>
-            <div>${esc(it.text)}</div>
+            <div style="color:#5cb6e5;font-weight:700;font-size:0.95rem;margin-bottom:6px;">${esc(it.author)} ${it.ref ? '· ' + esc(it.ref) : ''}</div>
+            ${formatClassicalCommentary(it.text, { compact: true, maxChars: 340, hideHint: true })}
           </div>`).join('')}
       </div>
       </div>`;
