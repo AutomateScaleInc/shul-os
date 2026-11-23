@@ -35,15 +35,12 @@ MOTD_PATH = CACHE_DIR / "motd.txt"
 
 # Gentle Halachic-watch backlight curve (%) to avoid nighttime glare & save power
 WATCH_BRIGHTNESS_PCT = {
-    "alot": 72,
-    "misheyakir": 84,
-    "shacharit": 95,
+    "dawn": 78,
+    "morning": 95,
     "midday": 100,
-    "mincha": 94,
-    "plag": 84,
+    "golden": 84,
     "twilight": 68,
-    "maariv": 56,
-    "midnight": 48,
+    "night": 54,
 }
 
 
@@ -326,8 +323,8 @@ def sync_once() -> dict:
 
     bright_status = "disabled"
     if cfg.get("os_brightness_sync", True):
-        watch_key = (snap["watch"].get("key") or "midday").lower()
-        target_pct = WATCH_BRIGHTNESS_PCT.get(watch_key, 88)
+        watch_mood = (snap["watch"].get("mood") or "midday").lower()
+        target_pct = WATCH_BRIGHTNESS_PCT.get(watch_mood, 90)
         if snap.get("shabbat_mode") and target_pct < 62:
             target_pct = 62  # Peaceful warm Shabbat sanctuary glow
         bright_status = apply_display_brightness(target_pct)
