@@ -60,7 +60,12 @@ p.write_text(json.dumps(cfg, indent=2))
 print("Configured:", p)
 PYEOF
 
-# 4. Index Haggadah, Siddur & offline sacred books into local SQLite FTS5
+# 4. Build local offline Tanakh + Classical Commentaries SQLite DB if first install, then index Haggadah & Siddur
+mkdir -p "$INSTALL_DIR/data"
+if [[ ! -f "$INSTALL_DIR/data/torah.db" ]]; then
+  echo "📜 First-time install: building complete 39-book offline Tanakh & Classical Commentary database..."
+  (cd "$INSTALL_DIR" && python3 ingest_corpus.py && python3 seed_knowledge.py)
+fi
 (cd "$INSTALL_DIR" && python3 -c "import sacred_books; print('Indexed offline books:', sacred_books.index_into_db())")
 
 # 5. Install one-tap recovery launcher & Desktop App Icon ("Shul.OS")
