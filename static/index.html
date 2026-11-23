@@ -1125,6 +1125,36 @@
     85%  { opacity: 0.9; }
     100% { transform: translateY(-108vh) rotate(10deg) scale(1.12); opacity: 0; }
   }
+  /* Hands-Free "Shul Open / Shul Click" Voice Command HUD & Golden Click Ripple */
+  .shul-voice-hud {
+    position: fixed; top: 56px; left: 50%; transform: translateX(-50%) translateY(-14px);
+    z-index: 320; pointer-events: none; opacity: 0;
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 16px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(16,28,56,0.96), rgba(9,16,34,0.98));
+    border: 1.5px solid var(--gold);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.55), 0 0 22px rgba(228,188,105,0.28);
+    color: #fff6df; font-size: 0.84rem; font-weight: 700;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-width: min(92vw, 620px);
+  }
+  .shul-voice-hud.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .shul-voice-hud .v-dot {
+    width: 9px; height: 9px; border-radius: 50%; background: #4ade80; flex-shrink: 0;
+    box-shadow: 0 0 10px #4ade80; animation: livePulse 1.5s infinite;
+  }
+  .voice-click-flash {
+    outline: 3px solid var(--gold) !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 26px rgba(243,215,150,0.75) !important;
+    transition: outline 0.2s ease, box-shadow 0.2s ease;
+  }
+  #hdrWakeBtn.active-wake {
+    border-color: #4ade80 !important; color: #86efac !important;
+    background: rgba(74,222,128,0.14) !important;
+    box-shadow: 0 0 12px rgba(74,222,128,0.28);
+  }
+
   /* ===== SYNAGOGUE-GRADE ARCHITECTURAL SIDE RAILS (TOP SACRED ICONS + BOTTOM COZY CLUSTER, ZERO JOSTLE) ===== */
   .sanctuary-rail {
     position: fixed; z-index: 6; pointer-events: none;
@@ -2159,6 +2189,10 @@
   </div>
 </aside>
 <div id="sparkBurstLayer" class="spark-burst-layer"></div>
+<div id="shulVoiceHud" class="shul-voice-hud" role="status" aria-live="polite">
+  <span class="v-dot"></span>
+  <span id="shulVoiceHudText">🎙 Say "Shul open..." or "Shul click..."</span>
+</div>
 
 <div class="app">
   <header>
@@ -2188,7 +2222,8 @@
     <div class="hdr-tools">
       <button class="btn-primary" style="padding:4px 9px;font-size:0.76rem;" onclick="openPresentation('parasha','')" title="Full-Screen Presentation">🎬 Present</button>
       <button class="tool-btn" style="border-color:var(--gold);color:var(--gold);font-weight:700;" onclick="openGiveModal()" title="Scan QR to Connect &amp; Sponsor">💛 QR</button>
-      <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Voice Ask">🎙</button>
+      <button class="tool-btn btn-mic" id="hdrMicBtn" onclick="toggleVoice()" title="Tap &amp; Say 'Shul open ...', 'Shul click ...', or Ask AI">🎙</button>
+      <button class="tool-btn" id="hdrWakeBtn" onclick="toggleShulHandsFree()" title="Hands-Free 'Shul Open / Shul Click' Voice Listener (Auto-pauses on Shabbat)">👂 Shul</button>
       <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹</button>
       <button class="tool-btn" onclick="adjustFont(-0.1)" title="Smaller text">A-</button>
       <button class="tool-btn" onclick="adjustFont(0.1)" title="Larger text">A+</button>
@@ -5111,13 +5146,16 @@ async function toggleVoice() {
         const d = await r.json();
         setMicVisual('idle');
         if (d.ok && d.text && d.text.trim()) {
-          switchView('ask');
-          document.getElementById('questionInput').value = d.text.trim();
-          lastAskWasVoice = true;
-          sendQuestion(new Event('submit'));
+          const spoken = d.text.trim();
+          const handled = executeShulVoiceCommand(spoken, { requireWakeWord: false });
+          if (!handled) {
+            switchView('ask');
+            document.getElementById('questionInput').value = spoken;
+            lastAskWasVoice = true;
+            sendQuestion(new Event('submit'));
+          }
         } else {
-          switchView('ask');
-          document.getElementById('questionInput').placeholder = 'Did not catch that — tap Speak and try again...';
+          showShulVoiceHud('🎙 Did not catch that — tap 🎙 and try again', 2800);
         }
       } catch (e) {
         setMicVisual('idle');
@@ -5128,6 +5166,358 @@ async function toggleVoice() {
   } catch (e) {
     setMicVisual('idle');
     alert('Could not access Sentinel microphone: ' + e.message);
+  }
+}
+
+// =============================================================================
+// HANDS-FREE "SHUL OPEN ..." / "SHUL CLICK ..." VOICE COMMAND ENGINE
+// Works both via Push-to-Talk (offline Whisper /api/stt) & Continuous Hands-Free
+// Mode (Web Speech API + 100% Offline VAD->Whisper fallback; auto-pauses Shabbat!)
+// =============================================================================
+let shulVoiceHudTimer = null;
+function showShulVoiceHud(msg, durationMs = 3400) {
+  const hud = document.getElementById('shulVoiceHud');
+  const txt = document.getElementById('shulVoiceHudText');
+  if (!hud || !txt) return;
+  txt.textContent = msg;
+  hud.classList.add('show');
+  if (shulVoiceHudTimer) clearTimeout(shulVoiceHudTimer);
+  if (durationMs > 0) {
+    shulVoiceHudTimer = setTimeout(() => hud.classList.remove('show'), durationMs);
+  }
+}
+
+function _normVoiceText(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function _flashAndClickEl(el, spokenLabel) {
+  if (!el) return false;
+  try {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (e) {}
+  el.classList.add('voice-click-flash');
+  setTimeout(() => el.classList.remove('voice-click-flash'), 900);
+  const label = (el.innerText || el.getAttribute('title') || el.getAttribute('aria-label') || spokenLabel || '').trim().slice(0, 48);
+  showShulVoiceHud(`✨ Clicked “${label}”`, 3000);
+  setTimeout(() => el.click(), 140);
+  return true;
+}
+
+function _findBestClickable(targetPhrase) {
+  const q = _normVoiceText(targetPhrase);
+  if (!q) return null;
+  const qTokens = q.split(' ').filter(t => t.length > 1);
+  // Prefer elements inside an open modal if one is currently open!
+  const openModal = document.querySelector('.coach-backdrop.open, .give-modal-backdrop.open, #presOverlay.open');
+  const root = openModal || document;
+  const candidates = Array.from(root.querySelectorAll(
+    'button, a, [onclick], .stream-item, .comm-tab, .liturgy-tab, .book-btn, .ch-pill, .story-card, .mode-pill, .quiz-opt, summary'
+  ));
+  let best = null;
+  let bestScore = 0;
+  for (const el of candidates) {
+    if (el.id === 'hdrMicBtn' || el.id === 'hdrWakeBtn') continue;
+    const rect = el.getBoundingClientRect();
+    if (rect.width < 4 || rect.height < 4) continue;
+    const style = getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.display === 'none' || parseFloat(style.opacity) < 0.1) continue;
+    const hay = _normVoiceText(`${el.innerText || ''} ${el.getAttribute('title') || ''} ${el.getAttribute('aria-label') || ''}`);
+    if (!hay) continue;
+    let score = 0;
+    if (hay === q) score = 100;
+    else if (hay.startsWith(q)) score = 88;
+    else if (hay.includes(q)) score = 74 - Math.min(20, (hay.length - q.length) * 0.15);
+    else if (qTokens.length) {
+      let hits = 0;
+      for (const tok of qTokens) {
+        if (hay.includes(tok)) hits++;
+      }
+      if (hits > 0) score = (hits / qTokens.length) * 62 - Math.min(18, hay.length * 0.08);
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = el;
+    }
+  }
+  return bestScore >= 34 ? best : null;
+}
+
+function executeShulVoiceCommand(rawTranscript, opts = {}) {
+  const requireWake = Boolean(opts.requireWakeWord);
+  const norm = _normVoiceText(rawTranscript);
+  if (!norm) return false;
+
+  // Phonetic wake-word matching ("shul", "shule", "shoal", "school", "shall", "torah", "hey shul")
+  const wakeRe = /^(?:hey\s+|ok\s+|okay\s+)?(?:shul|shule|shoal|school|shall|shull|shool|shol|torah)\b\s*(.*)$/i;
+  const wm = norm.match(wakeRe);
+  if (requireWake && !wm) return false;
+  let cmd = (wm ? wm[1] : norm).trim();
+  if (!cmd) {
+    showShulVoiceHud('🎙 Listening — say "Shul open Sky" or "Shul click Ramban"', 3000);
+    return true;
+  }
+
+  // 1. Direct Playback, Modal & Quick Utility Commands
+  if (/^(?:close|exit|dismiss|cancel)\b/.test(cmd)) {
+    ['commReaderModal', 'foundationModal', 'tefillinCoachModal', 'giveModal', 'presOverlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('open');
+    });
+    showShulVoiceHud('🎙 Closed overlay', 2200);
+    return true;
+  }
+  if (/^(?:next|forward|skip)\b/.test(cmd)) {
+    if (typeof stepSlide === 'function') stepSlide(1);
+    showShulVoiceHud('🎙 Next slide →', 2000);
+    return true;
+  }
+  if (/^(?:back|previous|prev)\b/.test(cmd)) {
+    if (typeof stepSlide === 'function') stepSlide(-1);
+    showShulVoiceHud('🎙 ← Previous slide', 2000);
+    return true;
+  }
+  if (/^(?:pause|hold|freeze)\b/.test(cmd)) {
+    if (typeof spotPlaying !== 'undefined' && spotPlaying && typeof toggleSpotPlay === 'function') toggleSpotPlay();
+    showShulVoiceHud('🎙 Paused slideshow', 2200);
+    return true;
+  }
+  if (/^(?:play|resume|continue)\b/.test(cmd)) {
+    if (typeof spotPlaying !== 'undefined' && !spotPlaying && typeof toggleSpotPlay === 'function') toggleSpotPlay();
+    showShulVoiceHud('🎙 Resumed slideshow', 2200);
+    return true;
+  }
+  if (/^(?:stop|quiet|silence|mute)\b/.test(cmd)) {
+    stopSpeaking();
+    showShulVoiceHud('🎙 Voice stopped', 2000);
+    return true;
+  }
+  if (/^(?:read|read aloud|speak)\b/.test(cmd)) {
+    const btn = _findBestClickable('read aloud');
+    if (btn) return _flashAndClickEl(btn, 'Read Aloud');
+  }
+  if (/^(?:reveal|answer)\b/.test(cmd)) {
+    if (typeof revealCurrentQuiz === 'function') { revealCurrentQuiz(null); showShulVoiceHud('🎙 Revealed answer', 2200); return true; }
+  }
+  if (/^(?:tefillin|wrap tefillin|say with me)\b/.test(cmd)) {
+    if (typeof openTefillinCoach === 'function') { openTefillinCoach(); showShulVoiceHud('🟦 Opened Guided Tefillin Coach', 2800); return true; }
+  }
+  if (/^(?:present|presentation|full presentation)\b/.test(cmd)) {
+    openPresentation('parasha', '');
+    showShulVoiceHud('🎬 Opened Full Presentation', 2600);
+    return true;
+  }
+  if (/^(?:parchment|light mode|dark mode|theme)\b/.test(cmd)) {
+    toggleTheme();
+    showShulVoiceHud('🎨 Switched Sanctuary Theme', 2200);
+    return true;
+  }
+  const askM = cmd.match(/^ask\s+(.+)$/);
+  if (askM && askM[1]) {
+    showShulVoiceHud(`🤖 Asking: “${askM[1].slice(0, 48)}”`, 3000);
+    lastAskWasVoice = true;
+    quickAsk(askM[1], 'all');
+    return true;
+  }
+
+  // 2. "Shul open <section>" / "Shul go to <section>" / "Shul show <section>"
+  const openM = cmd.match(/^(?:open|go to|goto|show|switch to|view)\s+(.+)$/);
+  if (openM) {
+    const target = openM[1].trim();
+    const sectionMap = [
+      [/\b(?:today|home|main|start)\b/, () => { switchView('today'); return 'Today'; }],
+      [/\b(?:sky|zmanim|calendar|sun|moon|astronomy|compass)\b/, () => { switchView('sky'); return 'Sky & Zmanim'; }],
+      [/\b(?:tefillin)\b/, () => { openTefillinCoach(); return 'Guided Tefillin Coach'; }],
+      [/\b(?:psalms|tehillim)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('psalms'), 60); return 'Daily Psalms'; }],
+      [/\b(?:meals|blessing|blessings|birkat|dinner)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('meals'), 60); return 'Meal Blessings'; }],
+      [/\b(?:songs|song|music|zemirot|sing)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('songs'), 60); return 'Sacred Songs'; }],
+      [/\b(?:holidays|holiday|festivals|chanukah|passover|purim)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('holidays'), 60); return 'Holidays Encyclopedia'; }],
+      [/\b(?:haggadah|siddur|talmud|daf yomi|yerushalmi|bavli|megillot|books)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('books'), 60); return 'Sacred Books, Daf Yomi & Twin Talmuds'; }],
+      [/\b(?:prayers|prayer|liturgy)\b/, () => { switchView('liturgy'); return 'Prayers & Books'; }],
+      [/\b(?:stories|story)\b/, () => { switchView('stories'); return 'Torah Stories'; }],
+      [/\b(?:cast|characters|character)\b/, () => { switchView('characters'); return 'Cast & Characters'; }],
+      [/\b(?:symbols|symbol)\b/, () => { switchView('symbols'); return 'Sacred Symbols'; }],
+      [/\b(?:ask|ai|chat|question)\b/, () => { switchView('ask'); return 'Ask AI'; }],
+      [/\b(?:parasha|parashah|portion|weekly)\b/, () => { switchView('parasha'); return 'Weekly Parashah'; }],
+      [/\b(?:tanakh|bible|reader|scripture|verses)\b/, () => { switchView('reader'); return 'Tanakh Reader'; }],
+      [/\b(?:shul|events|community|kiddush|rabbi)\b/, () => { switchView('shul'); return 'The Shul Hub'; }],
+      [/\b(?:mesh|network|broadcast)\b/, () => { switchView('mesh'); return 'Shul.OS Mesh'; }],
+      [/\b(?:history|timeline)\b/, () => { switchView('history'); return 'History & Timeline'; }],
+      [/\b(?:settings|config|preferences|update|updates)\b/, () => { switchView('settings'); return 'Settings'; }],
+      [/\b(?:deck|under the hood|download)\b/, () => { window.open('/under-the-hood', '_blank'); return 'Under the Hood Deck'; }],
+      [/\b(?:qr|give|sponsor|donate)\b/, () => { openGiveModal(); return 'QR Connect & Sponsor'; }],
+      [/\b(?:sources|foundation)\b/, () => { openFoundationModal(); return 'Sources & Talmud'; }],
+      [/\b(?:commentators|commentary|rashi|ramban)\b/, () => {
+        const b = _findBestClickable('all commentators');
+        if (b) { _flashAndClickEl(b, 'All Commentators'); return 'All Commentators'; }
+        return null;
+      }],
+    ];
+    for (const [rx, fn] of sectionMap) {
+      if (rx.test(target)) {
+        const lbl = fn();
+        if (lbl) { showShulVoiceHud(`✨ Opened ${lbl}`, 2800); return true; }
+      }
+    }
+    const fallbackEl = _findBestClickable(target);
+    if (fallbackEl) return _flashAndClickEl(fallbackEl, target);
+    showShulVoiceHud(`🎙 Couldn't find “${target}” on screen`, 2600);
+    return true;
+  }
+
+  // 3. "Shul click <anything>" / "Shul tap <anything>" / "Shul press <anything>"
+  const clickM = cmd.match(/^(?:click|tap|press|select|choose|hit)\s+(.+)$/);
+  if (clickM) {
+    const target = clickM[1].trim();
+    const el = _findBestClickable(target);
+    if (el) return _flashAndClickEl(el, target);
+    showShulVoiceHud(`🎙 No visible button matching “${target}”`, 2600);
+    return true;
+  }
+
+  // 4. If wake word was explicitly spoken ("Shul Ramban", "Shul Sky"), try matching visible controls or sections directly!
+  if (wm) {
+    const el = _findBestClickable(cmd);
+    if (el) return _flashAndClickEl(el, cmd);
+    // Otherwise treat "Shul <question>" as an AI question!
+    showShulVoiceHud(`🤖 Asking: “${cmd.slice(0, 48)}”`, 3000);
+    lastAskWasVoice = true;
+    quickAsk(cmd, 'all');
+    return true;
+  }
+  return false;
+}
+
+// Continuous Hands-Free Listener (Web Speech API + Offline VAD->Whisper fallback; auto-pauses on Shabbat)
+let shulWakeActive = false;
+let shulSpeechRec = null;
+let shulVadStream = null;
+let shulVadTimer = null;
+
+function stopShulHandsFree(silent = false) {
+  shulWakeActive = false;
+  const btn = document.getElementById('hdrWakeBtn');
+  if (btn) { btn.classList.remove('active-wake'); btn.textContent = '👂 Shul'; }
+  if (shulSpeechRec) { try { shulSpeechRec.onend = null; shulSpeechRec.stop(); } catch (e) {} shulSpeechRec = null; }
+  if (shulVadTimer) { clearInterval(shulVadTimer); shulVadTimer = null; }
+  if (shulVadStream) { shulVadStream.getTracks().forEach(t => t.stop()); shulVadStream = null; }
+  if (!silent) showShulVoiceHud('🔇 Hands-free "Shul" listener paused', 2000);
+}
+
+async function toggleShulHandsFree() {
+  if (shulWakeActive) { stopShulHandsFree(false); return; }
+  if (celestialData && celestialData.shabbat_mode) {
+    showShulVoiceHud('🕯 Shabbat Stillness active — voice listener rests until Havdalah', 3200);
+    return;
+  }
+  shulWakeActive = true;
+  const btn = document.getElementById('hdrWakeBtn');
+  if (btn) { btn.classList.add('active-wake'); btn.textContent = '👂 Listening'; }
+  showShulVoiceHud('🎙 Hands-Free Active — say "Shul open..." or "Shul click..."', 3600);
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    try {
+      const rec = new SR();
+      rec.continuous = true;
+      rec.interimResults = false;
+      rec.lang = 'en-US';
+      rec.onresult = (ev) => {
+        if (!shulWakeActive || (celestialData && celestialData.shabbat_mode)) return;
+        const last = ev.results[ev.results.length - 1];
+        if (last && last.isFinal && last[0] && last[0].transcript) {
+          executeShulVoiceCommand(last[0].transcript, { requireWakeWord: true });
+        }
+      };
+      rec.onerror = (ev) => {
+        if (ev.error === 'network' || ev.error === 'service-not-allowed') {
+          try { rec.stop(); } catch (e) {}
+          shulSpeechRec = null;
+          if (shulWakeActive) startOfflineVadWakeListener();
+        }
+      };
+      rec.onend = () => {
+        if (shulWakeActive && shulSpeechRec) {
+          setTimeout(() => { try { if (shulWakeActive) rec.start(); } catch (e) {} }, 400);
+        }
+      };
+      shulSpeechRec = rec;
+      rec.start();
+      return;
+    } catch (e) {}
+  }
+  startOfflineVadWakeListener();
+}
+
+async function startOfflineVadWakeListener() {
+  // 100% Offline local VAD -> Whisper (/api/stt) hands-free wake listener for bare-metal kiosks!
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    stopShulHandsFree(true);
+    return;
+  }
+  try {
+    shulVadStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(shulVadStream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    src.connect(analyser);
+    const buf = new Float32Array(analyser.fftSize);
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+    let vadRec = null;
+    let vadChunks = [];
+    let speaking = false;
+    let silenceMs = 0;
+    let speechMs = 0;
+
+    shulVadTimer = setInterval(() => {
+      if (!shulWakeActive || (celestialData && celestialData.shabbat_mode)) return;
+      analyser.getFloatTimeDomainData(buf);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+      const rms = Math.sqrt(sum / buf.length);
+      if (rms > 0.028) {
+        silenceMs = 0;
+        speechMs += 120;
+        if (!speaking && !vadRec) {
+          speaking = true;
+          vadChunks = [];
+          vadRec = new MediaRecorder(shulVadStream, { mimeType: mime });
+          vadRec.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) vadChunks.push(ev.data); };
+          vadRec.onstop = async () => {
+            const blob = new Blob(vadChunks, { type: mime });
+            vadRec = null;
+            if (blob.size < 2500) return;
+            try {
+              const r = await fetch('/api/stt', { method: 'POST', headers: { 'Content-Type': mime }, body: blob });
+              const d = await r.json();
+              if (d.ok && d.text && d.text.trim()) {
+                executeShulVoiceCommand(d.text.trim(), { requireWakeWord: true });
+              }
+            } catch (e) {}
+          };
+          vadRec.start();
+        }
+        if (speaking && speechMs > 5500 && vadRec && vadRec.state === 'recording') {
+          speaking = false; speechMs = 0; vadRec.stop();
+        }
+      } else if (speaking) {
+        silenceMs += 120;
+        if (silenceMs >= 900) {
+          speaking = false;
+          speechMs = 0;
+          if (vadRec && vadRec.state === 'recording') vadRec.stop();
+        }
+      }
+    }, 120);
+  } catch (e) {
+    showShulVoiceHud('🎙 Allow microphone access to enable "Shul open/click"', 3500);
+    stopShulHandsFree(true);
   }
 }
 
