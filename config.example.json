@@ -16,6 +16,7 @@
   "presence_sleep_minutes": 5,
   "default_theme": "sanctuary",
   "os_color_temp_sync": true,
+  "os_brightness_sync": true,
   "max_sanctuary_volume": 0.42,
   "scribe_enabled": true,
   "scribe_online_ingest": true,

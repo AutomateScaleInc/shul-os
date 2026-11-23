@@ -97,7 +97,58 @@ RestartSec=3
 WantedBy=default.target
 EOF
 
-# 7. Install nightly Shabbat-safe Fleet Auto-Updater timer (03:30 AM local)
+# 7. Install Living OS Celestial Rhythm (display warmth, hardware backlight & volume guard every 2m)
+cat > "$HOME/.config/systemd/user/torah-celestial.service" << EOF
+[Unit]
+Description=Shul.OS Celestial, Display Backlight & Volume Guard Sync
+
+[Service]
+Type=oneshot
+WorkingDirectory=$INSTALL_DIR
+ExecStart=/usr/bin/python3 $INSTALL_DIR/sacred-os-daemon.py --quiet
+EOF
+
+cat > "$HOME/.config/systemd/user/torah-celestial.timer" << EOF
+[Unit]
+Description=Run Shul.OS Living Display & Volume Guard Sync every 2 minutes
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=2m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# 8. Install Low-Heat Throttled Mini-Orca Living Scribe (every 30m, pauses on Shabbat)
+cat > "$HOME/.config/systemd/user/torah-scribe.service" << EOF
+[Unit]
+Description=Shul.OS Mini-Orca Autonomous Living Torah Scribe Cycle
+
+[Service]
+Type=oneshot
+WorkingDirectory=$INSTALL_DIR
+Nice=15
+IOSchedulingClass=idle
+CPUQuota=140%
+ExecStart=/usr/bin/python3 $INSTALL_DIR/torah_scribe.py --once
+EOF
+
+cat > "$HOME/.config/systemd/user/torah-scribe.timer" << EOF
+[Unit]
+Description=Run Shul.OS Mini-Orca Living Scribe every 30 minutes
+
+[Timer]
+OnBootSec=4m
+OnUnitActiveSec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# 9. Install nightly Shabbat-safe Fleet Auto-Updater timer (03:30 AM local)
 cat > "$HOME/.config/systemd/user/shul-os-update.service" << EOF
 [Unit]
 Description=Shul.OS Shabbat-Safe Fleet Auto-Updater
@@ -124,6 +175,8 @@ EOF
 
 systemctl --user daemon-reload
 systemctl --user enable --now torah-sanctuary.service
+systemctl --user enable --now torah-celestial.timer || true
+systemctl --user enable --now torah-scribe.timer || true
 systemctl --user enable --now shul-os-update.timer || true
 
 echo "✅ Shul.OS is LIVE at http://127.0.0.1:8080"

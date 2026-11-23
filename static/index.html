@@ -2784,6 +2784,14 @@
             <p class="muted" style="font-size:0.84rem;margin:0;">Link Synagogues, Chabad Houses &amp; Family Residences over encrypted WireGuard Mesh + Shul.OS Studio Camera with automatic per-city Shabbat Stillness protection.</p>
           </div>
 
+          <div class="card" style="margin-bottom:0;border-color:rgba(74,222,128,0.38);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <h3 style="margin:0;color:#86efac;">🖥 Shul.OS Hardware &amp; Living OS Telemetry</h3>
+              <button class="btn-secondary" style="padding:4px 10px;font-size:0.76rem;" onclick="loadOsTelemetry()">🔄 Refresh</button>
+            </div>
+            <div id="osTelemetryBox" class="muted" style="font-size:0.82rem;">Reading bare-metal CPU temperature, memory, display backlight &amp; OS services...</div>
+          </div>
+
           <div class="card" style="margin-bottom:0;border-color:rgba(228,188,105,0.48);">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
               <h3 style="margin:0;color:var(--gold);">🔄 Shul.OS Fleet Auto-Updater</h3>
@@ -2890,7 +2898,8 @@
                 <label class="settings-check"><input type="checkbox" id="cfgAutoSpeak" checked> Auto-Speak AI Replies Aloud</label>
                 <button type="button" class="btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="testNarratorVoice()">🔊 Test Voice (Gen 1:1–3)</button>
               </div>
-              <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Holy OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
+              <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Shul.OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
+              <label class="settings-check"><input type="checkbox" id="cfgOsBrightSync" checked> Living Shul.OS: Auto-Dim Hardware Backlight Gently at Twilight &amp; Night</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam</label>
               <label class="settings-check"><input type="checkbox" id="cfgAutoUpdate" checked> Shabbat-Safe Fleet Auto-Update: Pull open-source Shul.OS improvements nightly (pauses for Shabbat)</label>
@@ -7266,6 +7275,7 @@ async function loadSettings() {
   await loadHealth();
   loadScribeStatus();
   loadUpdaterStatus();
+  loadOsTelemetry();
   if (!Object.keys(cityPresetsCache).length) await loadCelestial();
   const r = await fetch('/api/config');
   const c = (await r.json()).config || {};
@@ -7284,6 +7294,7 @@ async function loadSettings() {
   document.getElementById('cfgLocLon').value = loc.lon ?? 4.3517;
   document.getElementById('cfgLocTz').value = loc.tz || 'Europe/Brussels';
   document.getElementById('cfgOsColorSync').checked = c.os_color_temp_sync !== false;
+  if (document.getElementById('cfgOsBrightSync')) document.getElementById('cfgOsBrightSync').checked = c.os_brightness_sync !== false;
   document.getElementById('cfgScribeEnabled').checked = c.scribe_enabled !== false;
   document.getElementById('cfgScribeOnline').checked = c.scribe_online_ingest !== false;
   document.getElementById('cfgOllamaModel').value = c.ollama_model || 'qwen2.5:1.5b';
@@ -7323,6 +7334,7 @@ async function saveSettings() {
       in_israel: !!preset.in_israel,
     },
     os_color_temp_sync: document.getElementById('cfgOsColorSync').checked,
+    os_brightness_sync: document.getElementById('cfgOsBrightSync') ? document.getElementById('cfgOsBrightSync').checked : true,
     scribe_enabled: document.getElementById('cfgScribeEnabled').checked,
     scribe_online_ingest: document.getElementById('cfgScribeOnline').checked,
     ollama_model: document.getElementById('cfgOllamaModel').value.trim() || 'qwen2.5:1.5b',
@@ -7351,6 +7363,40 @@ async function saveSettings() {
     loadHealth();
     loadCelestial();
     loadToday(null);
+  }
+}
+
+async function loadOsTelemetry() {
+  const box = document.getElementById('osTelemetryBox');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/system/os-health');
+    const d = await r.json();
+    const svcs = (d.services || []).map(s =>
+      `<span class="mesh-cap-pill ${s.active ? 'ok' : ''}" style="font-size:0.74rem;padding:4px 9px;">${s.active ? '●' : '○'} ${esc(s.label)}</span>`
+    ).join('');
+    box.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:10px;">
+        <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.65);border:1px solid var(--border);">
+          <div style="font-size:0.68rem;text-transform:uppercase;color:var(--accent);font-weight:700;">CPU Temp / Load</div>
+          <div style="font-size:0.96rem;font-weight:800;color:#fff;margin-top:2px;">${d.cpu_temp_c != null ? d.cpu_temp_c + '°C' : 'N/A'} <span class="muted" style="font-size:0.76rem;">(${d.load_1m ?? ''})</span></div>
+        </div>
+        <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.65);border:1px solid var(--border);">
+          <div style="font-size:0.68rem;text-transform:uppercase;color:var(--accent);font-weight:700;">Memory / SSD Free</div>
+          <div style="font-size:0.96rem;font-weight:800;color:#fff;margin-top:2px;">${d.mem_used_pct != null ? d.mem_used_pct + '% RAM' : 'N/A'} <span class="muted" style="font-size:0.76rem;">· ${d.disk_free_gb != null ? d.disk_free_gb + 'G' : ''}</span></div>
+        </div>
+        <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.65);border:1px solid var(--border);">
+          <div style="font-size:0.68rem;text-transform:uppercase;color:var(--accent);font-weight:700;">Display &amp; Audio</div>
+          <div style="font-size:0.96rem;font-weight:800;color:var(--gold);margin-top:2px;">${d.display_kelvin ? d.display_kelvin + 'K' : 'Day'} · ${d.backlight_pct != null ? d.backlight_pct + '%' : '100%'}</div>
+        </div>
+        <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.65);border:1px solid var(--border);">
+          <div style="font-size:0.68rem;text-transform:uppercase;color:var(--accent);font-weight:700;">Uptime &amp; Guard</div>
+          <div style="font-size:0.96rem;font-weight:800;color:#86efac;margin-top:2px;">${esc(d.uptime || 'Live')} <span class="muted" style="font-size:0.74rem;">· ${esc(d.volume_guard || '')}</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${svcs}</div>`;
+  } catch (e) {
+    box.textContent = 'Hardware telemetry unavailable.';
   }
 }
 

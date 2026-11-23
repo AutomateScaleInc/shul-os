@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Torah Sanctuary — Standalone Synagogue Presence Wake/Sleep Daemon.
+Shul.OS — Shabbat-Safe Synagogue Presence Wake/Sleep Daemon.
 100% local & fleet-independent:
-- Monitors Sentinel's built-in FaceTime HD camera (/dev/video0) + local Hyprland cursor/keyboard activity.
-- Wakes the display smoothly when a visitor steps up to the Torah Sanctuary station.
-- Gently dims & sleeps the display after configurable idle timeout (default 5 minutes) when empty.
+- On weekdays, monitors built-in camera (/dev/video0) + cursor/keyboard activity:
+  wakes display smoothly when a visitor steps up and sleeps cleanly after idle timeout.
+- On SHABBAT & YOM TOV (automatically detected via offline sacred_astronomy):
+  RELEASES /dev/video0 completely and disables motion-triggered wake/sleep so walking
+  past the sanctuary display NEVER triggers electronic switching on Shabbat!
 """
 
 import glob
@@ -12,9 +14,14 @@ import json
 import os
 import pathlib
 import subprocess
+import sys
 import time
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE_DIR))
+
+import sacred_astronomy
+
 CONFIG_PATH = BASE_DIR / "config.json"
 MODEL_CANDIDATES = [
     BASE_DIR / "data" / "face_detection_yunet.onnx",
@@ -43,7 +50,7 @@ def set_display(on: bool):
     if on:
         subprocess.run(["hyprctl", "dispatch", 'hl.dsp.dpms({ action = "enable" })'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
         subprocess.run(["hyprctl", "dispatch", "dpms", "on"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
-        subprocess.run(["brightnessctl", "-c", "backlight", "set", "100%"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
+        subprocess.run(["brightnessctl", "-c", "backlight", "set", "92%"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
         for p in glob.glob("/sys/class/backlight/*/bl_power"):
             try:
                 pathlib.Path(p).write_text("0\n")
@@ -71,6 +78,14 @@ def sleep_timeout_seconds() -> float:
         return 300.0
 
 
+def is_shabbat_stillness() -> bool:
+    try:
+        snap = sacred_astronomy.get_sacred_moment()
+        return bool(snap.get("shabbat_mode"))
+    except Exception:
+        return False
+
+
 def main():
     try:
         import cv2
@@ -92,10 +107,33 @@ def main():
     last_cursor = get_cursor_pos()
     display_on = True
     face_streak = 0
+    last_shabbat_check = 0.0
+    shabbat_still = False
 
-    print("Torah Sanctuary standalone presence monitor active.", flush=True)
+    print("Shul.OS Shabbat-safe presence monitor active.", flush=True)
     while True:
         now = time.time()
+
+        # Check Shabbat/Yom Tov status every 60s
+        if now - last_shabbat_check >= 60.0:
+            last_shabbat_check = now
+            shabbat_still = is_shabbat_stillness()
+            if shabbat_still:
+                # Release camera completely & keep display steady (never sensor-triggered on Shabbat!)
+                if cap is not None:
+                    try:
+                        cap.release()
+                    except Exception:
+                        pass
+                    cap = None
+                if not display_on:
+                    set_display(True)
+                    display_on = True
+
+        if shabbat_still:
+            time.sleep(5.0)
+            continue
+
         saw_activity = False
 
         # 1. Check cursor movement

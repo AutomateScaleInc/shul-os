@@ -154,6 +154,7 @@
     <p id="thanksMsg" style="font-size:0.9rem;color:#e8dfd0;line-height:1.5;margin:0 0 14px;"></p>
     <div class="quick-actions">
       <a class="btn-gold" id="checkoutLink" href="https://www.theshul.eu" target="_blank" rel="noopener">Complete Online Payment →</a>
+      <a class="btn-outline" id="pledgeWaLink" href="#" target="_blank" rel="noopener" style="display:none;border-color:rgba(74,222,128,0.65);color:#86efac;">💬 Notify Rabbi on WhatsApp</a>
       <a class="btn-outline" href="/watch">📺 Open Live Screen</a>
     </div>
   </div>
@@ -225,6 +226,12 @@
 <script>
 let items = [];
 let selectedItem = { slug: 'general-tzedakah', title: 'General Tzedakah & Synagogue Support', amount: 36, currency: 'EUR' };
+let rabbiWaDigits = '';
+let rabbiShortName = 'Rabbi Michoel';
+
+function buildRabbiWaUrl(text) {
+  return rabbiWaDigits ? `https://wa.me/${rabbiWaDigits}?text=${encodeURIComponent(text)}` : '';
+}
 
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -255,10 +262,14 @@ async function initGivePage() {
     if (dItems.rabbi_whatsapp) {
       const cleanWa = String(dItems.rabbi_whatsapp).replace(/[^\d]/g, '');
       const waBtn = document.getElementById('rabbiWaBtn');
-      if (waBtn && cleanWa.length >= 7) {
-        waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent('Shalom Rabbi! Reaching out from the Shul.OS sanctuary screen.')}`;
-        waBtn.textContent = `💬 WhatsApp ${dItems.rabbi_name ? dItems.rabbi_name.split(' ').slice(0,2).join(' ') : 'Rabbi'}`;
-        waBtn.style.display = 'inline-flex';
+      if (cleanWa.length >= 7) {
+        rabbiWaDigits = cleanWa;
+        rabbiShortName = dItems.rabbi_name ? dItems.rabbi_name.split(' ').slice(0,2).join(' ') : 'Rabbi';
+        if (waBtn) {
+          waBtn.href = buildRabbiWaUrl('Shalom Rabbi! Reaching out from the Shul.OS sanctuary screen.');
+          waBtn.textContent = `💬 WhatsApp ${rabbiShortName}`;
+          waBtn.style.display = 'inline-flex';
+        }
       }
     }
     const p = dToday.parasha || {};
@@ -310,6 +321,13 @@ async function submitPledge() {
     document.getElementById('thanksHead').textContent = `Thank you, ${name}! (€${amount} · ${selectedItem.title})`;
     document.getElementById('thanksMsg').textContent = 'Your sponsorship dedication has been recorded for Rabbi Michoel & The European Synagogue. Tap below to complete your contribution online or return to the live Sanctuary screen.';
     if (d.checkout_url) document.getElementById('checkoutLink').href = d.checkout_url;
+    const pWa = document.getElementById('pledgeWaLink');
+    if (pWa && rabbiWaDigits) {
+      const dedTxt = document.getElementById('fDedication').value.trim();
+      pWa.href = buildRabbiWaUrl(`Shalom ${rabbiShortName}! I just submitted a €${amount} sponsorship for "${selectedItem.title}" (${name})${dedTxt ? ' — Dedication: ' + dedTxt : ''}.`);
+      pWa.textContent = `💬 Message ${rabbiShortName} on WhatsApp`;
+      pWa.style.display = 'inline-flex';
+    }
     document.getElementById('thanksBox').style.display = 'block';
     document.getElementById('thanksBox').scrollIntoView({ behavior: 'smooth' });
   } catch (e) {
@@ -344,7 +362,9 @@ async function submitConnect() {
     const d = await r.json();
     if (!d.ok) { st.style.color = '#fca5a5'; st.textContent = d.error || 'Could not send message.'; return; }
     st.style.color = '#4ade80';
-    st.textContent = '✨ Shalom! Connected — your message has been received for Rabbi Michoel & The European Synagogue.';
+    const cWaUrl = buildRabbiWaUrl(`Shalom ${rabbiShortName}! (${document.getElementById('cTopic').value}) From ${name || 'a visitor'}: ${document.getElementById('cMsg').value.trim() || 'Looking forward to connecting!'}`);
+    st.innerHTML = `✨ Shalom! Connected — your message has been received for ${esc(rabbiShortName)} &amp; The European Synagogue.` +
+      (cWaUrl ? `<div style="margin-top:8px;"><a class="btn-outline" style="padding:7px 13px;font-size:0.84rem;border-color:rgba(74,222,128,0.65);color:#86efac;" href="${esc(cWaUrl)}" target="_blank" rel="noopener">💬 Send Directly to ${esc(rabbiShortName)} on WhatsApp →</a></div>` : '');
     document.getElementById('cMsg').value = '';
   } catch (e) {
     st.style.color = '#fca5a5';
@@ -376,7 +396,9 @@ async function submitDedication() {
     const d = await r.json();
     if (!d.ok) { st.style.color = '#fca5a5'; st.textContent = d.error || 'Could not save dedication.'; return; }
     st.style.color = '#4ade80';
-    st.textContent = `🕯 Added! "${honoree}" will now appear in the gold Community Heritage Plaque on the Shul.OS screen.`;
+    const dWaUrl = buildRabbiWaUrl(`Shalom ${rabbiShortName}! I placed a ${document.getElementById('dKind').value} dedication on the Shul.OS screen for "${honoree}"${document.getElementById('dDate').value.trim() ? ' (' + document.getElementById('dDate').value.trim() + ')' : ''}.`);
+    st.innerHTML = `🕯 Added! "${esc(honoree)}" will now appear in the gold Community Heritage Plaque on the Shul.OS screen.` +
+      (dWaUrl ? `<div style="margin-top:8px;"><a class="btn-outline" style="padding:7px 13px;font-size:0.84rem;border-color:rgba(74,222,128,0.65);color:#86efac;" href="${esc(dWaUrl)}" target="_blank" rel="noopener">💬 Share Dedication With ${esc(rabbiShortName)} on WhatsApp →</a></div>` : '');
     document.getElementById('dHonoree').value = '';
     document.getElementById('dDate').value = '';
     document.getElementById('dMsg').value = '';

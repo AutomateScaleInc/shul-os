@@ -295,6 +295,17 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json(shul_updater.check_for_updates())
             return
 
+        if path == "/api/system/os-health":
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("sacred_os_daemon", str(BASE_DIR / "sacred-os-daemon.py"))
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                self._send_json(mod.get_os_telemetry())
+            except Exception as e:
+                self._send_json({"error": str(e), "services": []}, status=200)
+            return
+
         if path == "/api/talmud/daf-yomi":
             dt_str = qs.get("date", [""])[0].strip()
             self._send_json({
@@ -467,6 +478,7 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
         if path == "/api/admin/export-bundle":
             cfg = dict(ai_engine.load_config())
             cfg["cloud_api_key"] = ""  # Never export secret API keys
+            cfg["rabbi_whatsapp"] = ""  # Never export private personal phone numbers in open-source bundle
             self._send_json({
                 "bundle_version": "shulos-1.0",
                 "license": "MIT",

@@ -286,6 +286,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/dedications",
             "/api/connect/messages",
             "/api/system/update-status?local=1",
+            "/api/system/os-health",
             "/api/talmud/daf-yomi",
             "/api/syndication/pack",
             "/api/today",
