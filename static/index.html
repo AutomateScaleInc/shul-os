@@ -5190,8 +5190,10 @@ function showShulVoiceHud(msg, durationMs = 3400) {
 function _normVoiceText(s) {
   return String(s || '')
     .toLowerCase()
+    .replace(/&/g, ' and ')
     .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
     .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\b(?:the|a|an|button|link|tab|section|page)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
