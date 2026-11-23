@@ -1145,10 +1145,26 @@
     justify-content: flex-end !important;
   }
   .sanctuary-rail.rail-qr-only #sanctuaryToast { display: none !important; }
-  /* Only activates on shorter viewports (<720px rail height) with smooth transitions — never jostles on 1080p! */
-  .sanctuary-rail.rail-compact .rail-filament { height: 8px; opacity: 0.4; }
-  .sanctuary-rail.rail-compact .bg-vignette { width: 112px; height: 100px; }
-  .sanctuary-rail.rail-ultra-compact .bg-vignette { display: none !important; }
+  /* Smooth 3-tier proportional rail breathing so bottom docks NEVER get pushed off-screen on any slide */
+  .sanctuary-rail { overflow: hidden; }
+  .sanctuary-rail .walker-svg-wrap { transition: transform 0.35s ease, margin 0.35s ease; }
+  .sanctuary-rail.rail-tight { gap: 7px; padding: 12px 10px 8px; }
+  .sanctuary-rail.rail-tight .rail-filament { height: 6px; opacity: 0.38; }
+  .sanctuary-rail.rail-tight .bg-vignette,
+  .sanctuary-rail.rail-tight #bgSceneRight { width: 108px; height: 96px; }
+  .sanctuary-rail.rail-tight .walker-svg-wrap { transform: scale(0.92); margin: -5px 0; }
+  .sanctuary-rail.rail-tight .heritage-plaque { min-height: 100px; padding: 7px 11px 8px; }
+  .sanctuary-rail.rail-compact { gap: 6px; padding: 10px 10px 6px; }
+  .sanctuary-rail.rail-compact .rail-filament { display: none; }
+  .sanctuary-rail.rail-compact .bg-vignette,
+  .sanctuary-rail.rail-compact #bgSceneRight { width: 84px; height: 76px; }
+  .sanctuary-rail.rail-compact .walker-svg-wrap { transform: scale(0.84); margin: -9px 0; }
+  .sanctuary-rail.rail-compact .heritage-plaque { min-height: 88px; padding: 6px 11px 7px; }
+  .sanctuary-rail.rail-compact .heritage-plaque .hp-text { -webkit-line-clamp: 2; }
+  .sanctuary-rail.rail-compact .moments-sanctuary-dock { min-height: 120px; padding: 7px 10px; }
+  .sanctuary-rail.rail-compact .moments-row { padding: 2px 0; font-size: 0.72rem; }
+  .sanctuary-rail.rail-ultra-compact .bg-vignette,
+  .sanctuary-rail.rail-ultra-compact #bgSceneRight { display: none !important; }
   .sanctuary-rail.rail-ultra-compact .rail-arch-crest { display: none !important; }
   #railLeft  { left: 26px; top: 170px; bottom: 58px; }
   #railRight { right: 26px; top: 170px; bottom: 268px; }
@@ -1633,6 +1649,7 @@
   .heritage-plaque .hp-title {
     font-family: var(--serif); font-size: 0.9rem; font-weight: 700; color: #fff6df; line-height: 1.18;
     letter-spacing: 0.01em;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
   .heritage-plaque .hp-sub {
     font-family: var(--serif); font-style: italic; font-size: 0.69rem; color: #f3d796; margin: 1px 0 3px;
@@ -4304,36 +4321,40 @@ function layoutSanctuaryRails() {
   balanceSanctuaryRails();
 }
 
+let _railBalanceRaf = 0;
 function balanceSanctuaryRails() {
-  const railL = document.getElementById('railLeft');
-  const railR = document.getElementById('railRight');
-  const measureAndBalance = (rail) => {
-    if (!rail || rail.classList.contains('rail-hidden') || rail.classList.contains('rail-qr-only')) {
-      if (rail) rail.classList.remove('rail-compact', 'rail-ultra-compact');
-      return;
-    }
-    // Check overflow ONLY against true viewport rail height — never toggle on toast open/close so ZERO jostling!
-    const availH = rail.clientHeight - 22;
-    if (availH <= 0) return;
-    const sumVisible = () => {
-      const vis = Array.from(rail.children).filter(ch => getComputedStyle(ch).display !== 'none');
-      const h = vis.reduce((acc, ch) => acc + Math.ceil(ch.getBoundingClientRect().height), 0);
-      return h + Math.max(0, vis.length - 1) * 11;
-    };
-    rail.classList.remove('rail-compact', 'rail-ultra-compact');
-    if (sumVisible() > availH) {
-      rail.classList.add('rail-compact');
-      if (sumVisible() > availH) {
-        rail.classList.add('rail-ultra-compact');
+  if (_railBalanceRaf) cancelAnimationFrame(_railBalanceRaf);
+  _railBalanceRaf = requestAnimationFrame(() => {
+    _railBalanceRaf = 0;
+    const railL = document.getElementById('railLeft');
+    const railR = document.getElementById('railRight');
+    const measureAndBalance = (rail) => {
+      if (!rail || rail.classList.contains('rail-hidden') || rail.classList.contains('rail-qr-only')) {
+        if (rail) rail.classList.remove('rail-tight', 'rail-compact', 'rail-ultra-compact');
+        return;
       }
-    }
-  };
-  requestAnimationFrame(() => {
+      const fits = () => rail.scrollHeight <= rail.clientHeight + 2;
+      rail.classList.remove('rail-tight', 'rail-compact', 'rail-ultra-compact');
+      if (fits()) return;
+      rail.classList.add('rail-tight');
+      if (fits()) return;
+      rail.classList.add('rail-compact');
+      if (fits()) return;
+      rail.classList.add('rail-ultra-compact');
+    };
     measureAndBalance(railL);
     measureAndBalance(railR);
   });
 }
 window.addEventListener('resize', layoutSanctuaryRails, { passive: true });
+(function attachRailObservers() {
+  if (typeof MutationObserver === 'undefined') return;
+  const obs = new MutationObserver(() => balanceSanctuaryRails());
+  ['marginStageLeft', 'marginStageRight', 'heritagePlaqueBody', 'momentsBody'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el, { childList: true, subtree: true, characterData: true });
+  });
+})();
 
 function syncMarginCastToSlide(slide) {
   const bgL = document.getElementById('bgSceneLeft');
@@ -8419,6 +8440,7 @@ function renderUpcomingMomentCard(idx) {
       ).join('');
     }
     body.style.opacity = '1';
+    balanceSanctuaryRails();
   }, 200);
 }
 
@@ -8467,6 +8489,7 @@ function renderHeritagePlaque(idx) {
     if (s) s.textContent = it.subtitle || '';
     if (tx) tx.textContent = it.text || '';
     body.style.opacity = '1';
+    balanceSanctuaryRails();
   }, 220);
 }
 
