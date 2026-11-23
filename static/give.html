@@ -237,14 +237,14 @@ function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function selectItem(slug) {
+function selectItem(slug, shouldScroll = true) {
   const it = items.find(x => x.slug === slug);
   if (!it) return;
   selectedItem = it;
   document.querySelectorAll('.item-card').forEach(el => el.classList.toggle('selected', el.dataset.slug === slug));
   document.getElementById('selectedTitle').textContent = it.title;
   pickAmount(it.amount);
-  document.getElementById('pledgeForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (shouldScroll) document.getElementById('pledgeForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function pickAmount(val) {
@@ -289,7 +289,7 @@ async function initGivePage() {
         <div class="item-meta">${esc(it.category)} · ${esc(it.schedule_label)}${it.sponsored_count ? ` · 💛 ${it.sponsored_count} sponsored` : ''}</div>
         <p class="item-desc">${esc(it.description)}</p>
       </div>`).join('');
-    if (items.length) selectItem(items[0].slug);
+    if (items.length) selectItem(items[0].slug, false);
   } catch (e) {
     document.getElementById('itemsList').innerHTML = '<div style="color:#fca5a5;">Could not load sponsorship items right now.</div>';
   }
