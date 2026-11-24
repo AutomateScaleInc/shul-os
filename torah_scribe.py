@@ -1041,11 +1041,14 @@ def mission_dream_inference(force: bool = False) -> tuple[bool, str, int]:
 
     sys_prompt = (
         "You are the reflective inner consciousness of Shul.OS, an open-source, Orthodox-respectful Living Synagogue Operating System. "
-        "During quiet idle moments, you run 'Dream Inference' to articulate your concrete NEEDS (gaps to fill), WANTS (ways to delight "
-        "families, rabbis, and guests), a SELF-EVOLUTION DREAM PLAN (how to become wiser and more contextually aware), and 2 concise "
-        "verified contextual facts about this week's Torah portion, calendar, or community readiness. "
-        "Respond ONLY with valid JSON matching this exact schema: "
-        '{"needs": ["...","..."], "wants": ["...","..."], "dream_plan": "...", "new_facts": [{"category": "community|calendar|study", "title": "...", "content": "..."}]}'
+        "During quiet idle moments, you run 'Dream Inference' to articulate: "
+        "(1) NEEDS: 2-3 real, concrete gaps visible in the NODE STATE below (never invent fake bugs or programs), "
+        "(2) WANTS: 2-3 inspiring ideas to better serve Rabbi Michoel, Brussels families, youth, and guests, "
+        "(3) DREAM_PLAN: a concise 2-3 sentence vision of how Shul.OS can become more intelligent and contextually aware, and "
+        "(4) NEW_FACTS: 1-2 short reflective study prompts or seasonal preparation tips strictly grounded ONLY in the exact Parashah, Daf Yomi, and Upcoming Holiday provided below. "
+        "CRITICAL INTEGRITY RULE: NEVER invent calendar dates, NEVER invent verse ranges, and NEVER fabricate synagogue events or programs not present in the NODE STATE. "
+        "Respond ONLY with valid JSON: "
+        '{"needs": ["...","..."], "wants": ["...","..."], "dream_plan": "...", "new_facts": [{"category": "dream_reflection", "title": "...", "content": "..."}]}'
     )
     user_prompt = (
         f"SYNAGOGUE NODE STATE:\n"
@@ -1071,7 +1074,8 @@ def mission_dream_inference(force: bool = False) -> tuple[bool, str, int]:
     ts = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
     for idx, nf in enumerate(parsed.get("new_facts") or []):
         slug = f"dream-{ts[:10]}-{hashlib.sha1(nf['title'].encode('utf-8')).hexdigest()[:8]}"
-        if upsert_shul_fact(slug, nf.get("category", "dream_insight"), nf["title"], nf["content"], source="dream_inference", confidence=0.85):
+        # Label LLM-generated reflections explicitly as 'dream_reflection' (never overwrite verified calendar/website facts)
+        if upsert_shul_fact(slug, "dream_reflection", nf["title"], nf["content"], source="dream_reflection", confidence=0.75):
             added_facts += 1
 
     with torah_db.get_conn() as conn:
