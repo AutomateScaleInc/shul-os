@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="static/branding/shulos-logo-wordmark.jpg" alt="Shul.OS — The Living Synagogue OS" width="760">
+</p>
+
 # ✡ Shul.OS — Living Synagogue Operating System
 
 **An open-source, 100% offline-capable Sacred Operating System for Synagogues, Chabad Houses, Jewish Schools, and Homes.**
