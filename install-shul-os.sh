@@ -214,5 +214,9 @@ systemctl --user enable --now torah-scribe.timer || true
 systemctl --user enable --now shul-daily-sync.timer || true
 systemctl --user enable --now shul-os-update.timer || true
 
+if [[ -x "$INSTALL_DIR/shul-os-apply-branding.sh" ]]; then
+  bash "$INSTALL_DIR/shul-os-apply-branding.sh" --skip-initramfs || true
+fi
+
 echo "✅ Shul.OS is LIVE at http://127.0.0.1:8080"
 echo "🚀 Instant recovery anytime: press Super+Space and launch 'Shul.OS', or run 'shul-os'"
