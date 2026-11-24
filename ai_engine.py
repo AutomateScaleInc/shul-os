@@ -37,6 +37,7 @@ DEFAULT_CONFIG = {
     "default_theme": "sanctuary",  # sanctuary | parchment
     "os_color_temp_sync": True,
     "os_brightness_sync": True,
+    "shabbat_display_policy": "candlelit",  # candlelit | static_board | screen_sleep
     "max_sanctuary_volume": 0.42,
     "scribe_enabled": True,
     "scribe_online_ingest": True,

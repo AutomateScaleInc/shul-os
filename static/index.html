@@ -1721,6 +1721,22 @@
     50%      { transform: scaleY(1.06) translateY(-1px); opacity: 1; filter: drop-shadow(0 0 20px rgba(255,216,120,0.95)); }
   }
   .shabbat-flame { transform-origin: center bottom; animation: shabbatCandleBreath 5.5s ease-in-out infinite; }
+  .shabbat-sanctuary-overlay.static-frozen .shabbat-flame { animation: none !important; filter: drop-shadow(0 0 12px rgba(255,209,102,0.7)); }
+  .shul-splash-veil {
+    position: fixed; inset: 0; z-index: 420;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    background: radial-gradient(ellipse at 50% 42%, #14254a 0%, #081124 60%, #050a16 100%);
+    color: #f6efe0; text-align: center; pointer-events: none;
+    opacity: 1; transition: opacity 0.65s ease;
+  }
+  .shul-splash-veil.hidden { opacity: 0; visibility: hidden; }
+  .shul-splash-veil .sp-title {
+    font-family: var(--serif); font-size: clamp(2.2rem, 4.4vw, 3.6rem); font-weight: 700;
+    background: linear-gradient(180deg, #fff6d6 0%, #e4bc69 58%, #b78228 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.04em;
+  }
+  .shul-splash-veil .sp-he { font-family: var(--hebrew); font-size: 1.35rem; color: #f3d796; letter-spacing: 0.08em; }
+  .shul-splash-veil .sp-sub { font-size: 0.84rem; letter-spacing: 0.2em; text-transform: uppercase; color: #9eb4d4; }
   .shabbat-top-bar {
     display: flex; justify-content: space-between; align-items: center; gap: 16px;
     padding: 10px 18px; border-radius: 18px;
@@ -2232,6 +2248,17 @@
 </style>
 </head>
 <body>
+<div class="shul-splash-veil" id="shulSplashVeil" aria-hidden="true">
+  <svg viewBox="0 0 120 120" width="76" height="76" aria-hidden="true">
+    <circle cx="60" cy="60" r="48" fill="none" stroke="#e4bc69" stroke-width="1.6" opacity="0.55"/>
+    <polygon points="60,16 98,82 22,82" fill="none" stroke="#e4bc69" stroke-width="3.6" stroke-linejoin="round"/>
+    <polygon points="60,104 98,38 22,38" fill="none" stroke="#e4bc69" stroke-width="3.6" stroke-linejoin="round"/>
+    <circle cx="60" cy="60" r="5" fill="#fff2c2"/>
+  </svg>
+  <div class="sp-title" id="shulSplashTitle">Shul.OS</div>
+  <div class="sp-he" id="shulSplashHe">אוֹר תּוֹרָה · בֵּית הַכְּנֶסֶת הַחַי</div>
+  <div class="sp-sub" id="shulSplashSub">The Living Synagogue Operating System</div>
+</div>
 <!-- AMBIENT LIVING STORYBOOK BACKGROUND & SYNAGOGUE ILLUMINATED SIDE RAILS -->
 <div id="sanctuaryBackdrop"></div>
 <aside id="railLeft" class="sanctuary-rail" aria-hidden="true">
@@ -3077,6 +3104,13 @@
               </div>
               <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Shul.OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
               <label class="settings-check"><input type="checkbox" id="cfgOsBrightSync" checked> Living Shul.OS: Auto-Dim Hardware Backlight Gently at Twilight &amp; Night</label>
+              <label class="settings-field" style="margin-top:4px;">🕯 Halachic Shabbat Display Policy (Rabbi's Preference)
+                <select id="cfgShabbatPolicy">
+                  <option value="candlelit">🕯 Candlelit Shabbat Sanctuary Board (Warm Glow · Zero Sensors · Muted)</option>
+                  <option value="static_board">📜 100% Frozen Static Shabbat Board (Zero Animation · Zero Sensors · Muted)</option>
+                  <option value="screen_sleep">🌑 Strictest: Full Display Sleep (Screen OFF Candle Lighting → Havdalah)</option>
+                </select>
+              </label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Daily Website/Calendar Sync + Classical Commentaries</label>
               <label class="settings-check"><input type="checkbox" id="cfgDreamEnabled" checked> 🌙 Idle Dream Inference: Articulate Needs, Wants &amp; Contextual Facts Locally When Idle</label>
@@ -8115,6 +8149,8 @@ async function loadSettings() {
   document.getElementById('cfgLocTz').value = loc.tz || 'Europe/Brussels';
   document.getElementById('cfgOsColorSync').checked = c.os_color_temp_sync !== false;
   if (document.getElementById('cfgOsBrightSync')) document.getElementById('cfgOsBrightSync').checked = c.os_brightness_sync !== false;
+  if (document.getElementById('cfgShabbatPolicy')) document.getElementById('cfgShabbatPolicy').value = c.shabbat_display_policy || 'candlelit';
+  window._shabbatDisplayPolicy = c.shabbat_display_policy || 'candlelit';
   document.getElementById('cfgScribeEnabled').checked = c.scribe_enabled !== false;
   document.getElementById('cfgScribeOnline').checked = c.scribe_online_ingest !== false;
   if (document.getElementById('cfgDreamEnabled')) document.getElementById('cfgDreamEnabled').checked = c.dream_inference_enabled !== false;
@@ -8157,6 +8193,7 @@ async function saveSettings() {
     },
     os_color_temp_sync: document.getElementById('cfgOsColorSync').checked,
     os_brightness_sync: document.getElementById('cfgOsBrightSync') ? document.getElementById('cfgOsBrightSync').checked : true,
+    shabbat_display_policy: document.getElementById('cfgShabbatPolicy') ? document.getElementById('cfgShabbatPolicy').value : 'candlelit',
     scribe_enabled: document.getElementById('cfgScribeEnabled').checked,
     scribe_online_ingest: document.getElementById('cfgScribeOnline').checked,
     dream_inference_enabled: document.getElementById('cfgDreamEnabled') ? document.getElementById('cfgDreamEnabled').checked : true,
@@ -9312,8 +9349,10 @@ function syncAutoShabbatSanctuary() {
   const ov = document.getElementById('shabbatSanctuaryOverlay');
   if (!ov) return;
   if (isRealShabbat && !shabbatAutoDismissed && !ov.classList.contains('open')) {
+    showShulTransitionSplash('Shabbat Shalom', 'שַׁבָּת שָׁלוֹם · מְנוּחַת הַשַּׁבָּת', 'Entering Automated Kosher Shabbat Sanctuary Mode', 1300);
     openShabbatSanctuaryMode(false);
   } else if (!isRealShabbat && !shabbatPreviewOpen && ov.classList.contains('open')) {
+    showShulTransitionSplash('Shavua Tov', 'שָׁבוּעַ טוֹב · Shul.OS', 'Returning to Living Torah Sanctuary Mode', 1300);
     ov.classList.remove('open');
     shabbatAutoDismissed = false;
   }
@@ -9327,6 +9366,7 @@ async function openShabbatSanctuaryMode(isPreview = true) {
   if (typeof stopSpeaking === 'function') stopSpeaking();
   if (typeof stopShulHandsFree === 'function' && shulWakeActive) stopShulHandsFree(true);
 
+  ov.classList.toggle('static-frozen', window._shabbatDisplayPolicy === 'static_board');
   ov.classList.add('open');
 
   try {
@@ -9537,6 +9577,25 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+function showShulTransitionSplash(title, he, sub, durationMs = 1100) {
+  const veil = document.getElementById('shulSplashVeil');
+  if (!veil) return;
+  const t = document.getElementById('shulSplashTitle');
+  const h = document.getElementById('shulSplashHe');
+  const s = document.getElementById('shulSplashSub');
+  if (t && title) t.textContent = title;
+  if (h && he) h.textContent = he;
+  if (s && sub) s.textContent = sub;
+  veil.classList.remove('hidden');
+  clearTimeout(window._shulSplashTimer);
+  window._shulSplashTimer = setTimeout(() => veil.classList.add('hidden'), durationMs);
+}
+
+setTimeout(() => {
+  const veil = document.getElementById('shulSplashVeil');
+  if (veil) veil.classList.add('hidden');
+}, 1150);
+
 loadHealth();
 loadCelestial();
 loadToday();
@@ -9564,6 +9623,7 @@ try {
   if (_usp.get('demo') === 'shabbat') {
     const _retSec = parseInt(_usp.get('return') || '0', 10);
     setTimeout(() => {
+      showShulTransitionSplash('Shabbat Shalom', 'שַׁבָּת שָׁלוֹם · מְנוּחַת הַשַּׁבָּת', 'Entering Automated Kosher Shabbat Sanctuary Mode', 1100);
       openShabbatSanctuaryMode(true);
       if (_retSec > 0) {
         setTimeout(() => {
@@ -9571,11 +9631,16 @@ try {
           if (ov && ov.classList.contains('open')) closeShabbatSanctuaryMode();
         }, _retSec * 1000);
       }
-    }, 1800);
+    }, 1400);
   }
 } catch (e) {}
 fetch('/api/config').then(r => r.json()).then(d => {
-  if (d && d.config && d.config.broadcast_follow_url) initCompanionFollow(d.config.broadcast_follow_url);
+  if (d && d.config) {
+    if (d.config.broadcast_follow_url) initCompanionFollow(d.config.broadcast_follow_url);
+    window._shabbatDisplayPolicy = d.config.shabbat_display_policy || 'candlelit';
+    const ov = document.getElementById('shabbatSanctuaryOverlay');
+    if (ov) ov.classList.toggle('static-frozen', window._shabbatDisplayPolicy === 'static_board');
+  }
 }).catch(() => {});
 setInterval(loadHealth, 30000);
 setInterval(loadCelestial, 60000);

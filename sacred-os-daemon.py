@@ -225,7 +225,8 @@ def get_os_telemetry() -> dict:
         ("torah-sanctuary.service", "Shul.OS Core"),
         ("torah-tunnel.service", "Public HTTPS Tunnel"),
         ("torah-celestial.timer", "Celestial OS Sync"),
-        ("torah-scribe.timer", "Mini-Orca Scribe"),
+        ("torah-scribe.timer", "Mini-Orca Scribe & Dreams"),
+        ("shul-daily-sync.timer", "Daily Website & Facts Sync"),
         ("shul-os-update.timer", "Fleet Auto-Updater"),
     ]
     services = []
@@ -301,6 +302,79 @@ def render_motd(snap: dict, parasha_name: str, parasha_he: str, daf_label: str =
     return "\n".join(lines) + "\n"
 
 
+def render_screensaver_art(snap: dict, p_en: str, p_he: str, daf_label: str, shul_name: str) -> str:
+    """Meaningful Shul.OS sacred screensaver synced to live Hebrew date, Parashah, Daf Yomi & Shabbat."""
+    he = snap["hebrew_date"]
+    nz = snap.get("next_zman") or {}
+    is_shab = bool(snap.get("shabbat_mode"))
+    banner = "🕯   S H A B B A T   S H A L O M   ·   שבת שלום   🕯" if is_shab else "✦   T H E   L I V I N G   S Y N A G O G U E   O S   ✦"
+    lines = [
+        "                     ▄█▄                     ",
+        "                 ▄▄███████▄▄                 ",
+        "                 ▀███▀ ▀███▀                 ",
+        "                 ▄███▄ ▄███▄                 ",
+        "                 ▀▀███████▀▀                 ",
+        "                     ▀█▀                     ",
+        "",
+        "  ▄██████  ██   ██  ██   ██  ██         ▄████▄   ▄██████  ",
+        "  ██       ██   ██  ██   ██  ██        ██    ██  ██       ",
+        "   ▀████▄  ███████  ██   ██  ██        ██    ██   ▀████▄  ",
+        "       ██  ██   ██  ██   ██  ██        ██    ██       ██  ",
+        "  ██████▀  ██   ██   ▀███▀   ███████ ▄  ▀████▀   ██████▀  ",
+        "",
+        f"  {banner}",
+        "",
+        f"  {shul_name}",
+        f"  {he['en_str']}  ·  Parashat {p_en}" + (f"  ·  Daf Yomi: {daf_label.split(' (')[0]}" if daf_label else ""),
+    ]
+    if is_shab:
+        lines.append("  Zero-Interaction Shabbat Stillness Active · Resting Until Havdalah")
+    elif nz:
+        lines.append(f"  Next Zman: {nz['name']} at {nz['time']} (in {nz['countdown']})")
+    return "\n".join(lines) + "\n"
+
+
+def sync_screensaver_branding(snap: dict, p_en: str, p_he: str, daf_label: str, cfg: dict):
+    """Replace any generic OS screensaver/about text with live Shul.OS sacred branding."""
+    branding_dir = Path.home() / ".config" / "omarchy" / "branding"
+    if not branding_dir.exists():
+        return
+    shul_name = cfg.get("synagogue_name") or "The European Synagogue — Ohel Eliezer"
+    art = render_screensaver_art(snap, p_en, p_he, daf_label, shul_name)
+    for fname in ("screensaver.txt", "about.txt"):
+        try:
+            target = branding_dir / fname
+            tmp = target.with_suffix(".tmp")
+            tmp.write_text(art, encoding="utf-8")
+            tmp.replace(target)
+        except Exception:
+            pass
+
+
+def apply_shabbat_dpms_policy(snap: dict, cfg: dict) -> str:
+    """If Rabbi selected 'screen_sleep' Shabbat Display Policy, turn monitor off at Candle Lighting & on after Havdalah."""
+    policy = (cfg.get("shabbat_display_policy") or "candlelit").strip().lower()
+    if policy != "screen_sleep":
+        return f"policy:{policy}"
+    if not shutil.which("hyprctl"):
+        return "no_hyprctl"
+    env = _wayland_env()
+    dpms_flag = CACHE_DIR / "shabbat-dpms-sleeping"
+    is_shab = bool(snap.get("shabbat_mode"))
+    try:
+        if is_shab and not dpms_flag.exists():
+            subprocess.run(["hyprctl", "dispatch", "dpms", "off"], env=env, timeout=3, check=False)
+            dpms_flag.write_text("sleeping\n", encoding="utf-8")
+            return "dpms_off_shabbat"
+        if not is_shab and dpms_flag.exists():
+            subprocess.run(["hyprctl", "dispatch", "dpms", "on"], env=env, timeout=3, check=False)
+            dpms_flag.unlink(missing_ok=True)
+            return "dpms_on_havdalah"
+    except Exception:
+        pass
+    return f"policy:{policy}:steady"
+
+
 def sync_once() -> dict:
     cfg = load_cfg()
     snap = sacred_astronomy.get_sacred_moment()
@@ -330,6 +404,8 @@ def sync_once() -> dict:
         bright_status = apply_display_brightness(target_pct)
 
     vol_status = enforce_sanctuary_volume(cfg.get("max_sanctuary_volume", 0.42))
+    dpms_status = apply_shabbat_dpms_policy(snap, cfg)
+    sync_screensaver_branding(snap, p_en, p_he, daf_label, cfg)
 
     state_payload = {
         "updated_at": snap["timestamp_iso"],
@@ -338,6 +414,8 @@ def sync_once() -> dict:
         "hebrew_date": snap["hebrew_date"],
         "watch": snap["watch"],
         "shabbat_mode": snap["shabbat_mode"],
+        "shabbat_display_policy": cfg.get("shabbat_display_policy", "candlelit"),
+        "shabbat_dpms": dpms_status,
         "sun": snap["sun"],
         "moon": snap["moon"],
         "mizrach": snap["mizrach"],
