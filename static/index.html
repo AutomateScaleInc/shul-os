@@ -9558,8 +9558,21 @@ setInterval(() => {
 setTimeout(syncAlwaysOnQr, 5000);
 setTimeout(syncAlwaysOnQr, 14000);
 try {
-  const _initView = new URLSearchParams(location.search).get('view');
+  const _usp = new URLSearchParams(location.search);
+  const _initView = _usp.get('view');
   if (_initView && document.getElementById('view-' + _initView)) switchView(_initView);
+  if (_usp.get('demo') === 'shabbat') {
+    const _retSec = parseInt(_usp.get('return') || '0', 10);
+    setTimeout(() => {
+      openShabbatSanctuaryMode(true);
+      if (_retSec > 0) {
+        setTimeout(() => {
+          const ov = document.getElementById('shabbatSanctuaryOverlay');
+          if (ov && ov.classList.contains('open')) closeShabbatSanctuaryMode();
+        }, _retSec * 1000);
+      }
+    }, 1800);
+  }
 } catch (e) {}
 fetch('/api/config').then(r => r.json()).then(d => {
   if (d && d.config && d.config.broadcast_follow_url) initCompanionFollow(d.config.broadcast_follow_url);
