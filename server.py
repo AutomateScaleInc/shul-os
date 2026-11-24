@@ -24,6 +24,7 @@ import sacred_books
 import sacred_liturgy
 import sanctuary_rich_data
 import scripture_foundation
+import shul_campaigns
 import shul_events
 import shul_mesh
 import shul_updater
@@ -715,6 +716,35 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(shul_events.generate_weekly_mailing())
             return
 
+        if path == "/api/campaigns/types":
+            self._send_json({
+                "types": list(shul_campaigns.CAMPAIGN_TYPES.values()),
+                "shabbat_guard": shul_campaigns.is_shabbat_or_yomtov_now(),
+                "subscribers_count": len(shul_events.list_subscribers()),
+            })
+            return
+
+        if path == "/api/campaigns/preview":
+            ctype = (qs.get("type", ["pre_shabbos"])[0] or "pre_shabbos").strip()
+            lang = (qs.get("lang", ["en"])[0] or "en").strip()
+            title = qs.get("title", [""])[0]
+            body_txt = qs.get("body", [""])[0]
+            cta_lbl = qs.get("cta_label", [""])[0]
+            cta_url = qs.get("cta_url", [""])[0]
+            self._send_json(shul_campaigns.compose_campaign(
+                campaign_type=ctype,
+                lang=lang,
+                custom_title=title,
+                custom_body=body_txt,
+                custom_cta_label=cta_lbl,
+                custom_cta_url=cta_url,
+            ))
+            return
+
+        if path == "/api/campaigns/history":
+            self._send_json({"history": shul_campaigns.list_campaign_history(20)})
+            return
+
         if path == "/api/shul/subscribers":
             self._send_json({"subscribers": shul_events.list_subscribers()})
             return
@@ -767,9 +797,10 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
         if path == "/api/config":
             cfg = ai_engine.load_config()
             safe = dict(cfg)
-            key = safe.get("cloud_api_key", "")
-            safe["cloud_api_key_set"] = bool(key)
-            safe["cloud_api_key"] = (key[:6] + "..." + key[-4:]) if len(key) > 12 else ("***" if key else "")
+            for secret_key in ("cloud_api_key", "mailing_api_key", "smtp_password"):
+                val = str(safe.get(secret_key, "") or "")
+                safe[f"{secret_key}_set"] = bool(val)
+                safe[secret_key] = (val[:6] + "..." + val[-4:]) if len(val) > 12 else ("***" if val else "")
             self._send_json({"config": safe})
             return
 
@@ -946,11 +977,32 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json({"ok": True, "started": True, "mission": "dream_inference"})
             return
 
+        if path == "/api/campaigns/send":
+            body = self._read_json_body()
+            res = shul_campaigns.dispatch_campaign(
+                campaign_type=(body.get("campaign_type") or "pre_shabbos").strip(),
+                lang=(body.get("lang") or "en").strip(),
+                channels=body.get("channels"),
+                test_email=(body.get("test_email") or "").strip(),
+                custom_title=(body.get("custom_title") or "").strip(),
+                custom_body=(body.get("custom_body") or "").strip(),
+                custom_cta_label=(body.get("custom_cta_label") or "").strip(),
+                custom_cta_url=(body.get("custom_cta_url") or "").strip(),
+                force_ignore_shabbat=bool(body.get("force_ignore_shabbat", False)),
+            )
+            self._send_json(res, status=200 if res.get("ok") else (423 if res.get("blocked_by_shabbat") else 400))
+            return
+
+        if path == "/api/campaigns/run-scheduled":
+            self._send_json(shul_campaigns.run_scheduled_automations())
+            return
+
         if path == "/api/config":
             body = self._read_json_body()
-            # Keep existing API key if masked or empty placeholder passed
-            if "cloud_api_key" in body and ("..." in str(body["cloud_api_key"]) or body["cloud_api_key"] == "***"):
-                body.pop("cloud_api_key", None)
+            # Keep existing secrets if masked or placeholder passed
+            for secret_key in ("cloud_api_key", "mailing_api_key", "smtp_password"):
+                if secret_key in body and ("..." in str(body[secret_key]) or body[secret_key] == "***"):
+                    body.pop(secret_key, None)
             cfg = ai_engine.save_config(body)
             try:
                 shul_mesh.ensure_self_node(port=PORT)

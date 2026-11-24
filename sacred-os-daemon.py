@@ -407,6 +407,13 @@ def sync_once() -> dict:
     dpms_status = apply_shabbat_dpms_policy(snap, cfg)
     sync_screensaver_branding(snap, p_en, p_he, daf_label, cfg)
 
+    campaign_auto = {"ran": []}
+    try:
+        import shul_campaigns
+        campaign_auto = shul_campaigns.run_scheduled_automations()
+    except Exception:
+        pass
+
     state_payload = {
         "updated_at": snap["timestamp_iso"],
         "parasha": {"en": p_en, "he": p_he},

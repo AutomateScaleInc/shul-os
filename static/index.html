@@ -3321,6 +3321,154 @@
               </label>
             </div>
 
+            <div class="settings-section" id="settingsBroadcastCenter">
+              <div class="settings-section-title">📣 Mailings, Event Notifications &amp; Marketing Broadcast Push</div>
+              <div class="muted" style="font-size:0.8rem;line-height:1.45;margin-bottom:8px;">
+                Configure direct email delivery (Resend, Mailgun, Brevo, SMTP, or Webhook) + mobile push notifications, schedule automated Pre-Shabbos / Holiday / Event broadcasts (with automatic Halachic Shabbat Guard), or push any campaign right from here.
+              </div>
+
+              <div class="settings-row-2">
+                <label class="settings-field">Direct Email Provider
+                  <select class="form-input" id="cfgMailProvider" onchange="toggleMailProviderFields()">
+                    <option value="webhook">Webhook (Zapier / Make / n8n / Mailchimp)</option>
+                    <option value="resend">Resend API (Direct Email)</option>
+                    <option value="mailgun">Mailgun API (Direct Email)</option>
+                    <option value="brevo">Brevo API (Direct Email)</option>
+                    <option value="smtp">SMTP Server (Gmail / Workspace / Custom)</option>
+                  </select>
+                </label>
+                <label class="settings-field">Rabbi / Test Recipient Email
+                  <input class="form-input" id="cfgMailTestEmail" placeholder="rabbi@theshul.eu">
+                </label>
+              </div>
+
+              <div class="settings-row-2">
+                <label class="settings-field">Sender Display Name
+                  <input class="form-input" id="cfgMailFromName" placeholder="The European Synagogue">
+                </label>
+                <label class="settings-field">Sender From Email
+                  <input class="form-input" id="cfgMailFromEmail" placeholder="news@theshul.eu">
+                </label>
+              </div>
+
+              <div class="settings-row-2" id="cfgMailApiRow">
+                <label class="settings-field">Email Provider API Key (Resend / Mailgun / Brevo)
+                  <input class="form-input" id="cfgMailApiKey" type="password" placeholder="re_... / key-... / xkeysib-...">
+                </label>
+                <label class="settings-field">Mailgun Sending Domain (Mailgun only)
+                  <input class="form-input" id="cfgMailDomain" placeholder="mg.theshul.eu">
+                </label>
+              </div>
+
+              <div id="cfgMailSmtpBlock" style="display:none;">
+                <div class="settings-row-2">
+                  <label class="settings-field">SMTP Host
+                    <input class="form-input" id="cfgSmtpHost" placeholder="smtp.gmail.com">
+                  </label>
+                  <label class="settings-field">SMTP Port (587 TLS / 465 SSL)
+                    <input class="form-input" id="cfgSmtpPort" type="number" value="587" placeholder="587">
+                  </label>
+                </div>
+                <div class="settings-row-2">
+                  <label class="settings-field">SMTP Username
+                    <input class="form-input" id="cfgSmtpUser" placeholder="office@theshul.eu">
+                  </label>
+                  <label class="settings-field">SMTP Password / App Password
+                    <input class="form-input" id="cfgSmtpPass" type="password" placeholder="App Password">
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-row-2">
+                <label class="settings-field">Mobile Push Channel URL (ntfy.sh / Telegram / Push Webhook)
+                  <input class="form-input" id="cfgPushChannelUrl" placeholder="https://ntfy.sh/theshul-brussels">
+                </label>
+                <label class="settings-field">Auto-Broadcast Default Language
+                  <select class="form-input" id="cfgAutoBroadcastLang">
+                    <option value="en">English (EN)</option>
+                    <option value="fr">Français (FR)</option>
+                    <option value="he">עברית (HE)</option>
+                  </select>
+                </label>
+              </div>
+
+              <div style="margin:10px 0 6px;font-size:0.78rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);">
+                ⏰ Automated Scheduled Push Rules (Shabbat-Safe)
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px;margin-bottom:10px;">
+                <label class="settings-check"><input type="checkbox" id="cfgAutoPreShabbos"> 🕯️ Pre-Shabbos Alert (Fri 09:30)</label>
+                <label class="settings-check"><input type="checkbox" id="cfgAutoWeeklyPrep"> 📖 Weekly Prep &amp; Parashah (Wed 10:00)</label>
+                <label class="settings-check"><input type="checkbox" id="cfgAutoHolidayAlert"> 🕎 Chagim / Holidays Guide (3 days prior)</label>
+                <label class="settings-check"><input type="checkbox" id="cfgAutoSpecialDays"> 🌙 Rosh Chodesh &amp; Special Days (1 day prior)</label>
+                <label class="settings-check"><input type="checkbox" id="cfgAutoEventReminder"> 🎉 Shul Event Reminders (24h prior)</label>
+                <label class="settings-check"><input type="checkbox" id="cfgShabbatSendGuard" checked> 🛡️ Halachic Shabbat &amp; Yom Tov Send Guard</label>
+              </div>
+
+              <div style="margin-top:12px;padding:14px;border-radius:12px;background:rgba(9,16,32,0.72);border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                  <div style="font-size:0.82rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">
+                    🚀 Compose &amp; Push Instant Broadcast
+                  </div>
+                  <div class="muted" id="campSubsCount" style="font-size:0.78rem;">Loading subscribers…</div>
+                </div>
+
+                <div class="settings-row-2">
+                  <label class="settings-field">Campaign Type
+                    <select class="form-input" id="campType" onchange="previewShulCampaign()">
+                      <option value="pre_shabbos">🕯️ Pre-Shabbos Alert (Candles &amp; Parashah)</option>
+                      <option value="weekly_prep">📖 Weekly Prep &amp; Full Parashah Mailing</option>
+                      <option value="event_notification">🎉 Event Notification &amp; RSVP Blast</option>
+                      <option value="special_days">🌙 Special Days, Rosh Chodesh &amp; Dedications</option>
+                      <option value="holiday_chag">🕎 Holidays &amp; Chagim Guide</option>
+                      <option value="custom_marketing">📢 Custom Announcement / Marketing Push</option>
+                    </select>
+                  </label>
+                  <label class="settings-field">Broadcast Language
+                    <select class="form-input" id="campLang" onchange="previewShulCampaign()">
+                      <option value="en">English (EN)</option>
+                      <option value="fr">Français (FR)</option>
+                      <option value="he">עברית (HE)</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="settings-row-2">
+                  <label class="settings-field">Custom Headline / Subject Override (optional)
+                    <input class="form-input" id="campCustomTitle" placeholder="Leave blank to auto-compose from Shul calendar">
+                  </label>
+                  <label class="settings-field">CTA Link URL (optional)
+                    <input class="form-input" id="campCustomCtaUrl" placeholder="https://www.theshul.eu">
+                  </label>
+                </div>
+                <label class="settings-field">Custom Rabbi Note / Promo Message (optional)
+                  <textarea class="form-input" id="campCustomBody" rows="2" placeholder="Optional personal message, Kiddush sponsor shoutout, or special announcement..."></textarea>
+                </label>
+
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 10px;font-size:0.82rem;">
+                  <label class="settings-check"><input type="checkbox" id="campChanEmail" checked> 📧 Email Subscribers</label>
+                  <label class="settings-check"><input type="checkbox" id="campChanWebhook" checked> 🌐 Syndication Webhook</label>
+                  <label class="settings-check"><input type="checkbox" id="campChanPush" checked> 📱 Mobile Push (ntfy/Telegram)</label>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                  <button class="tool-btn" type="button" onclick="previewShulCampaign()">👁️ Preview Copy</button>
+                  <button class="tool-btn" type="button" onclick="sendShulCampaign(true)">🧪 Send Test to Rabbi</button>
+                  <button class="btn-primary" type="button" onclick="sendShulCampaign(false)">🚀 Push Broadcast Now</button>
+                  <button class="tool-btn" type="button" onclick="copyCampaignChannel('whatsapp')">💬 Copy WhatsApp</button>
+                  <button class="tool-btn" type="button" onclick="copyCampaignChannel('sms')">📱 Copy SMS</button>
+                  <a class="tool-btn" id="campWaLink" href="#" target="_blank" style="text-decoration:none;display:none;">↗ Open WhatsApp</a>
+                </div>
+
+                <div id="campStatusMsg" class="muted" style="font-size:0.82rem;margin-top:8px;"></div>
+                <div id="campPreviewBox" style="display:none;margin-top:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);font-size:0.82rem;"></div>
+
+                <div style="margin-top:12px;">
+                  <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;">Recent Broadcast Log</div>
+                  <div id="campHistoryList" class="muted" style="font-size:0.78rem;line-height:1.5;">Loading history…</div>
+                </div>
+              </div>
+            </div>
+
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <button class="btn-primary" onclick="saveSettings()">💾 Save All Settings</button>
               <div id="cfgMsg" class="muted" style="font-size:0.85rem;"></div>
@@ -8395,6 +8543,28 @@ async function loadSettings() {
   document.getElementById('cfgPublicSanctuary').value = c.public_sanctuary_url || '';
   document.getElementById('cfgDonateUrl').value = c.donation_checkout_url || 'https://www.theshul.eu';
   document.getElementById('cfgSynHook').value = c.syndication_webhook_url || '';
+  if (document.getElementById('cfgMailProvider')) {
+    document.getElementById('cfgMailProvider').value = c.mailing_provider || 'webhook';
+    document.getElementById('cfgMailTestEmail').value = c.mailing_test_email || '';
+    document.getElementById('cfgMailFromName').value = c.mailing_from_name || 'The European Synagogue';
+    document.getElementById('cfgMailFromEmail').value = c.mailing_from_email || '';
+    document.getElementById('cfgMailApiKey').value = c.mailing_api_key || '';
+    document.getElementById('cfgMailDomain').value = c.mailing_domain || '';
+    document.getElementById('cfgSmtpHost').value = c.smtp_host || '';
+    document.getElementById('cfgSmtpPort').value = c.smtp_port || 587;
+    document.getElementById('cfgSmtpUser').value = c.smtp_user || '';
+    document.getElementById('cfgSmtpPass').value = c.smtp_password || '';
+    document.getElementById('cfgPushChannelUrl').value = c.push_channel_url || '';
+    document.getElementById('cfgAutoBroadcastLang').value = c.auto_broadcast_lang || 'en';
+    document.getElementById('cfgAutoPreShabbos').checked = !!c.auto_pre_shabbos;
+    document.getElementById('cfgAutoWeeklyPrep').checked = !!c.auto_weekly_prep;
+    document.getElementById('cfgAutoHolidayAlert').checked = !!c.auto_holiday_alert;
+    document.getElementById('cfgAutoSpecialDays').checked = !!c.auto_special_days;
+    document.getElementById('cfgAutoEventReminder').checked = !!c.auto_event_reminder;
+    document.getElementById('cfgShabbatSendGuard').checked = c.shabbat_send_guard !== false;
+    toggleMailProviderFields();
+    loadCampaignHistory();
+  }
   if (c.broadcast_follow_url) initCompanionFollow(c.broadcast_follow_url);
 }
 
@@ -8439,16 +8609,149 @@ async function saveSettings() {
     mesh_node_type: document.getElementById('cfgMeshType') ? document.getElementById('cfgMeshType').value : 'synagogue',
     mesh_camera_url: document.getElementById('cfgMeshCam') ? document.getElementById('cfgMeshCam').value.trim() : '',
     mesh_auto_receive: document.getElementById('cfgMeshAutoRecv') ? document.getElementById('cfgMeshAutoRecv').checked : true,
+    mailing_provider: document.getElementById('cfgMailProvider') ? document.getElementById('cfgMailProvider').value : 'webhook',
+    mailing_test_email: document.getElementById('cfgMailTestEmail') ? document.getElementById('cfgMailTestEmail').value.trim() : '',
+    mailing_from_name: document.getElementById('cfgMailFromName') ? document.getElementById('cfgMailFromName').value.trim() : 'The European Synagogue',
+    mailing_from_email: document.getElementById('cfgMailFromEmail') ? document.getElementById('cfgMailFromEmail').value.trim() : '',
+    mailing_api_key: document.getElementById('cfgMailApiKey') ? document.getElementById('cfgMailApiKey').value.trim() : '',
+    mailing_domain: document.getElementById('cfgMailDomain') ? document.getElementById('cfgMailDomain').value.trim() : '',
+    smtp_host: document.getElementById('cfgSmtpHost') ? document.getElementById('cfgSmtpHost').value.trim() : '',
+    smtp_port: document.getElementById('cfgSmtpPort') ? (parseInt(document.getElementById('cfgSmtpPort').value, 10) || 587) : 587,
+    smtp_user: document.getElementById('cfgSmtpUser') ? document.getElementById('cfgSmtpUser').value.trim() : '',
+    smtp_password: document.getElementById('cfgSmtpPass') ? document.getElementById('cfgSmtpPass').value.trim() : '',
+    push_channel_url: document.getElementById('cfgPushChannelUrl') ? document.getElementById('cfgPushChannelUrl').value.trim() : '',
+    auto_broadcast_lang: document.getElementById('cfgAutoBroadcastLang') ? document.getElementById('cfgAutoBroadcastLang').value : 'en',
+    auto_pre_shabbos: document.getElementById('cfgAutoPreShabbos') ? document.getElementById('cfgAutoPreShabbos').checked : false,
+    auto_weekly_prep: document.getElementById('cfgAutoWeeklyPrep') ? document.getElementById('cfgAutoWeeklyPrep').checked : false,
+    auto_holiday_alert: document.getElementById('cfgAutoHolidayAlert') ? document.getElementById('cfgAutoHolidayAlert').checked : false,
+    auto_special_days: document.getElementById('cfgAutoSpecialDays') ? document.getElementById('cfgAutoSpecialDays').checked : false,
+    auto_event_reminder: document.getElementById('cfgAutoEventReminder') ? document.getElementById('cfgAutoEventReminder').checked : false,
+    shabbat_send_guard: document.getElementById('cfgShabbatSendGuard') ? document.getElementById('cfgShabbatSendGuard').checked : true,
   };
   initCompanionFollow(payload.broadcast_follow_url);
   currentVoiceProfile = payload.voice_profile;
   autoSpeakReplies = payload.auto_speak;
   const r = await fetch('/api/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
   if (r.ok) {
-    document.getElementById('cfgMsg').textContent = 'Settings saved! Celestial observatory, display rhythm & calendar updated.';
+    document.getElementById('cfgMsg').textContent = 'Settings saved! Mailings, broadcast schedules, celestial observatory & calendar updated.';
     loadHealth();
     loadCelestial();
     loadToday(null);
+  }
+}
+
+let latestCampaignPreview = null;
+
+function toggleMailProviderFields() {
+  const prov = (document.getElementById('cfgMailProvider')?.value || 'webhook');
+  const smtpBox = document.getElementById('cfgMailSmtpBlock');
+  const apiRow = document.getElementById('cfgMailApiRow');
+  if (smtpBox) smtpBox.style.display = prov === 'smtp' ? 'block' : 'none';
+  if (apiRow) apiRow.style.display = (prov === 'resend' || prov === 'mailgun' || prov === 'brevo') ? 'grid' : 'none';
+}
+
+async function previewShulCampaign() {
+  const ctype = document.getElementById('campType')?.value || 'pre_shabbos';
+  const lang = document.getElementById('campLang')?.value || 'en';
+  const title = document.getElementById('campCustomTitle')?.value.trim() || '';
+  const body = document.getElementById('campCustomBody')?.value.trim() || '';
+  const ctaUrl = document.getElementById('campCustomCtaUrl')?.value.trim() || '';
+  const status = document.getElementById('campStatusMsg');
+  const box = document.getElementById('campPreviewBox');
+  if (status) status.textContent = 'Composing multi-channel broadcast preview...';
+  try {
+    const qs = new URLSearchParams({ type: ctype, lang, title, body, cta_url: ctaUrl });
+    const r = await fetch('/api/campaigns/preview?' + qs.toString());
+    const d = await r.json();
+    latestCampaignPreview = d;
+    if (document.getElementById('campSubsCount')) {
+      document.getElementById('campSubsCount').textContent = `${d.subscribers_count || 0} mailing subscriber(s) · ${d.shabbat_guard?.blocked ? '🛡️ Shabbat Guard Active' : '✅ Ready to Send'}`;
+    }
+    const waLink = document.getElementById('campWaLink');
+    if (waLink && d.whatsapp_url) { waLink.href = d.whatsapp_url; waLink.style.display = 'inline-flex'; }
+    if (status) status.textContent = `Preview ready: "${d.subject}"`;
+    if (box) {
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div style="font-weight:700;color:var(--gold);margin-bottom:6px;">📧 Subject: ${esc(d.subject)}</div>
+        <div style="color:var(--muted);margin-bottom:8px;"><strong>📱 Push:</strong> ${esc(d.push_title)} — ${esc(d.push_body)}</div>
+        <pre style="white-space:pre-wrap;font-family:inherit;background:rgba(0,0,0,0.28);padding:10px;border-radius:8px;max-height:200px;overflow-y:auto;margin:0;color:var(--ink);">${esc(d.whatsapp_text)}</pre>
+      `;
+    }
+  } catch (e) {
+    if (status) status.textContent = 'Preview error: ' + e.message;
+  }
+}
+
+async function sendShulCampaign(isTest) {
+  const status = document.getElementById('campStatusMsg');
+  const channels = [];
+  if (document.getElementById('campChanEmail')?.checked) channels.push('email');
+  if (document.getElementById('campChanWebhook')?.checked) channels.push('webhook');
+  if (document.getElementById('campChanPush')?.checked) channels.push('push');
+  const testEmail = isTest ? (document.getElementById('cfgMailTestEmail')?.value.trim() || '') : '';
+  if (isTest && !testEmail) {
+    if (status) status.textContent = 'Enter a Rabbi / Test Recipient Email above (and Save Settings) before sending a test.';
+    return;
+  }
+  if (status) status.textContent = isTest ? `Sending test broadcast to ${testEmail}...` : 'Pushing synagogue broadcast across selected channels...';
+  try {
+    const r = await fetch('/api/campaigns/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        campaign_type: document.getElementById('campType')?.value || 'pre_shabbos',
+        lang: document.getElementById('campLang')?.value || 'en',
+        channels,
+        test_email: testEmail,
+        custom_title: document.getElementById('campCustomTitle')?.value.trim() || '',
+        custom_body: document.getElementById('campCustomBody')?.value.trim() || '',
+        custom_cta_url: document.getElementById('campCustomCtaUrl')?.value.trim() || '',
+      }),
+    });
+    const d = await r.json();
+    if (status) status.textContent = d.detail || (d.ok ? 'Broadcast dispatched!' : 'Broadcast error.');
+    loadCampaignHistory();
+  } catch (e) {
+    if (status) status.textContent = 'Broadcast error: ' + e.message;
+  }
+}
+
+async function copyCampaignChannel(kind) {
+  if (!latestCampaignPreview) await previewShulCampaign();
+  if (!latestCampaignPreview) return;
+  const txt = kind === 'sms' ? latestCampaignPreview.sms_text : latestCampaignPreview.whatsapp_text;
+  try {
+    await navigator.clipboard.writeText(txt);
+    document.getElementById('campStatusMsg').textContent = `Copied ${kind.toUpperCase()} broadcast copy to clipboard!`;
+  } catch {
+    document.getElementById('campStatusMsg').textContent = 'Preview opened below — select & copy text manually.';
+  }
+}
+
+async function loadCampaignHistory() {
+  const el = document.getElementById('campHistoryList');
+  if (!el) return;
+  try {
+    const [hRes, tRes] = await Promise.all([fetch('/api/campaigns/history'), fetch('/api/campaigns/types')]);
+    const hData = await hRes.json();
+    const tData = await tRes.json();
+    if (document.getElementById('campSubsCount')) {
+      document.getElementById('campSubsCount').textContent = `${tData.subscribers_count || 0} mailing subscriber(s) · ${tData.shabbat_guard?.blocked ? '🛡️ Shabbat Guard Active' : '✅ Ready to Send'}`;
+    }
+    const items = hData.history || [];
+    if (!items.length) {
+      el.innerHTML = '<span>No broadcasts sent yet. Click <strong>Preview Copy</strong> or <strong>Send Test to Rabbi</strong> above.</span>';
+      return;
+    }
+    el.innerHTML = items.slice(0, 6).map(row => `
+      <div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <span><strong>${esc(row.campaign_type)}</strong> (${esc(row.lang)})${row.is_test ? ' [TEST]' : ''} — ${esc(row.subject.slice(0, 62))}</span>
+        <span style="color:var(--accent);">${esc(row.status)} · ${esc(row.created_at)}</span>
+      </div>
+    `).join('');
+  } catch {
+    el.textContent = 'History unavailable.';
   }
 }
 
