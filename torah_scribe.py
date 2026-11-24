@@ -460,7 +460,7 @@ def mission_ingest_next_commentary(max_chapters: int = 12) -> tuple[bool, str, i
     return False, "All queued classical commentators fully ingested!", 0
 
 
-def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 420) -> str:
+def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 420, json_mode: bool = False) -> str:
     cfg = ai_engine.load_config()
     url = cfg.get("ollama_url", "http://127.0.0.1:11434").rstrip("/") + "/api/chat"
     model = cfg.get("ollama_model", "qwen2.5:1.5b")
@@ -473,13 +473,15 @@ def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 4
             {"role": "user", "content": user_prompt},
         ],
     }
+    if json_mode:
+        payload["format"] = "json"
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
     )
     chunks = []
-    with urllib.request.urlopen(req, timeout=120) as r:
+    with urllib.request.urlopen(req, timeout=240) as r:
         for raw_line in r:
             line = raw_line.decode("utf-8", "ignore").strip()
             if not line:
@@ -1060,7 +1062,7 @@ def mission_dream_inference(force: bool = False) -> tuple[bool, str, int]:
         "Reflect deeply and output strictly valid JSON with 2-3 specific NEEDS, 2-3 inspiring WANTS, a focused DREAM_PLAN, and 2 fresh NEW_FACTS."
     )
 
-    raw = _call_local_ollama(sys_prompt, user_prompt, max_tokens=520)
+    raw = _call_local_ollama(sys_prompt, user_prompt, max_tokens=340, json_mode=True)
     if len(raw) < 40:
         return False, "Local Ollama returned empty dream output.", 0
 
