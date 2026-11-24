@@ -145,22 +145,42 @@
           <h1>A 13-Year-Old iMac Turned Into a Living Synagogue OS</h1>
           <div class="hook">“Everyone throws away 2013 iMacs. We installed Shul.OS on bare metal and turned one into a 100% offline-capable, open-source Operating System for Synagogues, Chabad Houses, and Jewish homes.”</div>
           <div class="stats-grid">
-            <div class="stat"><div class="v">19,899</div><div class="k">Lines Pure Code</div><div class="d">Zero React, zero Node server, MIT Open Source</div></div>
-            <div class="stat"><div class="v">71 MB</div><div class="k">Offline Brain</div><div class="d">23,206 verses + 21,763 commentaries in SQLite FTS5</div></div>
-            <div class="stat"><div class="v">qwen2.5:3b</div><div class="k">Unplugged AI</div><div class="d">4096-ctx local Ollama reasoning with zero Wi-Fi</div></div>
-            <div class="stat"><div class="v">~60 ms</div><div class="k">Global Live QR</div><div class="d">shul.automatescale.com on any phone (4G/5G/Wi-Fi)</div></div>
+            <div class="stat"><div class="v">21,000+</div><div class="k">Lines Pure Code</div><div class="d">Zero React, zero Node server, MIT Open Source</div></div>
+            <div class="stat"><div class="v">71 MB</div><div class="k">Offline Brain</div><div class="d">23,206 verses + 21,763 commentaries + Daf Yomi</div></div>
+            <div class="stat"><div class="v">EN · FR · עב</div><div class="k">Tri-Lingual &amp; Voice</div><div class="d">“Shul open…” voice nav + local qwen2.5:3b AI</div></div>
+            <div class="stat"><div class="v">🕯 Auto-Shabbat</div><div class="k">Zero-Touch Kosher</div><div class="d">Auto Candle-Lighting Stillness → Havdalah resume</div></div>
           </div>
         </div>
         <div class="shot">
-          <img src="showcase/showcase_sanctuary_desktop.png" alt="ShulOS Desktop Sanctuary">
-          <div class="shot-cap">Live on 2013 iMac (`sentinel`) — Parashat Vayishlach, 400 Armed Men Swath, Live Tefillin Zmanim &amp; Always-On HTTPS QR</div>
+          <img src="showcase/showcase_sanctuary_desktop.png" alt="Shul.OS Desktop Sanctuary">
+          <div class="shot-cap">Live on 2013 iMac (`sentinel`) — Parashat Vayishlach, Gold Heritage Plaque, 400 Armed Men, EN/FR/עב &amp; Always-On HTTPS QR</div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 2: SYSTEM ARCHITECTURE -->
+    <!-- SLIDE 2: AUTO SHABBAT SANCTUARY MODE & RABBI'S DESK -->
     <section class="slide">
-      <div class="kicker">SLIDE 2 · FULL-STACK ARCHITECTURE</div>
+      <div class="two-col">
+        <div>
+          <div class="kicker">SLIDE 2 · ZERO-TOUCH KOSHER SANCTUARY</div>
+          <h1>Auto Shabbat Mode, Rabbi’s Desk &amp; Bar/Bat Mitzvah Studio</h1>
+          <div class="hook">“At Friday Candle Lighting, Shul.OS automatically mutes audio, pauses the microphone and camera, dims to a warm 3700K candlelit glow, and displays Shabbat times, Kiddush, Daf Yomi &amp; Yahrzeits — then resumes weekday study right after Havdalah.”</div>
+          <ul class="points">
+            <li><strong>🕯 Auto Shabbat Sanctuary Mode:</strong> Zero-flicker, zero-interaction display with Halachic Stillness Guard (`Audio Muted · Mic Paused · Camera OFF · Updates Paused`) + 1-click weekday preview.</li>
+            <li><strong>🎙 Rabbi’s Desk — 1-Click Dvar Torah Studio:</strong> Synthesizes weekly Parashah, verified Scripture parallels, 3 classical commentators (Rashi/Ramban/Ibn Ezra), and a ready-to-send <strong>EN / FR / עב WhatsApp bulletin</strong> offline.</li>
+            <li><strong>🎓 Bar/Bat Mitzvah Finder &amp; Aliyah Coach:</strong> Enter any birthday to compute exact Hebrew birthday, Shabbat celebration date, Torah &amp; Haftarah portion, plus 4-step <em>“Called to the Torah”</em> Studio Hebrew blessings!</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <img src="showcase/showcase_shabbat_mode.png" alt="Auto Shabbat Sanctuary Mode">
+          <div class="shot-cap">Live Auto Shabbat Sanctuary Mode — Candle Lighting, Vayishlach &amp; Haftarah, Friday Kiddush, Shabbat Daf Yomi &amp; Stillness Guard</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: FULL-STACK ARCHITECTURE -->
+    <section class="slide">
+      <div class="kicker">SLIDE 3 · FULL-STACK ARCHITECTURE</div>
       <h1>From Bare-Metal Silicon to Global Chabad Mesh</h1>
       <div class="hook">“Zero cloud lock-in. Unplug it from the wall, walk it into Rabbi Michoel’s house, plug it back in — 6 systemd units bring the entire Living OS back in seconds.”</div>
       <div class="arch-flow">
@@ -184,108 +204,108 @@
       <div class="broll">🎥 <strong>Shot Idea:</strong> Film unplugging the single power cable from the 2013 iMac, carrying it to another room, plugging it in, and watching it boot straight into fullscreen Torah Sanctuary with zero Wi-Fi!</div>
     </section>
 
-    <!-- SLIDE 3: LIVING ASTRONOMICAL OS -->
+    <!-- SLIDE 4: LIVING ASTRONOMICAL OS -->
     <section class="slide">
-      <div class="kicker">SLIDE 3 · LIVING CELESTIAL OS</div>
+      <div class="kicker">SLIDE 4 · LIVING CELESTIAL OS</div>
       <h1>Pure-Math Solar &amp; Lunar Ephemeris (Zero APIs)</h1>
       <div class="hook">“The OS literally knows the exact angle of the sun and moon over Brussels right now — and automatically dims into Shabbat Stillness at Candle Lighting without touching the internet.”</div>
       <ul class="points">
         <li><strong>Offline Halachic Zmanim (<code>sacred_astronomy.py</code>):</strong> Computes <em>Alot HaShachar, Misheyakir, Sunrise, Sof Zman Shema, Chatzot, Mincha, Shkiah, Candle Lighting &amp; Havdalah</em> for any city on Earth purely from orbital math.</li>
         <li><strong>Mizrach Compass &amp; 13-Month Hebrew Wheel:</strong> Live bearing &amp; distance straight toward Jerusalem (118° ESE · 3,298 km from Brussels) + lunar illumination % and <em>Kiddush Levana</em> window.</li>
-        <li><strong>OS-Level Hardware Symbiosis:</strong> Syncs Shul.OS display color warmth + BLE RGB sanctuary lighting to the Halachic watch of day, and pauses scrapers &amp; broadcasts on Shabbat/Yom Tov.</li>
+        <li><strong>OS-Level Hardware Symbiosis:</strong> Syncs Shul.OS display backlight &amp; color warmth + BLE RGB sanctuary lighting to the Halachic watch of day, and pauses cameras, mic, scrapers &amp; broadcasts on Shabbat/Yom Tov.</li>
       </ul>
-      <div class="broll">🎥 <strong>Shot Idea:</strong> Click the top Celestial Ribbon to open the real-time Sun &amp; Moon Observatory dome, Jerusalem compass, and countdown to Sunset.</div>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Click the top Celestial Ribbon (or say <em>“Shul open Sky”</em>) to open the real-time Sun &amp; Moon Observatory dome, Jerusalem compass, and countdown to Sunset.</div>
     </section>
 
-    <!-- SLIDE 4: 3-TIER VERIFIED SOURCE STANDARD -->
+    <!-- SLIDE 5: 3-TIER VERIFIED SOURCE STANDARD -->
     <section class="slide">
-      <div class="kicker">SLIDE 4 · EPISTEMIC INTEGRITY &amp; UNPLUGGED AI</div>
-      <h1>The 3-Tier Verified Source Standard (Anti-Hallucination, Anti-Dogma)</h1>
-      <div class="hook">“Most AI either fabricates verses or preaches one opinion as absolute truth. We engineered a strict 3-Tier Foundation Standard directly into the database, RAG pipeline, and UI.”</div>
+      <div class="kicker">SLIDE 5 · EPISTEMIC INTEGRITY &amp; UNPLUGGED AI</div>
+      <h1>The 3-Tier Verified Source Standard &amp; Twin Talmuds</h1>
+      <div class="hook">“Most AI either fabricates verses or preaches one opinion as absolute truth. We engineered a strict 3-Tier Foundation Standard directly into the database, RAG pipeline, and Editorial Commentary Studio.”</div>
       <ul class="points">
         <li><strong>📜 Tier 1 — Primary Verified Scripture:</strong> Verbatim local Tanakh (23,206 verses) + <strong>verified coinciding cross-scripture parallels</strong> hydrated directly from SQLite (e.g., Genesis 32 ↔ Hosea 12:4–5 ↔ Obadiah 1:1 ↔ Psalm 91:11).</li>
-        <li><strong>⚖️ Tier 2 — Cited Interpretations (Explicitly Non-Exclusive):</strong> Babylonian Talmud (<em>Bavli</em> tractate &amp; folio) and classical commentators (<em>Rashi, Rambam, Ramban, Ibn Ezra, Rashbam, Or HaChaim</em>) are ALWAYS labeled as interpretations and paired with differing classical lenses.</li>
-        <li><strong>🧠 Unplugged <code>qwen2.5:3b</code> Synthesis:</strong> With 4096-token context packing verbatim Scripture + coinciding parallels + 5 diverse commentators + Haggadah/Siddur, it delivers cunning comparative reasoning even with the internet unplugged.</li>
+        <li><strong>⚖️ Tier 2 — Twin Talmuds (Bavli &amp; Yerushalmi) + 100% Offline Daf Yomi:</strong> Babylonian &amp; Jerusalem Talmud + classical commentators (<em>Rashi, Rambam, Ramban, Ibn Ezra, Sforno, Or HaChaim</em>) in our clean tabbed <strong>Commentary Studio</strong> — always labeled as cited lenses.</li>
+        <li><strong>🧠 Unplugged <code>qwen2.5:3b</code> Synthesis (EN · FR · עב):</strong> Packs verbatim Scripture + parallels + 5 commentators into 4096 tokens and responds warmly in English, French, or Hebrew even with Wi-Fi unplugged.</li>
       </ul>
-      <div class="broll">🎥 <strong>Shot Idea:</strong> Expand the Source Foundation card at the bottom of Today's Reading, then disconnect Wi-Fi and ask the AI to contrast Rashi vs. Ibn Ezra on Esau's kiss.</div>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Say <em>“Shul click Sources and Talmud”</em>, then switch the top bar to <code>FR</code> and ask a question in French with Wi-Fi turned off.</div>
     </section>
 
-    <!-- SLIDE 5: VISUAL STORYTELLING, SWATHS & GRAVITY -->
+    <!-- SLIDE 6: VISUAL STORYTELLING, SWATHS & GRAVITY -->
     <section class="slide">
       <div class="two-col">
         <div>
-          <div class="kicker">SLIDE 5 · STORYTELLING THAT CLICKS</div>
-          <h1>400-Soldier Swaths, 7/7 Daily Art &amp; 60fps Gravity Physics</h1>
+          <div class="kicker">SLIDE 6 · STORYTELLING THAT CLICKS</div>
+          <h1>400-Soldier Swaths, Heritage Plaque &amp; 60fps Gravity Physics</h1>
           <div class="hook">“Reading ‘Esau came with 400 men’ is abstract. Seeing 400 miniature armed soldiers marching behind Esau and the glowing Night Angel makes the Torah click in half a second.”</div>
           <ul class="points">
-            <li><strong>Procedural Crowds &amp; Armies:</strong> Dynamically visualizes countable miniature groups (e.g., 12 children, 15 people) and receding armed formations (Esau’s 400 Armed Men).</li>
-            <li><strong>7/7 Unique Daily Artwork + Time-Travel:</strong> Every day of the week &amp; every week transforms the hero painting, accent color, opening Aliyah excerpt, and top animated emblems — step backward or forward to any date!</li>
-            <li><strong>60fps Gravity-Spring Side Blocks:</strong> Heavenly icons float weightlessly up top; grounded story blocks obey cushioned gravity and fall smoothly onto the QR dock when a whisper card slips away.</li>
+            <li><strong>Procedural Crowds &amp; Armies:</strong> Dynamically visualizes countable miniature groups (e.g., 20 people) and receding armed formations (Esau’s 400 Armed Men).</li>
+            <li><strong>Gold Community Heritage &amp; Yahrzeit Plaque:</strong> Ornate right-rail plaque showcases live community Yahrzeits, Kiddush honors, Refuah Shleimah names, Jewish Birthdays &amp; Belgian heritage — balanced dynamically with zero overlap.</li>
+            <li><strong>Hands-Free <code>“Shul open…”</code> &amp; <code>“Shul click…”</code> Voice Control:</strong> Walk up without a mouse or keyboard and navigate any tab, prayer, or presentation cleanly by voice (auto-pauses on Shabbat).</li>
           </ul>
         </div>
         <div class="shot">
-          <img src="showcase/showcase_sanctuary_desktop.png" alt="400 Armed Men Swath and Gravity Rail">
-          <div class="shot-cap">Look right: ⚔️ 400 ARMED MEN behind Esau &amp; Night Angel · Look left: Gravity-stacked Jacob + Whisper + Always-On QR</div>
+          <img src="showcase/showcase_sanctuary_desktop.png" alt="400 Armed Men Swath and Heritage Plaque">
+          <div class="shot-cap">Look right: ⚔️ 400 ARMED MEN + Gold Community Heritage Plaque · Look left: Jacob + Always-On HTTPS QR</div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 6: STUDIO HEBREW, SINGING & GUIDED TEFILLIN -->
+    <!-- SLIDE 7: STUDIO HEBREW, SINGING & GUIDED TEFILLIN -->
     <section class="slide">
-      <div class="kicker">SLIDE 6 · HIGH-QUALITY AUDIO &amp; LIVING LITURGY</div>
-      <h1>48 kHz Studio Hebrew, Singing &amp; Guided “Say It With Me” Tefillin</h1>
-      <div class="hook">“At weekday Misheyakir through Sunset, a glowing Tefillin Coach lights up in the top ribbon — speaking phrase-by-phrase Studio Hebrew with transliteration so anyone can wrap and repeat aloud.”</div>
+      <div class="kicker">SLIDE 7 · HIGH-QUALITY AUDIO &amp; LIVING LITURGY</div>
+      <h1>48 kHz Studio Hebrew, Tefillin &amp; Aliyah Blessings Coach</h1>
+      <div class="hook">“At weekday Misheyakir through Sunset, a glowing Tefillin Coach lights up in the top ribbon — and anyone called to the Torah can rehearse every Aliyah blessing phrase-by-phrase in Studio Hebrew.”</div>
       <ul class="points">
-        <li><strong>Hybrid 48 kHz Studio Neural Voice:</strong> Authentic nikud Hebrew (<code>he-IL-AvriNeural</code>) + warm Studio English (<code>en-US-BrianMultilingualNeural</code>), ffmpeg-mastered &amp; permanently cached offline (22 Tefillin Hebrew phrases pre-warmed on SSD!) + offline Piper TTS &amp; Whisper STT.</li>
-        <li><strong>Guided 5-Step Tefillin Coach:</strong> Tallit → Arm Tefillin → Head Tefillin → Hosea 2:21–22 Finger Wraps → Shema Yisrael — speaks 2–4 word Hebrew phrases slowly, then fills a glowing <em>“Your Turn — Repeat Aloud”</em> bar.</li>
-        <li><strong>Complete Offline Bookshelf &amp; Singing:</strong> Polyphonic harp/choir melody player for sacred songs (<em>Shalom Aleichem, Lecha Dodi, Adon Olam, Ma'oz Tzur</em>), full 15-step <strong>Passover Haggadah</strong>, complete <strong>Siddur</strong> (Kiddush, Havdalah, transliterated Kaddish, Mi Sheberach), 150 Psalms &amp; all 5 Megillot.</li>
+        <li><strong>Hybrid 48 kHz Studio Neural Voice:</strong> Authentic nikud Hebrew (<code>he-IL-AvriNeural</code>) + warm Studio English (<code>en-US-BrianMultilingualNeural</code>), ffmpeg-mastered &amp; permanently cached offline + offline Piper TTS &amp; Whisper STT.</li>
+        <li><strong>Guided Tefillin &amp; Bar/Bat Mitzvah Aliyah Coach:</strong> 5-step Tefillin coach + 4-step <em>“Called to the Torah”</em> coach (Barchu, Before Torah, After Torah, Haftarah) with glowing <em>“Your Turn — Repeat Aloud”</em> bar.</li>
+        <li><strong>Complete Offline Bookshelf &amp; Singing:</strong> Polyphonic harp/choir melody player (<em>Shalom Aleichem, Lecha Dodi, Adon Olam, Ma'oz Tzur</em>), 15-step <strong>Passover Haggadah</strong>, complete <strong>Siddur</strong>, 150 Psalms, 5 Megillot &amp; Exact 14th Cycle Daf Yomi.</li>
       </ul>
-      <div class="broll">🎥 <strong>Shot Idea:</strong> Tap the glowing <code>🟦 Tefillin Time · Say With Me</code> pill and record the Studio Hebrew voice guiding Shema while the repeat bar animates!</div>
+      <div class="broll">🎥 <strong>Shot Idea:</strong> Tap the glowing <code>🟦 Tefillin Time · Say With Me</code> pill or say <em>“Shul open Bar Mitzvah”</em> to demo the live Hebrew voice coach!</div>
     </section>
 
-    <!-- SLIDE 7: ZERO-MOUSE QR & MOBILE EXPERIENCE -->
+    <!-- SLIDE 8: ZERO-MOUSE QR & MOBILE EXPERIENCE -->
     <section class="slide">
       <div class="two-col">
         <div>
-          <div class="kicker">SLIDE 7 · ZERO-MOUSE LOBBY TO POCKET</div>
-          <h1>Scan Any Phone → Sponsor, Message Rabbi, or Mirror Screen</h1>
-          <div class="hook">“No mouse, no keyboard in a synagogue lobby. Point any iPhone or Android at the corner QR — on 4G, 5G, or Wi-Fi — and you’re connected to the exact screen and Rabbi Michoel in 60 milliseconds.”</div>
+          <div class="kicker">SLIDE 8 · ZERO-MOUSE LOBBY TO POCKET</div>
+          <h1>Scan Any Phone → Sponsor, Yahrzeit Plaque, or WhatsApp Rabbi</h1>
+          <div class="hook">“No mouse, no keyboard in a synagogue lobby. Point any iPhone or Android at the corner QR — in English, French, or Hebrew — and connect directly to Rabbi Michoel or place a Yahrzeit dedication live on screen.”</div>
           <ul class="points">
             <li><strong>Permanent Branded HTTPS Tunnel:</strong> Dedicated Cloudflare Named Tunnel runs right on the iMac (<code>https://shul.automatescale.com/give</code>) — portable even when carried to another building!</li>
-            <li><strong>Itemized Shul Sponsorships &amp; Direct Rabbi Inbox:</strong> Sponsor Shabbat Kiddush, Kids Shul, or Day of Learning, or send a Shabbat RSVP / <em>Mi Sheberach</em> prayer straight to Rabbi Michoel’s inbox with <strong>1-click WhatsApp reply links</strong>.</li>
-            <li><strong>Native-Grade Mobile App Feel:</strong> Responsive sticky swipeable nav, zero scroll hijacking, plus <strong>7-Channel Auto-Syndication</strong> (RSS, Website Embed, Email, WhatsApp, SMS, Eventbrite, PR).</li>
+            <li><strong>Tri-Lingual Sponsorships, Live Dedications &amp; WhatsApp Rabbi:</strong> Sponsor Shabbat Kiddush, place a <em>Ner Neshama</em> Yahrzeit / Refuah Shleimah dedication onto the screen plaque, or message Rabbi Michoel in 1 tap.</li>
+            <li><strong>Native-Grade Mobile App Feel:</strong> Instant <code>EN | FR | עב</code> mobile switcher, zero scroll hijacking, plus <strong>7-Channel Auto-Syndication</strong> (RSS, Website Embed, Email, WhatsApp, SMS, Eventbrite, PR).</li>
           </ul>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="shot phone"><img src="showcase/showcase_phone_give.png" alt="Mobile QR Splash"><div class="shot-cap">/give — QR Splash &amp; Connect</div></div>
+          <div class="shot phone"><img src="showcase/showcase_phone_give.png" alt="Mobile QR Splash"><div class="shot-cap">/give — Tri-Lingual QR Splash &amp; Connect</div></div>
           <div class="shot phone"><img src="showcase/showcase_phone_home.png" alt="Mobile Sanctuary"><div class="shot-cap">/ — Full Mobile Sanctuary</div></div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 8: SHUL.OS GLOBAL SHUL MESH -->
+    <!-- SLIDE 9: SHUL.OS GLOBAL SHUL MESH -->
     <section class="slide">
       <div class="two-col">
         <div>
-          <div class="kicker">SLIDE 8 · OPEN-SOURCE GLOBAL NETWORK</div>
+          <div class="kicker">SLIDE 9 · OPEN-SOURCE GLOBAL NETWORK</div>
           <h1>The Shul.OS Synagogue, Chabad House &amp; Residence Mesh</h1>
-          <div class="hook">“Because Shul.OS has an encrypted WireGuard mesh built right in, every Synagogue, Chabad House, and Jewish home can link into one Shabbat-aware broadcast network.”</div>
+          <div class="hook">“Because Shul.OS has an encrypted WireGuard mesh built right in, every Synagogue, Chabad House, and Jewish home can link into one Shabbat-aware broadcast network with nightly Shabbat-safe OTA updates.”</div>
           <ul class="points">
             <li><strong>Real Hardware Auto-Detection:</strong> Detects Shul.OS hardware, encrypted WireGuard peers, <strong>Shul.OS Studio Virtual Camera</strong>, celestial display warmth, BLE RGB lighting &amp; Cloudflare Tunnel.</li>
             <li><strong>1-Click Mesh Broadcast + Local Shabbat Guard:</strong> Stream <code>&lt;50ms</code> synchronized Torah slides + live Rabbi Studio Camera PiP (<code>/watch</code>) or push announcements — every receiving node automatically protects its own local Shabbat!</li>
-            <li><strong>MIT Open Source Rollout:</strong> Turnkey 1-command <code>install.sh</code> + 1-click <strong>Download Shul.OS</strong> so any Chabad House worldwide can join in 2 minutes.</li>
+            <li><strong>MIT Open Source Fleet Rollout:</strong> Public GitHub repo (<code>AutomateScaleInc/shul-os</code>) + turnkey 1-command <code>install.sh</code> + Shabbat-safe automatic OTA updates so any Chabad House worldwide joins in 2 minutes.</li>
           </ul>
         </div>
         <div class="shot">
           <img src="showcase/showcase_shul_mesh.png" alt="Shul.OS Mesh Console">
-          <div class="shot-cap">Live Shul.OS Mesh on Sentinel — 6 active native stack badges, encrypted peers &amp; 1-click Broadcast</div>
+          <div class="shot-cap">Live Shul.OS Mesh on Sentinel — pure Shul.OS branding, encrypted WireGuard peers &amp; 1-click Broadcast</div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 9: 60-SECOND CREATOR SCRIPT & HOOKS -->
+    <!-- SLIDE 10: 60-SECOND CREATOR SCRIPT & HOOKS -->
     <section class="slide">
-      <div class="kicker">SLIDE 9 · READY-TO-FILM CREATOR KIT</div>
+      <div class="kicker">SLIDE 10 · READY-TO-FILM CREATOR KIT</div>
       <h1>60-Second Video Script &amp; Viral Content Hooks</h1>
       <div class="script-box">
         <div><span class="ts">[0:00–0:08]</span> <em>(Pan across glowing 2013 iMac)</em> “This is a 13-year-old iMac everyone else would throw away. We turned it into Shul.OS — an open-source Operating System for synagogues — and it doesn’t even need the internet.”</div>
