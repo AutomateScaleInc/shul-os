@@ -230,6 +230,22 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
 
+        if path.startswith("/branding/"):
+            fname = os.path.basename(path)
+            bp = STATIC_DIR / "branding" / fname
+            if not bp.exists() or not bp.is_file():
+                self.send_error(404, "Branding asset not found")
+                return
+            ctype = "image/jpeg" if fname.lower().endswith((".jpg", ".jpeg")) else ("image/svg+xml" if fname.lower().endswith(".svg") else "image/png")
+            body = bp.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         if path in ("/feed.xml", "/rss.xml"):
             xml_bytes = community_hub.build_rss_xml(self.headers.get("Host", "")).encode("utf-8")
             self.send_response(200)
