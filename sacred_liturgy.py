@@ -583,7 +583,7 @@ HOLIDAY_ENCYCLOPEDIA = [
         "emoji": "🌿",
         "hebrew_date_label": "15–23 Tishrei (Pilgrimage Festival)",
         "category": "Three Pilgrimage Festivals (Shalosh Regalim)",
-        "art": "/art/promised-land.jpg",
+        "art": "/art/sukkot-arba-minim.jpg",
         "biblical_origins": "Leviticus 23:33–43 ('Dwell in booths 7 days' + the Four Species: Etrog, Lulav, Hadas, Aravah), Deuteronomy 16:14 ('And you shall be completely joyful!'), and Book of Ecclesiastes (Kohelet).",
         "deep_history": "During the Temple era, Sukkot featured the breathtaking 'Simchat Beit HaShoevah' (Water-Drawing Festival) — giant golden candelabras lit up all of Jerusalem while Sages danced with flaming torches until dawn! Meanwhile 70 offerings were brought for ALL 70 nations of the world (Talmud Sukkah 55b) — praying for universal rain and peace.",
         "prominent_celebrations": [
@@ -644,7 +644,7 @@ HOLIDAY_ENCYCLOPEDIA = [
         "emoji": "🍷",
         "hebrew_date_label": "15–22 Nisan (Pilgrimage Festival)",
         "category": "Three Pilgrimage Festivals (Shalosh Regalim)",
-        "art": "/art/exodus-sea.jpg",
+        "art": "/art/passover-seder-table.jpg",
         "biblical_origins": "Exodus 12–15 (The Exodus from Egypt, Matzah, Splitting of the Sea, Song of Miriam & Moses) and Song of Songs (Shir HaShirim).",
         "deep_history": "The oldest continuously celebrated freedom meal on planet Earth — observed uninterrupted for over 3,300 years! From King Josiah's great Jerusalem Passover (II Kings 23) and King Hezekiah's reunification Passover (II Chronicles 30) to the 5th-c. BCE Elephantine Passover Papyrus in Egypt and the five Sages debating until sunrise in Bnei Brak.",
         "prominent_celebrations": [

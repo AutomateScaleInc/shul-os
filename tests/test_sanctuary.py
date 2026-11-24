@@ -108,6 +108,22 @@ class TestRichVisualAtlas(unittest.TestCase):
         labels = [c["label"] for c in cast]
         self.assertGreaterEqual(len(labels), 3)
 
+    def test_zero_duplicate_art_across_week_and_day(self):
+        # All 7 days of Vayishlach must have 7 distinct hero paintings
+        week_arts = [srd.select_daily_visual_theme("vayishlach", day_index=d)["art"] for d in range(7)]
+        self.assertEqual(len(week_arts), len(set(week_arts)), f"Duplicate daily hero arts across week: {week_arts}")
+        # Within a single day's slides, zero paintings may repeat
+        sample_slides = [
+            {"kind": "banner", "title": "Vayishlach", "en_text": "Jacob wrestled the angel at dawn"},
+            {"kind": "verse", "ref": "Genesis 33:1", "title": "Genesis 33:1", "en_text": "Esau came with four hundred men"},
+            {"kind": "verse", "ref": "Genesis 33:2", "title": "Genesis 33:2", "en_text": "Esau came and Jacob divided the children"},
+            {"kind": "verse", "ref": "Genesis 33:4", "title": "Genesis 33:4", "en_text": "Esau ran to meet him and embraced and kissed him"},
+            {"kind": "verse", "ref": "Genesis 33:5", "title": "Genesis 33:5", "en_text": "Esau asked who are these with you"},
+        ]
+        srd.assign_unique_slide_illustrations(sample_slides, parasha_key="vayishlach", day_index=2, primary_art=week_arts[2])
+        shown = [s["art"] for s in sample_slides if s.get("art")]
+        self.assertEqual(len(shown), len(set(shown)), f"Duplicate slide arts within one day: {shown}")
+
 
 class TestBroadcastHub(unittest.TestCase):
     def test_omarchy_shul_mesh(self):

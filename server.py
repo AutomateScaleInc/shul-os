@@ -639,12 +639,17 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
                     daily["show_extras"]["month_chronicle"] = lit["month_chronicle"]
                 except Exception:
                     pass
-                # Tag each slide with cute cast/angel badges AND its own story-matched museum illustration plate!
+                # Tag each slide with cute cast/angel badges AND strictly zero-repeat museum illustrations!
                 for sl in (daily.get("slides") or []):
                     sl["cast_badges"] = sanctuary_rich_data.detect_verse_cast(sl.get("en_text", "") + " " + sl.get("commentary", ""))
-                    s_art, s_cap = sanctuary_rich_data.select_slide_illustration(sl, parasha_key=p_key, fallback_art=day_vis["art"])
-                    sl["art"] = s_art
-                    sl["art_caption"] = s_cap
+                sanctuary_rich_data.assign_unique_slide_illustrations(
+                    daily.get("slides") or [],
+                    parasha_key=p_key,
+                    day_index=daily.get("selected_day_index", 0),
+                    primary_art=day_vis["art"],
+                )
+                daily["art_catalog"] = sanctuary_rich_data.ART_CAPTIONS
+                daily["art_gallery"] = sanctuary_rich_data.ALL_ILLUMINATED_ARTS
             except Exception:
                 pass
             try:

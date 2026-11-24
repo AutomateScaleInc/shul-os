@@ -672,6 +672,48 @@
     gap: 8px;
     flex-shrink: 0;
   }
+  .manuscript-verse-folio {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(228,188,105,0.44);
+    background:
+      radial-gradient(ellipse 72% 55% at 50% 35%, rgba(228,188,105,0.10), transparent 72%),
+      linear-gradient(160deg, rgba(16,28,54,0.88), rgba(9,16,32,0.94));
+    box-shadow: inset 0 0 0 4px rgba(7,13,27,0.62), inset 0 0 0 5px rgba(228,188,105,0.18);
+    position: relative;
+  }
+  .manuscript-verse-folio .mv-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    color: rgba(228,188,105,0.72); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800;
+  }
+  .manuscript-verse-folio .mv-ornament::before,
+  .manuscript-verse-folio .mv-ornament::after {
+    content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(228,188,105,0.48), transparent);
+  }
+  .manuscript-verse-folio .spot-he {
+    font-size: clamp(1.62rem, 2.75vh, 2.18rem);
+    line-height: 1.78;
+    text-align: center;
+    margin: 0;
+  }
+  .manuscript-verse-folio .spot-en {
+    font-size: clamp(1.12rem, 1.85vh, 1.32rem);
+    line-height: 1.62;
+    text-align: center;
+    max-width: 62ch;
+    margin: 0 auto;
+    color: #f8f2e4;
+  }
+  [data-theme="parchment"] .manuscript-verse-folio {
+    background: radial-gradient(ellipse at 50% 35%, rgba(228,188,105,0.14), #f8f1e0 75%);
+    box-shadow: inset 0 0 0 4px #fbf5e6, inset 0 0 0 5px rgba(154,105,24,0.28);
+  }
+  [data-theme="parchment"] .manuscript-verse-folio .spot-en { color: #261c12; }
   [data-theme="parchment"] .story-crown-title { color: #221910; }
   [data-theme="parchment"] .story-crown-bar { border-bottom-color: rgba(154,105,24,0.28); }
   #spotlightContent::-webkit-scrollbar { display: none; }
@@ -3593,25 +3635,28 @@ function weaveLivingShow(d) {
   const syms = ex.featured_symbols || [];
   const hwords = ex.hebrew_words || [];
   const anatomy = ex.story_anatomy || null;
-  const artCycle = [
-    (d.rich && d.rich.art) || '/art/jacobs-ladder.jpg',
-    '/art/abraham-stars.jpg',
-    '/art/solomon-temple.jpg',
-    '/art/burning-bush.jpg',
-    '/art/elijah-horeb.jpg',
-    '/art/sinai-tablets.jpg',
-    '/art/esther-shushan.jpg',
-    '/art/noah-rainbow.jpg',
-    '/art/promised-land.jpg',
-    '/art/ruth-harvest.jpg',
-    '/art/david-harp.jpg',
-    '/art/sacred-symbols.jpg',
+  const catalog = d.art_catalog || {};
+  const allGallery = (Array.isArray(d.art_gallery) && d.art_gallery.length) ? d.art_gallery.slice() : [
+    '/art/esau-riders-horizon.jpg', '/art/jacob-gifts-caravan.jpg', '/art/jacob-angel-dawn.jpg',
+    '/art/jacob-esau-reunion.jpg', '/art/jacob-camp-night.jpg', '/art/bethel-altar-stones.jpg',
+    '/art/rachel-road-bethlehem.jpg', '/art/rachel-well-haran.jpg', '/art/jacobs-ladder.jpg',
+    '/art/joseph-coat-shechem.jpg', '/art/joseph-egypt.jpg', '/art/abraham-stars.jpg',
+    '/art/akedah-moriah.jpg', '/art/creation-shabbat.jpg', '/art/noah-rainbow.jpg',
+    '/art/burning-bush.jpg', '/art/exodus-sea.jpg', '/art/passover-seder-table.jpg',
+    '/art/sinai-tablets.jpg', '/art/mishkan-tabernacle.jpg', '/art/sukkot-arba-minim.jpg',
+    '/art/promised-land.jpg', '/art/jerusalem-scroll.jpg', '/art/ruth-harvest.jpg',
+    '/art/david-harp.jpg', '/art/solomon-temple.jpg', '/art/elijah-horeb.jpg',
+    '/art/esther-shushan.jpg', '/art/jonah-sea.jpg', '/art/chanukah-menorah.jpg',
+    '/art/shabbat-table-candles.jpg', '/art/sacred-symbols.jpg',
   ];
+  // Rotate fallback gallery uniquely per day of week so Sun..Sat never share the same sequence!
+  const dayOff = ((Number(d.selected_day_index || 0) * 5) + (d.parasha && d.parasha.en_name ? d.parasha.en_name.length : 0)) % allGallery.length;
+  const uniquePool = allGallery.slice(dayOff).concat(allGallery.slice(0, dayOff));
+
   const out = [];
   let sIdx = 0, qIdx = 0, symIdx = 0, hwIdx = 0, vSeen = 0, anatomyInserted = false, patternsInserted = false;
   base.forEach((sl, idx) => {
     const copy = Object.assign({}, sl);
-    if (!copy.art) copy.art = (idx === 0) ? artCycle[0] : artCycle[idx % artCycle.length];
     out.push(copy);
     if (idx === 0 && anatomy && !anatomyInserted) {
       anatomyInserted = true;
@@ -3623,7 +3668,7 @@ function weaveLivingShow(d) {
         en_text: `Meet ${anatomy.protagonist.name}, ${anatomy.antagonist.name}, and the Angels & Friends of this portion!`,
         commentator: 'Cast & Roles',
         anatomy: anatomy,
-        art: anatomy.art || artCycle[0],
+        art: anatomy.art || '',
         cast_badges: [
           { label: `${anatomy.protagonist.emoji} ${anatomy.protagonist.name}`, role: 'protagonist' },
           { label: `${anatomy.antagonist.emoji} ${anatomy.antagonist.name}`, role: 'antagonist' },
@@ -3643,11 +3688,10 @@ function weaveLivingShow(d) {
           en_text: `${anatomy.setting.area} (${anatomy.setting.era})`,
           commentator: 'Literary & Historical Atlas',
           anatomy: anatomy,
-          art: anatomy.art || artCycle[1],
+          art: '/art/promised-land.jpg',
           cast_badges: [{ label: '🗺 Setting & Era', role: 'ally' }, { label: '🔁 Patterns', role: 'angel' }],
         });
       }
-      // Keep energy high! Interleave Quiz Challenges every 2nd verse, plus Character Scenes, Hebrew Roots & Symbols!
       if (vSeen % 3 === 1 && sIdx < scenes.length) {
         const sc = scenes[sIdx++];
         out.push({
@@ -3658,7 +3702,7 @@ function weaveLivingShow(d) {
           en_text: sc.beats.map(b => `${b.speaker}: ${b.line}`).join(' '),
           commentator: 'Animated Story Scene',
           scene: sc,
-          art: sc.art,
+          art: sc.art || '',
         });
       }
       if (vSeen % 2 === 1 && qIdx < quizzes.length) {
@@ -3671,7 +3715,7 @@ function weaveLivingShow(d) {
           en_text: q.question,
           commentator: 'Auto-Reveal in 8s',
           quiz: q,
-          art: q.art,
+          art: q.art || '',
         });
       }
       if (vSeen % 3 === 2 && hwIdx < hwords.length) {
@@ -3684,7 +3728,7 @@ function weaveLivingShow(d) {
           en_text: `${hw.translit} (${hw.pronounce}) — ${hw.meaning}`,
           commentator: '3-Letter Shoresh',
           hword: hw,
-          art: hw.art,
+          art: hw.art || '',
         });
       }
       if (vSeen % 3 === 0 && symIdx < syms.length) {
@@ -3697,9 +3741,44 @@ function weaveLivingShow(d) {
           en_text: sym.meaning,
           commentator: 'In Today\'s Terms',
           symbol: sym,
-          art: sym.art,
+          art: sym.art || '',
         });
       }
+    }
+  });
+
+  // STRICT ZERO-REPEAT VISUAL CURATOR: no painting may EVER appear twice in the same day's show!
+  const usedArts = new Set();
+  const claimUnused = () => {
+    for (const candidate of uniquePool) {
+      if (!usedArts.has(candidate)) {
+        usedArts.add(candidate);
+        return candidate;
+      }
+    }
+    return '';
+  };
+
+  out.forEach((sl) => {
+    // Verse slides deliberately left without art by the server stay clean Illuminated Manuscript Folios (zero repetition!)
+    if (sl.kind === 'verse' && !sl.art) {
+      sl.art = '';
+      sl.art_caption = '';
+      return;
+    }
+    const preferred = sl.art || '';
+    if (preferred && !usedArts.has(preferred)) {
+      usedArts.add(preferred);
+      sl.art = preferred;
+      if (!sl.art_caption) sl.art_caption = catalog[preferred] || '';
+    } else if (sl.kind === 'verse') {
+      // Never repeat a painting on a verse slide — gracefully step back to an Illuminated Manuscript Folio!
+      sl.art = '';
+      sl.art_caption = '';
+    } else {
+      const fresh = claimUnused();
+      sl.art = fresh;
+      sl.art_caption = fresh ? (catalog[fresh] || '') : '';
     }
   });
   return out;
@@ -5026,7 +5105,8 @@ function renderSpotlight() {
   updateBackgroundIllustrations(s);
   syncMarginCastToSlide(s);
   const rich = dailyData.rich || {};
-  const slideArt = s.art || rich.art || '/art/jacobs-ladder.jpg';
+  // Strictly respect per-slide curated art (empty string '' on verse slides means clean Illuminated Manuscript Folio — NEVER repeat!)
+  const slideArt = (s.art !== undefined) ? s.art : (rich.art || '/art/jacobs-ladder.jpg');
   currentSpotDurationMs = (s.kind === 'quiz' || s.kind === 'character_scene') ? 15500 : 12500;
   document.getElementById('spotCounter').textContent = `${spotIdx + 1} / ${dailyData.slides.length}`;
 
@@ -5041,7 +5121,7 @@ function renderSpotlight() {
     const allies = (an.angels_and_allies || []).slice(0, 2);
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(an.art || slideArt, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
+        ${renderLivingScene(slideArt || an.art, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
         <div class="anatomy-grid" style="margin:0;flex-shrink:0;">
           <div class="anatomy-card protag" style="animation-delay:0.05s;">
             <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.72rem;font-weight:800;color:var(--gold);">${esc(an.protagonist.tag)}</span><span style="font-family:var(--hebrew);color:var(--gold);">${esc(an.protagonist.he)}</span></div>
@@ -5072,7 +5152,7 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.25rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">מְקוֹמוֹת וּדְפוּסִים</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(an.art || slideArt, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
+        ${renderLivingScene(slideArt || an.art, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
         <div class="story-body-stack">
         <div class="anatomy-grid" style="margin-top:0;margin-bottom:4px;">
           <div class="anatomy-card angel">
@@ -5094,10 +5174,11 @@ function renderSpotlight() {
       </div>`;
   } else if (s.kind === 'character_scene' && s.scene) {
     const sc = s.scene;
+    const scArt = slideArt || sc.art;
     const stageHtml = `
       <div class="living-stage" style="flex:1 1 auto;min-height:185px;max-height:300px;">
-        <img class="living-img" src="${esc(sc.art)}" alt="${esc(sc.title)}">
-        ${getLivingOverlaySvg(sc.art)}
+        <img class="living-img" src="${esc(scArt)}" alt="${esc(sc.title)}">
+        ${getLivingOverlaySvg(scArt)}
         <div class="char-stage-actors">
           <div class="char-actor">
             <div class="char-orb">${esc(sc.left.badge)}</div>
@@ -5151,7 +5232,7 @@ function renderSpotlight() {
     const letters = ['A', 'B', 'C', 'D'];
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(q.art || slideArt, 'clamp(160px, 21vh, 250px)', capHtml, '', 'flex:1 1 auto;min-height:155px;')}
+        ${renderLivingScene(slideArt || q.art, 'clamp(160px, 21vh, 250px)', capHtml, '', 'flex:1 1 auto;min-height:155px;')}
         <div class="quiz-wrap" style="flex-shrink:0;">
           <div class="quiz-q">${esc(q.question)}</div>
           <div class="quiz-opts">
@@ -5193,7 +5274,7 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:2.1rem;text-shadow:0 2px 12px rgba(0,0,0,0.85);">${esc(hw.word_he)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(hw.art || slideArt, 'clamp(180px, 24vh, 275px)', capHtml, '', 'flex:1 1 auto;min-height:175px;')}
+        ${renderLivingScene(slideArt || hw.art, 'clamp(180px, 24vh, 275px)', capHtml, '', 'flex:1 1 auto;min-height:175px;')}
         <div class="story-body-stack">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
@@ -5227,7 +5308,7 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.35rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sym.he_name)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(sym.art || slideArt, 'clamp(195px, 26vh, 300px)', capHtml, "switchView('symbols')", 'flex:1 1 auto;min-height:190px;cursor:pointer;')}
+        ${renderLivingScene(slideArt || sym.art, 'clamp(195px, 26vh, 300px)', capHtml, "switchView('symbols')", 'flex:1 1 auto;min-height:190px;cursor:pointer;')}
         <div class="story-body-stack">
         <div class="spot-en" style="font-size:1.04rem;margin:0;">${esc(sym.meaning)}</div>
         <div class="spot-comm" style="margin:0;"><div class="c-label">What the Sages Teach</div><div>${esc(sym.classical)}</div></div>
@@ -5297,14 +5378,21 @@ function renderSpotlight() {
             <span class="story-plate-pill"><span class="sp-star">✦</span> ${esc(plateCaption)}</span>
             <span class="story-plate-hint">🎬 Full Presentation</span>
           </div>
-        </div>` : ''}
+        </div>
         <div class="story-body-stack">
           ${s.he_text ? `<div class="spot-he-wrap" style="margin:0;"><div class="verse-micro-badge" title="Illuminated Verse Emblem">${getVerseMicroEmblem(s)}</div><div class="spot-he" style="margin:0;flex:1;">${esc(s.he_text)}</div></div>` : ''}
           <div class="spot-en" style="margin:0;">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
           ${s.commentary ? `<div class="spot-comm" style="margin:0;"><div class="c-head"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div>${commMoreBtn}</div>${commBodyHtml}</div>` : ''}
           ${todayHint}
           ${richBar}
-        </div>
+        </div>` : `
+        <div class="manuscript-verse-folio">
+          <div class="mv-ornament"><span>✦ ILLUMINATED SCRIPTURE FOLIO · ${esc(s.ref || s.title)} ✦</span></div>
+          ${s.he_text ? `<div class="spot-he">${esc(s.he_text)}</div>` : ''}
+          <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
+          ${s.commentary ? `<div class="spot-comm" style="margin:4px 0 0;"><div class="c-head"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div>${commMoreBtn}</div>${commBodyHtml}</div>` : ''}
+          ${richBar}
+        </div>`}
       </div>`;
     // Mid-slide animated pop-in pill at 3.8s so viewers always see what's coming up next!
     showBeatTimers.push(setTimeout(() => {

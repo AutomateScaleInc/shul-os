@@ -2313,6 +2313,14 @@ ALL_ILLUMINATED_ARTS = [
     "/art/akedah-moriah.jpg",
     "/art/jonah-sea.jpg",
     "/art/rachel-well-haran.jpg",
+    "/art/jacob-camp-night.jpg",
+    "/art/esau-riders-horizon.jpg",
+    "/art/jacob-gifts-caravan.jpg",
+    "/art/bethel-altar-stones.jpg",
+    "/art/rachel-road-bethlehem.jpg",
+    "/art/joseph-coat-shechem.jpg",
+    "/art/passover-seder-table.jpg",
+    "/art/sukkot-arba-minim.jpg",
 ]
 
 ART_CAPTIONS = {
@@ -2322,13 +2330,21 @@ ART_CAPTIONS = {
     "/art/akedah-moriah.jpg": "Mount Moriah at Dawn — The Ram in the Thicket · Vayera",
     "/art/rachel-well-haran.jpg": "The Well of Haran at Golden Hour · Vayetzei",
     "/art/jacobs-ladder.jpg": "Jacob's Ladder Between Heaven & Earth · Vayetzei",
+    "/art/jacob-camp-night.jpg": "Alone at the Jabbok Ford Beneath the Stars · Vayishlach",
+    "/art/esau-riders-horizon.jpg": "Mount Seir Horizon — Distant Riders Across the Valley · Vayishlach",
+    "/art/jacob-gifts-caravan.jpg": "The Caravan of Peace Gifts Crossing Gilead · Vayishlach",
     "/art/jacob-angel-dawn.jpg": "Peniel — Wrestling Until Dawn at the Jabbok Ford · Vayishlach",
     "/art/jacob-esau-reunion.jpg": "Jacob & Esau's Reconciliation on the Hills of Gilead · Vayishlach",
+    "/art/bethel-altar-stones.jpg": "The Anointed Pillar of Bethel Beneath the Ancient Oak · Vayishlach",
+    "/art/rachel-road-bethlehem.jpg": "The Quiet Stone Road to Bethlehem at Twilight · Vayishlach",
+    "/art/joseph-coat-shechem.jpg": "The Woven Tunic of Colors in the Valley of Shechem · Vayeshev",
     "/art/joseph-egypt.jpg": "Joseph's Dreams & Wisdom in Egypt · Vayeshev & Miketz",
     "/art/burning-bush.jpg": "The Burning Bush at Mount Horeb · Shemot",
     "/art/exodus-sea.jpg": "Crossing the Sea of Reeds · Beshalach",
+    "/art/passover-seder-table.jpg": "The Illuminated Passover Seder Table & Four Cups · Pesach",
     "/art/sinai-tablets.jpg": "The Revelation at Mount Sinai · Yitro",
     "/art/mishkan-tabernacle.jpg": "The Desert Tabernacle (Mishkan) at Twilight · Terumah & Pekudei",
+    "/art/sukkot-arba-minim.jpg": "Golden Etrog, Lulav & Starlit Sukkah · Sukkot",
     "/art/promised-land.jpg": "Entering the Promised Land of Israel · Bamidbar & Devarim",
     "/art/jerusalem-scroll.jpg": "The Sacred Torah Scroll & Jerusalem Light",
     "/art/ruth-harvest.jpg": "Ruth & Boaz in the Golden Fields of Bethlehem · Megillat Ruth",
@@ -2342,76 +2358,102 @@ ART_CAPTIONS = {
     "/art/sacred-symbols.jpg": "Sacred Symbols of Israel · Light, Torah & Heritage",
 }
 
+# Guaranteed 7 DISTINCT day-by-day story paintings for key Parashiyot (Sun=0 .. Sat=6)
 PARASHA_STORY_ARTS = {
-    "bereshit": ("/art/creation-shabbat.jpg", "/art/shabbat-table-candles.jpg"),
-    "noach": ("/art/noah-rainbow.jpg", "/art/creation-shabbat.jpg"),
-    "lech-lecha": ("/art/abraham-stars.jpg", "/art/promised-land.jpg"),
-    "vayera": ("/art/akedah-moriah.jpg", "/art/abraham-stars.jpg"),
-    "chayei-sara": ("/art/rachel-well-haran.jpg", "/art/akedah-moriah.jpg"),
-    "toldot": ("/art/rachel-well-haran.jpg", "/art/abraham-stars.jpg"),
-    "vayetzei": ("/art/jacobs-ladder.jpg", "/art/rachel-well-haran.jpg"),
-    "vayishlach": ("/art/jacob-angel-dawn.jpg", "/art/jacob-esau-reunion.jpg"),
-    "vayeshev": ("/art/joseph-egypt.jpg", "/art/rachel-well-haran.jpg"),
-    "miketz": ("/art/joseph-egypt.jpg", "/art/chanukah-menorah.jpg"),
-    "vayigash": ("/art/joseph-egypt.jpg", "/art/jacob-esau-reunion.jpg"),
-    "vayechi": ("/art/joseph-egypt.jpg", "/art/jerusalem-scroll.jpg"),
-    "shemot": ("/art/burning-bush.jpg", "/art/exodus-sea.jpg"),
-    "vaera": ("/art/burning-bush.jpg", "/art/exodus-sea.jpg"),
-    "bo": ("/art/exodus-sea.jpg", "/art/burning-bush.jpg"),
-    "beshalach": ("/art/exodus-sea.jpg", "/art/sinai-tablets.jpg"),
-    "yitro": ("/art/sinai-tablets.jpg", "/art/jerusalem-scroll.jpg"),
-    "mishpatim": ("/art/sinai-tablets.jpg", "/art/mishkan-tabernacle.jpg"),
-    "terumah": ("/art/mishkan-tabernacle.jpg", "/art/chanukah-menorah.jpg"),
-    "tetzaveh": ("/art/mishkan-tabernacle.jpg", "/art/chanukah-menorah.jpg"),
-    "ki-tisa": ("/art/sinai-tablets.jpg", "/art/mishkan-tabernacle.jpg"),
-    "vayakhel": ("/art/mishkan-tabernacle.jpg", "/art/shabbat-table-candles.jpg"),
-    "pekudei": ("/art/mishkan-tabernacle.jpg", "/art/solomon-temple.jpg"),
+    "bereshit": ("/art/creation-shabbat.jpg", "/art/abraham-stars.jpg", "/art/promised-land.jpg", "/art/rachel-well-haran.jpg", "/art/noah-rainbow.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "noach": ("/art/noah-rainbow.jpg", "/art/jonah-sea.jpg", "/art/creation-shabbat.jpg", "/art/abraham-stars.jpg", "/art/promised-land.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "lech-lecha": ("/art/abraham-stars.jpg", "/art/promised-land.jpg", "/art/bethel-altar-stones.jpg", "/art/rachel-well-haran.jpg", "/art/jacob-gifts-caravan.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "vayera": ("/art/akedah-moriah.jpg", "/art/abraham-stars.jpg", "/art/rachel-well-haran.jpg", "/art/bethel-altar-stones.jpg", "/art/promised-land.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "vayetzei": ("/art/jacobs-ladder.jpg", "/art/rachel-well-haran.jpg", "/art/jacob-camp-night.jpg", "/art/bethel-altar-stones.jpg", "/art/jacob-gifts-caravan.jpg", "/art/rachel-road-bethlehem.jpg", "/art/shabbat-table-candles.jpg"),
+    "vayishlach": (
+        "/art/esau-riders-horizon.jpg",     # Sun · 1st Aliyah: Messengers & news of Esau approaching from Seir
+        "/art/jacob-gifts-caravan.jpg",     # Mon · 2nd Aliyah: Caravan of gifts & crossing the Jabbok at night
+        "/art/jacob-angel-dawn.jpg",        # Tue · 3rd Aliyah: Peniel at dawn after wrestling the angel
+        "/art/jacob-esau-reunion.jpg",      # Wed · 4th Aliyah: Peaceful reunion & Shechem
+        "/art/bethel-altar-stones.jpg",     # Thu · 5th Aliyah: Returning to Bethel & anointing the pillar
+        "/art/rachel-road-bethlehem.jpg",   # Fri · 6th Aliyah: Road to Bethlehem & Matzevah
+        "/art/shabbat-table-candles.jpg",   # Sat · 7th Aliyah / Shabbat Sanctuary Crown
+    ),
+    "vayeshev": ("/art/joseph-coat-shechem.jpg", "/art/joseph-egypt.jpg", "/art/jacob-gifts-caravan.jpg", "/art/rachel-well-haran.jpg", "/art/chanukah-menorah.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "miketz": ("/art/joseph-egypt.jpg", "/art/chanukah-menorah.jpg", "/art/joseph-coat-shechem.jpg", "/art/jacob-gifts-caravan.jpg", "/art/solomon-temple.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "shemot": ("/art/burning-bush.jpg", "/art/exodus-sea.jpg", "/art/passover-seder-table.jpg", "/art/sinai-tablets.jpg", "/art/mishkan-tabernacle.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
+    "beshalach": ("/art/exodus-sea.jpg", "/art/burning-bush.jpg", "/art/passover-seder-table.jpg", "/art/sinai-tablets.jpg", "/art/mishkan-tabernacle.jpg", "/art/promised-land.jpg", "/art/shabbat-table-candles.jpg"),
+    "yitro": ("/art/sinai-tablets.jpg", "/art/burning-bush.jpg", "/art/exodus-sea.jpg", "/art/mishkan-tabernacle.jpg", "/art/jerusalem-scroll.jpg", "/art/sacred-symbols.jpg", "/art/shabbat-table-candles.jpg"),
+    "terumah": ("/art/mishkan-tabernacle.jpg", "/art/chanukah-menorah.jpg", "/art/sinai-tablets.jpg", "/art/solomon-temple.jpg", "/art/sacred-symbols.jpg", "/art/jerusalem-scroll.jpg", "/art/shabbat-table-candles.jpg"),
 }
 
 
-def select_slide_illustration(slide: dict, parasha_key: str = "", fallback_art: str = "/art/jerusalem-scroll.jpg") -> tuple[str, str]:
-    """Match an individual Today slide (verse, overview, story, scene) to its most contextually faithful museum painting."""
-    p_slug = (parasha_key or "").lower().replace(" ", "-")
+def select_slide_illustration(slide: dict, parasha_key: str = "", fallback_art: str = "/art/jerusalem-scroll.jpg", used_arts: set | None = None) -> tuple[str, str]:
+    """Match a slide to its most accurate UNUSED museum painting — NEVER repeating an already-shown painting."""
+    used = used_arts if used_arts is not None else set()
     blob = " ".join(
         str(slide.get(k) or "") for k in ("title", "ref", "kicker", "en_text", "commentary")
     ).lower()
 
-    # Story-accurate keyword matching (checked in priority order so each moment glows with its exact scene!)
+    # Granular, non-overlapping scene rules (each painting maps ONLY to its specific moment!)
     keyword_rules = [
-        (("peniel", "penuel", "wrestl", "jabbok", "hip", "limp", "dawn", "daybreak", "israel", "angel"), "/art/jacob-angel-dawn.jpg"),
-        (("esau", "four hundred", "400", "kissed", "embrac", "bowed", "reconcil", "seir", "brother", "leah", "children"), "/art/jacob-esau-reunion.jpg"),
-        (("well", "haran", "flock", "sheep", "shepherd", "rachel", "laban"), "/art/rachel-well-haran.jpg"),
-        (("ladder", "bethel", "dream", "stone pillow"), "/art/jacobs-ladder.jpg"),
-        (("moriah", "ram", "thicket", "altar", "isaac", "bind", "akedah"), "/art/akedah-moriah.jpg"),
+        (("peniel", "penuel", "wrestl", "limp", "hip", "sunrise", "sun rose", "dawn", "daybreak"), "/art/jacob-angel-dawn.jpg"),
+        (("kissed", "fell on his neck", "embrac", "wept", "reconcil"), "/art/jacob-esau-reunion.jpg"),
+        (("four hundred", "400", "seir", "edom", "messengers", "looking up"), "/art/esau-riders-horizon.jpg"),
+        (("gift", "present", "camels", "goats", "herds", "drove", "appease"), "/art/jacob-gifts-caravan.jpg"),
+        (("ford", "jabbok", "alone", "night", "crossed the stream"), "/art/jacob-camp-night.jpg"),
+        (("bethel", "pillar", "oak", "altar", "anointed"), "/art/bethel-altar-stones.jpg"),
+        (("bethlehem", "ephrath", "buried", "tomb", "road"), "/art/rachel-road-bethlehem.jpg"),
+        (("well", "haran", "flock", "sheep", "shepherd", "laban"), "/art/rachel-well-haran.jpg"),
+        (("ladder", "angels ascending", "dream", "stone pillow"), "/art/jacobs-ladder.jpg"),
+        (("coat", "tunic", "shechem", "dothan"), "/art/joseph-coat-shechem.jpg"),
+        (("moriah", "ram", "thicket", "isaac", "akedah"), "/art/akedah-moriah.jpg"),
         (("chanukah", "hanukkah", "menorah", "lampstand", "olive oil", "maccab"), "/art/chanukah-menorah.jpg"),
-        (("tabernacle", "mishkan", "ark", "curtain", "sanctuary", "cherub", "laver"), "/art/mishkan-tabernacle.jpg"),
-        (("jonah", "whale", "nineveh", "tarshish", "stormy sea", "fish"), "/art/jonah-sea.jpg"),
+        (("tabernacle", "mishkan", "ark", "curtain", "cherub", "laver"), "/art/mishkan-tabernacle.jpg"),
+        (("jonah", "whale", "nineveh", "tarshish", "stormy sea"), "/art/jonah-sea.jpg"),
+        (("passover", "pesach", "matzah", "seder", "haggadah"), "/art/passover-seder-table.jpg"),
+        (("sukkah", "sukkot", "etrog", "lulav", "booths"), "/art/sukkot-arba-minim.jpg"),
         (("shabbat", "sabbath", "kiddush", "challah", "seventh day", "candle"), "/art/shabbat-table-candles.jpg"),
         (("burning bush", "horeb", "unconsumed", "midian"), "/art/burning-bush.jpg"),
         (("red sea", "sea of reeds", "pharaoh", "chariot", "parted"), "/art/exodus-sea.jpg"),
-        (("sinai", "commandment", "tablet", "thunder", "covenant"), "/art/sinai-tablets.jpg"),
-        (("joseph", "egypt", "coat", "dreamer", "grain", "viceroy"), "/art/joseph-egypt.jpg"),
+        (("sinai", "commandment", "tablet", "thunder"), "/art/sinai-tablets.jpg"),
+        (("joseph", "egypt", "grain", "viceroy"), "/art/joseph-egypt.jpg"),
         (("rainbow", "flood", "noah", "dove"), "/art/noah-rainbow.jpg"),
-        (("stars", "abraham", "sarah", "covenant between"), "/art/abraham-stars.jpg"),
-        (("ruth", "boaz", "harvest", "barley", "bethlehem"), "/art/ruth-harvest.jpg"),
+        (("stars", "abraham", "sarah"), "/art/abraham-stars.jpg"),
+        (("ruth", "boaz", "harvest", "barley"), "/art/ruth-harvest.jpg"),
         (("david", "psalm", "harp", "goliath"), "/art/david-harp.jpg"),
         (("solomon", "temple", "zion", "jerusalem"), "/art/solomon-temple.jpg"),
         (("elijah", "still small voice", "carmel"), "/art/elijah-horeb.jpg"),
         (("esther", "shushan", "mordechai", "purim"), "/art/esther-shushan.jpg"),
     ]
     for keys, art_path in keyword_rules:
-        if any(k in blob for k in keys):
+        if art_path not in used and any(k in blob for k in keys):
             return art_path, ART_CAPTIONS.get(art_path, "Illuminated Torah Sanctuary Plate")
 
-    if p_slug in PARASHA_STORY_ARTS:
-        arts = PARASHA_STORY_ARTS[p_slug]
-        # Alternate cleanly between primary & secondary story plates if slide is odd/even
-        seed = sum(ord(c) for c in (slide.get("ref") or slide.get("title") or ""))
-        chosen = arts[seed % len(arts)]
-        return chosen, ART_CAPTIONS.get(chosen, "Illuminated Torah Sanctuary Plate")
+    # For banner/overview/story slides, ALWAYS ensure a fresh unused painting;
+    # for intermediate verse slides where no fresh scene matches, return "" (clean Illuminated Manuscript Typography Folio — zero repetition!)
+    if slide.get("kind") == "verse":
+        return "", ""
 
-    chosen = slide.get("art") or fallback_art or "/art/jerusalem-scroll.jpg"
-    return chosen, ART_CAPTIONS.get(chosen, "Illuminated Torah Sanctuary Plate")
+    if fallback_art and fallback_art not in used:
+        return fallback_art, ART_CAPTIONS.get(fallback_art, "Illuminated Torah Sanctuary Plate")
+    for art_path in ALL_ILLUMINATED_ARTS:
+        if art_path not in used:
+            return art_path, ART_CAPTIONS.get(art_path, "Illuminated Torah Sanctuary Plate")
+    return "", ""
+
+
+def assign_unique_slide_illustrations(slides: list, parasha_key: str = "", day_index: int = 0, primary_art: str = "") -> list:
+    """Curate a STRICTLY ZERO-REPEAT gallery across all base slides of a day (and rest on clean manuscript typography rather than repeating)."""
+    used = set()
+    p_slug = (parasha_key or "").lower().replace(" ", "-")
+    day_fallback = primary_art or "/art/jerusalem-scroll.jpg"
+    for idx, sl in enumerate(slides):
+        if idx == 0 and day_fallback and day_fallback not in used:
+            art_path = day_fallback
+            art_cap = ART_CAPTIONS.get(art_path, "Illuminated Torah Sanctuary Plate")
+        else:
+            art_path, art_cap = select_slide_illustration(sl, parasha_key=p_slug, fallback_art=day_fallback, used_arts=used)
+        if art_path:
+            used.add(art_path)
+        sl["art"] = art_path
+        sl["art_caption"] = art_cap
+    return slides
 
 DAY_VISUAL_PALETTES = [
     {"mood": "Dawn Awakening · Day 1 of Creation (Light)", "accent": "#e4bc69", "glow": "rgba(228,188,105,0.22)", "border": "rgba(228,188,105,0.58)"},
@@ -2444,26 +2486,22 @@ def select_daily_visual_theme(parasha_key: str = "", day_index: int = 0, date_is
     # Compute a stable week seed from parasha slug so different weeks get different galleries too!
     week_seed = sum((i + 1) * ord(ch) for i, ch in enumerate(slug or "torah"))
 
-    # Prefer authentic story-matched artwork for the current Parashah & Shabbat!
+    # Guarantee 7 COMPLETELY DISTINCT hero paintings across Sun..Sat (never the same image on two days of a week!)
     shabbat_pool = ["/art/shabbat-table-candles.jpg", "/art/creation-shabbat.jpg", "/art/solomon-temple.jpg"]
     shabbat_art = shabbat_pool[week_seed % len(shabbat_pool)]
-    if slug in PARASHA_STORY_ARTS:
-        p_arts = PARASHA_STORY_ARTS[slug]
-        if d_idx == 6:
-            chosen_art = "/art/shabbat-table-candles.jpg"
-        else:
-            chosen_art = p_arts[0] if (d_idx % 2 == 0) else p_arts[min(1, len(p_arts) - 1)]
-    elif d_idx == 0:
-        day0_art = primary_art if (primary_art in ALL_ILLUMINATED_ARTS and primary_art != shabbat_art) else ALL_ILLUMINATED_ARTS[week_seed % len(ALL_ILLUMINATED_ARTS)]
-        chosen_art = day0_art
+    if slug in PARASHA_STORY_ARTS and len(PARASHA_STORY_ARTS[slug]) == 7:
+        chosen_art = PARASHA_STORY_ARTS[slug][d_idx]
     elif d_idx == 6:
         chosen_art = shabbat_art
     else:
         day0_art = primary_art if (primary_art in ALL_ILLUMINATED_ARTS and primary_art != shabbat_art) else ALL_ILLUMINATED_ARTS[week_seed % len(ALL_ILLUMINATED_ARTS)]
-        mid_pool = [a for a in ALL_ILLUMINATED_ARTS if a not in (day0_art, shabbat_art)]
-        offset = week_seed % len(mid_pool)
-        rotated = mid_pool[offset:] + mid_pool[:offset]
-        chosen_art = rotated[(d_idx - 1) * 2 % len(rotated)]
+        if d_idx == 0:
+            chosen_art = day0_art
+        else:
+            mid_pool = [a for a in ALL_ILLUMINATED_ARTS if a not in (day0_art, shabbat_art)]
+            offset = week_seed % len(mid_pool)
+            rotated = mid_pool[offset:] + mid_pool[:offset]
+            chosen_art = rotated[(d_idx - 1) % len(rotated)]
 
     return {
         "art": chosen_art,
