@@ -712,3 +712,123 @@ def get_ticker_announcements() -> list:
     for h in (sh.get("upcoming_holidays") or [])[:3]:
         items.append(f"✨ UPCOMING: {h['title']} ({h['hebrew']}) — {h['date']}")
     return items[:8]
+
+
+def generate_rabbi_dvar_torah(parasha_slug: str = "", lang: str = "en") -> dict:
+    """100% offline Rabbi's Desk 1-Click Shabbat Dvar Torah & WhatsApp Bulletin Generator."""
+    import ai_engine
+    import sacred_books
+    import sanctuary_rich_data
+    import scripture_foundation
+    import urllib.parse
+
+    cfg = ai_engine.load_config()
+    p = torah_db.get_weekly_parasha()
+    p_key = (parasha_slug or p.get("slug") or p.get("en_name") or "").lower().replace(" ", "-")
+    sh = get_brussels_shabbat_and_holidays()
+    daf = sacred_books.get_daily_daf_yomi()
+    foundation = scripture_foundation.get_foundation_dossier(parasha_slug=p_key)
+    pres = sanctuary_rich_data.build_presentation("parasha", p_key)
+    slides = pres.get("slides") or []
+    today_pts = next((sl.get("points", []) for sl in slides if sl.get("type") == "today"), [])
+
+    # Opening verse + 3 distinct classical commentators directly from torah.db!
+    verses = p.get("verses_preview") or []
+    opening_v = verses[0] if verses else {}
+    comm_voices = []
+    if opening_v:
+        raw_c = torah_db.get_verse_commentaries(
+            opening_v.get("book_title") or p.get("book_slug") or "Genesis",
+            int(opening_v.get("chapter") or 1),
+            int(opening_v.get("verse") or 1),
+        )
+        seen = set()
+        for c in raw_c:
+            auth = c.get("commentator") or ""
+            txt = (c.get("en_text") or "").strip()
+            if auth and txt and auth not in seen:
+                seen.add(auth)
+                comm_voices.append({"commentator": auth, "text": txt[:280].rstrip() + ("..." if len(txt) > 280 else "")})
+            if len(comm_voices) >= 3:
+                break
+
+    lang_code = (lang or "en").strip().lower()[:2]
+    rabbi = cfg.get("rabbi_name") or "Rabbi Michoel Rosenblum"
+    shul_name = cfg.get("synagogue_name") or SHUL_INFO["name"]
+    p_en = p.get("en_name", "")
+    p_he = p.get("he_name", "")
+    torah_ref = p.get("ref") or p.get("ref_span") or p.get("torah_ref") or ""
+    candles = sh.get("candle_lighting") or "16:24"
+    havdalah = sh.get("havdalah") or "17:38"
+    coinc = (foundation.get("coinciding_scripture") or [])[:2]
+
+    if lang_code == "fr":
+        greeting = f"🕯 Chabbat Chalom de {rabbi} — {shul_name} (Bruxelles)!"
+        hdr_portion = f"📖 Paracha {p_en} ({p_he})" + (f" · {torah_ref}" if torah_ref else "")
+        hdr_times = f"🕯 Allumage des bougies : {candles} · ✨ Havdala : {havdalah} · 📖 Daf Yomi : {daf['label']}"
+        hdr_app = "✨ Message pour notre table de Chabbat :"
+        hdr_q = "❓ Question pour la table de Chabbat :"
+        table_q = f"Dans la Paracha {p_en}, quel moment de courage ou de générosité résonne le plus avec notre semaine à Bruxelles ?"
+    elif lang_code == "he":
+        greeting = f"🕯 שבת שלום מאת {rabbi} — {shul_name}"
+        hdr_portion = f"📖 פרשת {p_he} ({p_en})" + (f" · {torah_ref}" if torah_ref else "")
+        hdr_times = f"🕯 הדלקת נרות: {candles} · ✨ הבדלה: {havdalah} · 📖 דף יומי: {daf['display_he']}"
+        hdr_app = "✨ רעיון לשולחן השבת:"
+        hdr_q = "❓ שאלה למשפחה ולשולחן השבת:"
+        table_q = f"איזה רגע בפרשת {p_he} מלמד אותנו להוסיף אור ואחדות השבוע?"
+    else:
+        greeting = f"🕯 Shabbat Shalom from {rabbi} — {shul_name}!"
+        hdr_portion = f"📖 Parashat {p_en} ({p_he})" + (f" · {torah_ref}" if torah_ref else "")
+        hdr_times = f"🕯 Candle Lighting: {candles} · ✨ Havdalah: {havdalah} · 📖 Daf Yomi: {daf['label']}"
+        hdr_app = "✨ Living Lesson for Today's Shabbat Table:"
+        hdr_q = "❓ Shabbat Table Question for Families & Guests:"
+        table_q = f"In Parashat {p_en}, which moment of courage, humility, or kindness speaks most to your week right now?"
+
+    wa_lines = [
+        greeting,
+        hdr_portion,
+        hdr_times,
+        "",
+        f"📜 Opening Verse ({opening_v.get('ref') or torah_ref}):",
+        f"“{(opening_v.get('en_text') or p.get('summary') or '')[:220]}”",
+        "",
+    ]
+    if comm_voices:
+        wa_lines.append("⚖️ Classical Commentators (Cited Lenses):")
+        for cv in comm_voices[:2]:
+            wa_lines.append(f"• {cv['commentator']}: {cv['text'][:190]}")
+        wa_lines.append("")
+    if today_pts:
+        wa_lines.append(hdr_app)
+        for pt in today_pts[:2]:
+            wa_lines.append(f"• {pt}")
+        wa_lines.append("")
+    wa_lines += [
+        hdr_q,
+        table_q,
+        "",
+        "🥂 Shabbat Shacharit 10:00 · Kids Shul 11:15 · Buffet Kiddush 12:15",
+        f"🌐 Live Sanctuary & Kiddush Sponsorships: {cfg.get('public_sanctuary_url') or 'https://shul.automatescale.com'}/give",
+    ]
+    whatsapp_text = "\n".join(wa_lines)
+    return {
+        "lang": lang_code,
+        "parasha_en": p_en,
+        "parasha_he": p_he,
+        "torah_ref": torah_ref,
+        "haftarah_ref": p.get("live_haftarah") or p.get("haftarah_ref", ""),
+        "summary": p.get("summary", ""),
+        "opening_verse": {
+            "ref": opening_v.get("ref", ""),
+            "he_text": opening_v.get("he_text", ""),
+            "en_text": opening_v.get("en_text", ""),
+        },
+        "coinciding_scripture": coinc,
+        "commentators": comm_voices,
+        "today_points": today_pts[:3],
+        "table_question": table_q,
+        "shabbat_times": {"candle_lighting": candles, "havdalah": havdalah},
+        "daf_yomi": daf["label"],
+        "whatsapp_text": whatsapp_text,
+        "whatsapp_url": "https://wa.me/?text=" + urllib.parse.quote(whatsapp_text),
+    }

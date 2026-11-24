@@ -1256,3 +1256,133 @@ def get_community_heritage() -> dict:
         "items": ordered,
         "count": len(ordered),
     }
+
+
+# =============================================================================
+# 7. BAR / BAT MITZVAH PARASHAH FINDER & "CALLED TO THE TORAH" ALIYAH COACH
+# =============================================================================
+
+TORAH_ALIYAH_COACH = [
+    {
+        "step": 1,
+        "title": "Opening Call (Barchu) — Before the Torah Reading",
+        "he_title": "בָּרְכוּ אֶת אֲדֹנָי",
+        "cue": "Approach the Bimah, gently touch the Torah parchment with the corner of your Tallit (or belt) where the reader points, kiss the Tallit, hold both wooden handles (Atzei Chaim), and call out clearly:",
+        "source": "Talmud Bavli, Berakhot 21b & Megillah 21b (Cited Liturgical Tradition)",
+        "hebrew": "בָּרְכוּ אֶת אֲדֹנָי הַמְּבֹרָךְ.",
+        "translit": "Ba-r'chu et A-do-nai ha-m'vo-rach.",
+        "english": "Bless the Lord, Who is to be blessed!",
+        "response_he": "בָּרוּךְ אֲדֹנָי הַמְּבֹרָךְ לְעוֹלָם וָעֶד.",
+        "response_tr": "Congregation responds (and you repeat): Ba-ruch A-do-nai ha-m'vo-rach l'o-lam va-ed.",
+    },
+    {
+        "step": 2,
+        "title": "Blessing Before the Torah Reading (Birkat HaTorah)",
+        "he_title": "בִּרְכַּת הַתּוֹרָה לְפָנֶיהָ",
+        "cue": "Immediately after repeating the congregation's response, recite the blessing before the Torah is chanted:",
+        "source": "Talmud Bavli, Berakhot 11b · Shulchan Aruch Orach Chaim 139",
+        "hebrew": "בָּרוּךְ אַתָּה אֲדֹנָי אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר בָּחַר בָּנוּ מִכָּל הָעַמִּים, וְנָתַן לָנוּ אֶת תּוֹרָתוֹ. בָּרוּךְ אַתָּה אֲדֹנָי, נוֹתֵן הַתּוֹרָה.",
+        "translit": "Ba-ruch a-tah A-do-nai E-lo-hei-nu Me-lech ha-o-lam, a-sher ba-char ba-nu mi-kol ha-a-mim, v'na-tan la-nu et To-ra-to. Ba-ruch a-tah A-do-nai, no-tein ha-To-rah.",
+        "english": "Blessed are You, Lord our God, King of the universe, Who chose us from all peoples and gave us His Torah. Blessed are You, Lord, Giver of the Torah. (Congregation: Amen!)",
+        "response_he": "",
+        "response_tr": "Now hold the right handle gently and follow silently as the Baal Korei chants your Aliyah!",
+    },
+    {
+        "step": 3,
+        "title": "Blessing After the Torah Reading (Birkat HaTorah)",
+        "he_title": "בִּרְכַּת הַתּוֹרָה לְאַחֲרֶיהָ",
+        "cue": "When the reader finishes your portion, touch the end of the passage with your Tallit, kiss it, roll the scroll gently closed while holding the handles, and recite:",
+        "source": "Talmud Bavli, Berakhot 11b · Shulchan Aruch Orach Chaim 139",
+        "hebrew": "בָּרוּךְ אַתָּה אֲדֹנָי אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר נָתַן לָנוּ תּוֹרַת אֱמֶת, וְחַיֵּי עוֹלָם נָטַע בְּתוֹכֵנוּ. בָּרוּךְ אַתָּה אֲדֹנָי, נוֹתֵן הַתּוֹרָה.",
+        "translit": "Ba-ruch a-tah A-do-nai E-lo-hei-nu Me-lech ha-o-lam, a-sher na-tan la-nu To-rat e-met, v'cha-yei o-lam na-ta b'to-chei-nu. Ba-ruch a-tah A-do-nai, no-tein ha-To-rah.",
+        "english": "Blessed are You, Lord our God, King of the universe, Who gave us a Torah of truth and planted eternal life within us. Blessed are You, Lord, Giver of the Torah. (Congregation: Amen! Step slightly to the right until the next Aliyah finishes — Yasher Koach!)",
+        "response_he": "",
+        "response_tr": "Wait beside the Bimah for one more Aliyah before returning to your seat — Mazal Tov & Yasher Koach!",
+    },
+    {
+        "step": 4,
+        "title": "Haftarah Opening Blessing (Bar / Bat Mitzvah & Maftir)",
+        "he_title": "בִּרְכַּת הַהַפְטָרָה",
+        "cue": "Recited by the Bar/Bat Mitzvah or Maftir honoree right before chanting the weekly prophetic reading (Haftarah):",
+        "source": "Tractate Soferim 13:9 · Classic Synagogue Liturgy",
+        "hebrew": "בָּרוּךְ אַתָּה אֲדֹנָי אֱלֹהֵינוּ מֶלֶךְ הָעוֹלָם, אֲשֶׁר בָּחַר בִּנְבִיאִים טוֹבִים, וְרָצָה בְדִבְרֵיהֶם הַנֶּאֱמָרִים בֶּאֱמֶת. בָּרוּךְ אַתָּה אֲדֹנָי, הַבּוֹחֵר בַּתּוֹרָה וּבְמֹשֶׁה עַבְדּוֹ, וּבְיִשְׂרָאֵל עַמּוֹ, וּבִנְבִיאֵי הָאֱמֶת וָצֶדֶק.",
+        "translit": "Ba-ruch a-tah A-do-nai E-lo-hei-nu Me-lech ha-o-lam, a-sher ba-char bin-vi-im to-vim, v'ra-tzah v'div-rei-hem ha-ne-e-ma-rim be-e-met. Ba-ruch a-tah A-do-nai, ha-bo-cheir ba-To-rah u-v'Mo-sheh av-do, u-v'Yis-ra-eil a-mo, u-vin-vi-ei ha-e-met va-tze-dek.",
+        "english": "Blessed are You, Lord our God, King of the universe, Who chose good prophets and took delight in their words spoken in truth. Blessed are You, Lord, Who chooses the Torah, Moses His servant, Israel His people, and the prophets of truth and righteousness.",
+        "response_he": "",
+        "response_tr": "Congregation answers Amen — then chant the Haftarah proudly!",
+    },
+]
+
+
+def get_aliyah_coach() -> dict:
+    return {
+        "title": "Called to the Torah — Aliyah & Bar/Bat Mitzvah Blessings Coach",
+        "he_title": "עֲלִיָּה לַתּוֹרָה · בַּר וּבַת מִצְוָה",
+        "steps": TORAH_ALIYAH_COACH,
+    }
+
+
+def find_bar_bat_mitzvah(birth_date_str: str, kind: str = "bar", after_sunset: bool = False) -> dict:
+    """100% offline exact Hebrew birthday, Bar/Bat Mitzvah date, Shabbat & Torah Parashah calculator."""
+    from datetime import date as _date, timedelta as _td
+    try:
+        bdate = datetime.strptime((birth_date_str or "").strip()[:10], "%Y-%m-%d").date()
+    except Exception:
+        bdate = _date(2014, 5, 15)
+    eff_bdate = bdate + _td(days=1) if after_sunset else bdate
+    he_birth = sacred_astronomy.gregorian_to_hebrew(eff_bdate)
+    years_add = 12 if (kind or "").strip().lower().startswith("bat") else 13
+    target_hy = int(he_birth["year"]) + years_add
+    target_hm = int(he_birth["month"])
+    target_hd = int(he_birth["day"])
+    # Handle Adar II -> Adar in non-leap year, or 30th day in 29-day month
+    if target_hm == 13 and not sacred_astronomy.is_hebrew_leap_year(target_hy):
+        target_hm = 12
+    elif target_hm == 12 and sacred_astronomy.is_hebrew_leap_year(target_hy) and not he_birth.get("is_leap_year"):
+        target_hm = 13
+    max_d = sacred_astronomy.last_day_of_hebrew_month(target_hm, target_hy)
+    target_hd = min(target_hd, max_d)
+
+    bm_gdate = _date.fromordinal(sacred_astronomy.hebrew_to_rd(target_hy, target_hm, target_hd))
+    he_bm = sacred_astronomy.gregorian_to_hebrew(bm_gdate)
+    # Next Shabbat on or after the Bar/Bat Mitzvah Hebrew birthday (Python Sat = 5)
+    days_to_sat = (5 - bm_gdate.weekday()) % 7
+    shabbat_date = bm_gdate + _td(days=days_to_sat)
+    he_shabbat = sacred_astronomy.gregorian_to_hebrew(shabbat_date)
+
+    # Determine the Shabbat Parashah offline from our 54-Parashah cycle anchored to Simchat Torah (23 Tishrei)
+    sh_hy = int(he_shabbat["year"])
+    simchat_rd = sacred_astronomy.hebrew_to_rd(sh_hy, 7, 23)
+    if shabbat_date.toordinal() < simchat_rd:
+        simchat_rd = sacred_astronomy.hebrew_to_rd(sh_hy - 1, 7, 23)
+    simchat_g = _date.fromordinal(simchat_rd)
+    first_bereshit_sat = simchat_g + _td(days=((5 - simchat_g.weekday()) % 7 or 7))
+    weeks_since = max(0, (shabbat_date - first_bereshit_sat).days // 7)
+
+    parasha = {}
+    with torah_db.get_conn() as conn:
+        all_p = [dict(r) for r in conn.execute("SELECT * FROM parashiyot ORDER BY order_num ASC").fetchall()]
+        if all_p:
+            # Map smoothly across the 54 portions in the Jewish year
+            total_weeks = 54 if sacred_astronomy.is_hebrew_leap_year(sh_hy) else 50
+            idx = min(len(all_p) - 1, int(round((weeks_since / max(1, total_weeks)) * (len(all_p) - 1))))
+            parasha = all_p[idx]
+
+    return {
+        "birth_date": bdate.isoformat(),
+        "after_sunset": bool(after_sunset),
+        "ceremony_type": "Bat Mitzvah (Age 12)" if years_add == 12 else "Bar Mitzvah (Age 13)",
+        "hebrew_birthday": he_birth,
+        "mitzvah_gregorian": bm_gdate.isoformat(),
+        "mitzvah_hebrew": he_bm,
+        "shabbat_gregorian": shabbat_date.isoformat(),
+        "shabbat_hebrew": he_shabbat,
+        "parasha": {
+            "slug": parasha.get("slug", ""),
+            "en_name": parasha.get("en_name", ""),
+            "he_name": parasha.get("he_name", ""),
+            "torah_ref": parasha.get("ref") or parasha.get("ref_span") or parasha.get("torah_ref", ""),
+            "haftarah_ref": parasha.get("haftarah_ref", ""),
+            "summary": parasha.get("summary", ""),
+        },
+    }

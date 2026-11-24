@@ -213,6 +213,24 @@ class TestDatabaseAndRAG(unittest.TestCase):
         for required_kind in ("birthday", "memoriam", "community", "wit"):
             self.assertIn(required_kind, kinds)
 
+        aliyah = sacred_liturgy.get_aliyah_coach()
+        self.assertEqual(len(aliyah["steps"]), 4)
+        self.assertTrue(all(s.get("hebrew") and s.get("translit") for s in aliyah["steps"]))
+
+        bm = sacred_liturgy.find_bar_bat_mitzvah("2014-05-15", kind="bar", after_sunset=False)
+        self.assertIn("Bar Mitzvah", bm["ceremony_type"])
+        self.assertTrue(bm["parasha"]["en_name"])
+        self.assertTrue(bm["parasha"]["torah_ref"])
+        self.assertTrue(bm["shabbat_gregorian"])
+        self.assertIn("hebrew_birthday", bm)
+
+        dvar_en = shul_events.generate_rabbi_dvar_torah(lang="en")
+        self.assertTrue(dvar_en["torah_ref"])
+        self.assertIn("Shabbat Shalom", dvar_en["whatsapp_text"])
+        self.assertGreaterEqual(len(dvar_en["commentators"]), 2)
+        dvar_fr = shul_events.generate_rabbi_dvar_torah(lang="fr")
+        self.assertIn("Chabbat Chalom", dvar_fr["whatsapp_text"])
+
     def test_scripture_foundation_and_studio_voice(self):
         import scripture_foundation
         import voice_engine
@@ -298,6 +316,8 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/quizzes",
             "/api/liturgy/today",
             "/api/liturgy/psalm?chapter=24",
+            "/api/liturgy/aliyah-coach",
+            "/api/liturgy/barmitzvah?birth=2014-05-15&type=bar",
             "/api/community/heritage",
             "/api/holidays",
             "/api/foundation?parasha=vayishlach",
@@ -305,6 +325,8 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/admin/export-bundle",
             "/api/shul/events",
             "/api/shul/mailing",
+            "/api/shul/dvar-torah?lang=en",
+            "/api/shul/dvar-torah?lang=fr",
             "/api/scribe/status",
             "/api/broadcast/state",
             "/api/mesh/overview",

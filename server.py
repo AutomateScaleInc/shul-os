@@ -449,6 +449,23 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(sacred_liturgy.get_today_liturgy())
             return
 
+        if path == "/api/liturgy/aliyah-coach":
+            self._send_json(sacred_liturgy.get_aliyah_coach())
+            return
+
+        if path == "/api/liturgy/barmitzvah":
+            b_str = qs.get("birth", [""])[0].strip()
+            c_type = qs.get("type", ["bar"])[0].strip()
+            after_sun = qs.get("after_sunset", ["0"])[0].strip() in ("1", "true", "yes")
+            self._send_json(sacred_liturgy.find_bar_bat_mitzvah(b_str, kind=c_type, after_sunset=after_sun))
+            return
+
+        if path == "/api/shul/dvar-torah":
+            lang = qs.get("lang", ["en"])[0].strip()
+            p_slug = qs.get("parasha", [""])[0].strip()
+            self._send_json(shul_events.generate_rabbi_dvar_torah(parasha_slug=p_slug, lang=lang))
+            return
+
         if path == "/api/liturgy/psalm":
             try:
                 ch = int(qs.get("chapter", ["23"])[0])

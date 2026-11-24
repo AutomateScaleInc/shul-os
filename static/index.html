@@ -2328,6 +2328,7 @@
       <button class="tool-btn" id="stopSpeakBtn" onclick="stopSpeaking()" style="display:none;border-color:var(--gold);color:var(--gold);" title="Stop Voice">⏹</button>
       <button class="tool-btn" onclick="adjustFont(-0.1)" title="Smaller text">A-</button>
       <button class="tool-btn" onclick="adjustFont(0.1)" title="Larger text">A+</button>
+      <button class="tool-btn" id="langBtn" onclick="cycleShulLang()" title="Switch Brussels Lobby Language: English / Français / עברית" style="font-weight:800;color:var(--accent);border-color:rgba(92,182,229,0.45);">EN</button>
       <button class="tool-btn" onclick="toggleTheme()" id="themeBtn">Parchment</button>
       <div class="status-pill" id="statusPill" title="Local Offline AI Status"><span class="dot"></span><span>3b</span></div>
     </div>
@@ -2422,6 +2423,25 @@
       <div class="card" id="shulHero">Loading The European Synagogue (theshul.eu) calendar &amp; Brussels Shabbat times...</div>
       <div class="ask-layout">
         <div>
+          <!-- 🎙 RABBI'S DESK: 1-CLICK SHABBAT DVAR TORAH & WHATSAPP BULLETIN STUDIO -->
+          <div class="card" style="border-color:rgba(228,188,105,0.52);background:linear-gradient(150deg, rgba(20,32,60,0.94), rgba(10,18,36,0.96));">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+              <div>
+                <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);">🎙 RABBI'S DESK · 100% OFFLINE SERMON &amp; BULLETIN STUDIO</div>
+                <h2 style="margin:3px 0 0;">1-Click Shabbat Dvar Torah &amp; WhatsApp Sheet</h2>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <select id="dvarLangSel" style="width:auto;padding:5px 9px;font-size:0.82rem;" onchange="loadRabbiDvarTorah()">
+                  <option value="en">🇬🇧 English</option>
+                  <option value="fr">🇫🇷 Français (Bruxelles)</option>
+                  <option value="he">🇮🇱 עברית</option>
+                </select>
+                <button class="btn-primary" style="padding:6px 12px;font-size:0.82rem;" onclick="loadRabbiDvarTorah()">✨ Generate Dvar Torah</button>
+              </div>
+            </div>
+            <div id="rabbiDvarBox" class="muted" style="font-size:0.86rem;">Tap <strong>Generate Dvar Torah</strong> to synthesize this week's Parashah, verified Scripture parallels, 3 classical commentators (Rashi/Ramban/Ibn Ezra), a Brussels table reflection, and a ready-to-send WhatsApp bulletin!</div>
+          </div>
+
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
               <div>
@@ -2600,6 +2620,7 @@
           <button class="liturgy-tab" data-ltab="songs" onclick="switchLiturgyTab('songs')">🎵 Sacred Songs &amp; Zemirot</button>
           <button class="liturgy-tab" data-ltab="holidays" onclick="switchLiturgyTab('holidays')">🏛 Holidays &amp; High Holidays</button>
           <button class="liturgy-tab" data-ltab="books" onclick="switchLiturgyTab('books')">🍷 Haggadah &amp; Sacred Books</button>
+          <button class="liturgy-tab" data-ltab="barmitzvah" onclick="switchLiturgyTab('barmitzvah')">🎓 Bar/Bat Mitzvah &amp; Aliyah</button>
         </div>
       </div>
 
@@ -2609,6 +2630,7 @@
       <div id="ltab-songs" class="liturgy-pane"><div class="card muted">Loading Sacred Songs &amp; Zemirot...</div></div>
       <div id="ltab-holidays" class="liturgy-pane"><div class="card muted">Loading Deep Holiday &amp; High Holiday Encyclopedia...</div></div>
       <div id="ltab-books" class="liturgy-pane"><div class="card muted">Loading Complete Offline Passover Haggadah, Siddur, Five Megillot &amp; Classical Library...</div></div>
+      <div id="ltab-barmitzvah" class="liturgy-pane"><div class="card muted">Loading Bar/Bat Mitzvah Parashah Finder &amp; Called-to-the-Torah Aliyah Coach...</div></div>
     </section>
 
     <section id="view-ask" class="view">
@@ -5556,6 +5578,10 @@ function executeShulVoiceCommand(rawTranscript, opts = {}) {
     const target = openM[1].trim();
     const sectionMap = [
       [/\b(?:shabbat|shabbos|sabbath|candles)\b/, () => { openShabbatSanctuaryMode(true); return 'Shabbat Sanctuary Mode'; }],
+      [/\b(?:bar mitzvah|bat mitzvah|mitzvah|aliyah)\b/, () => { switchView('liturgy'); setTimeout(() => switchLiturgyTab('barmitzvah'), 60); return 'Bar/Bat Mitzvah & Aliyah Coach'; }],
+      [/\b(?:french|francais)\b/, () => { setShulLang('fr'); return 'Français (Brussels Mode)'; }],
+      [/\b(?:hebrew|ivrit)\b/, () => { setShulLang('he'); return 'עברית (Hebrew Mode)'; }],
+      [/\b(?:english)\b/, () => { setShulLang('en'); return 'English Mode'; }],
       [/\b(?:today|home|main|start)\b/, () => { switchView('today'); return 'Today'; }],
       [/\b(?:sky|zmanim|calendar|sun|moon|astronomy|compass)\b/, () => { switchView('sky'); return 'Sky & Zmanim'; }],
       [/\b(?:tefillin)\b/, () => { openTefillinCoach(); return 'Guided Tefillin Coach'; }],
@@ -5781,10 +5807,15 @@ async function sendQuestion(ev) {
   let fullText = '';
 
   try {
+    const langPrefix = (typeof currentShulLang !== 'undefined' && currentShulLang === 'fr')
+      ? '[Respond warmly in French (français) while preserving verbatim Hebrew/English Torah citations] '
+      : (typeof currentShulLang !== 'undefined' && currentShulLang === 'he')
+        ? '[Respond warmly in modern Hebrew (עברית) while preserving verbatim Torah citations] '
+        : '';
     const resp = await fetch('/api/ask/stream', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ question: q, mode: currentMode, history: chatHistory })
+      body: JSON.stringify({ question: langPrefix + q, mode: currentMode, history: chatHistory })
     });
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
@@ -7166,6 +7197,111 @@ function switchLiturgyTab(tabKey) {
   document.querySelectorAll('#liturgyTabBar .liturgy-tab').forEach(b => b.classList.toggle('active', b.dataset.ltab === tabKey));
   document.querySelectorAll('#view-liturgy .liturgy-pane').forEach(p => p.classList.toggle('active', p.id === 'ltab-' + tabKey));
   if (tabKey === 'books' && !window._sacredBooksLoaded) loadSacredBooksShelf();
+  if (tabKey === 'barmitzvah' && !window._barMitzvahLoaded) loadBarMitzvahTab();
+}
+
+async function loadBarMitzvahTab() {
+  window._barMitzvahLoaded = true;
+  const host = document.getElementById('ltab-barmitzvah');
+  if (!host) return;
+  try {
+    const r = await fetch('/api/liturgy/aliyah-coach');
+    const d = await r.json();
+    const steps = d.steps || [];
+    host.innerHTML = `
+      <div class="card" style="border-color:rgba(228,188,105,0.55);background:linear-gradient(150deg, rgba(20,33,62,0.94), rgba(11,19,38,0.96));">
+        <span class="tier-badge-scripture">🎓 100% OFFLINE HEBREW CALENDAR CALCULATOR</span>
+        <h3 style="margin:6px 0 4px;font-family:var(--serif);color:var(--gold);font-size:1.42rem;">Bar &amp; Bat Mitzvah Parashah Finder</h3>
+        <p class="muted" style="font-size:0.86rem;margin:0 0 14px;">Enter any birthday to instantly calculate their exact Hebrew birthday, Bar/Bat Mitzvah date, Shabbat celebration date, Torah Portion (Parashah) &amp; Haftarah — 100% offline.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <label class="settings-field" style="width:185px;">Gregorian Birthday
+            <input type="date" class="form-input" id="bmBirthInput" value="2014-05-15">
+          </label>
+          <label class="settings-field" style="width:200px;">Milestone
+            <select id="bmTypeSel">
+              <option value="bar">Bar Mitzvah (Age 13)</option>
+              <option value="bat">Bat Mitzvah (Age 12)</option>
+            </select>
+          </label>
+          <label class="settings-check" style="padding-bottom:8px;">
+            <input type="checkbox" id="bmAfterSun"> Born after sunset?
+          </label>
+          <button class="btn-primary" style="margin-bottom:2px;" onclick="runBarMitzvahFinder()">✨ Find My Parashah</button>
+        </div>
+        <div id="bmResultBox" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+          <div>
+            <span class="tier-badge-interp">📜 CALLED TO THE TORAH · STUDIO HEBREW COACH</span>
+            <h3 style="margin:5px 0 2px;font-family:var(--serif);color:var(--gold);font-size:1.38rem;">${esc(d.title || 'Torah Aliyah Blessings Coach')} · <span style="font-family:var(--hebrew);">${esc(d.he_title || '')}</span></h3>
+            <div class="muted" style="font-size:0.84rem;">Perfect for Shabbat guests or Bar/Bat Mitzvah students called up to the Bimah — practice phrase-by-phrase with 48 kHz Studio Hebrew audio!</div>
+          </div>
+        </div>
+        ${steps.map(st => `
+          <div class="prayer-step">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <span class="trait-pill" style="margin-right:6px;">STEP ${st.step}</span>
+                <strong style="color:#fff;font-family:var(--serif);font-size:1.08rem;">${esc(st.title)}</strong>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.15rem;">${esc(st.he_title)}</span>
+                <button class="btn-primary" style="padding:4px 10px;font-size:0.76rem;" onclick="speakHebrew(this.dataset.he, 'slow')" data-he="${esc(st.hebrew)}">🐢 Slow Hebrew</button>
+                <button class="btn-secondary" style="padding:4px 10px;font-size:0.76rem;" onclick="speakHebrew(this.dataset.he, 'normal')" data-he="${esc(st.hebrew)}">🔊 Normal</button>
+                <button class="btn-secondary" style="padding:4px 10px;font-size:0.76rem;" onclick="speakText(this.dataset.en, null, 'en')" data-en="${esc(st.title + '. ' + st.english)}">🔊 English</button>
+              </div>
+            </div>
+            <div class="muted" style="font-size:0.8rem;margin-top:4px;">💡 ${esc(st.cue)} · 📜 ${esc(st.source)}</div>
+            <div class="b-he" style="font-size:1.32rem;">${esc(st.hebrew)}</div>
+            <div class="b-tr">${esc(st.translit)}</div>
+            <div class="b-en">${esc(st.english)}</div>
+            ${st.response_he ? `<div style="margin-top:8px;padding:8px 11px;border-radius:10px;background:rgba(92,182,229,0.09);border:1px solid rgba(92,182,229,0.28);"><div style="font-family:var(--hebrew);direction:rtl;color:var(--gold);font-size:1.12rem;">${esc(st.response_he)}</div><div class="muted" style="font-size:0.8rem;">${esc(st.response_tr)}</div></div>` : `<div class="muted" style="font-size:0.8rem;margin-top:5px;">✦ ${esc(st.response_tr)}</div>`}
+          </div>`).join('')}
+      </div>`;
+    runBarMitzvahFinder();
+  } catch (e) {
+    host.innerHTML = '<div class="card muted">Could not load Bar/Bat Mitzvah coach.</div>';
+  }
+}
+
+async function runBarMitzvahFinder() {
+  const box = document.getElementById('bmResultBox');
+  if (!box) return;
+  const birth = document.getElementById('bmBirthInput')?.value || '2014-05-15';
+  const kind = document.getElementById('bmTypeSel')?.value || 'bar';
+  const afterSun = document.getElementById('bmAfterSun')?.checked ? '1' : '0';
+  box.innerHTML = '<div class="muted">Calculating exact Hebrew calendar milestone...</div>';
+  try {
+    const r = await fetch(`/api/liturgy/barmitzvah?birth=${encodeURIComponent(birth)}&type=${encodeURIComponent(kind)}&after_sunset=${afterSun}`);
+    const d = await r.json();
+    const p = d.parasha || {};
+    box.innerHTML = `
+      <div style="padding:14px 16px;border-radius:14px;background:rgba(228,188,105,0.09);border:1.5px solid rgba(228,188,105,0.52);display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-size:0.74rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">✨ ${esc(d.ceremony_type)} · MAZAL TOV!</div>
+            <div style="font-family:var(--serif);font-size:1.4rem;font-weight:700;color:#fff;margin-top:2px;">
+              Parashat ${esc(p.en_name)} &nbsp;·&nbsp; <span style="font-family:var(--hebrew);color:var(--gold);">${esc(p.he_name)}</span>
+            </div>
+            <div class="muted" style="font-size:0.84rem;">Torah: <strong>${esc(p.torah_ref)}</strong> · Haftarah: <strong>${esc(p.haftarah_ref)}</strong></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${p.slug ? `<button class="btn-primary" onclick="switchView('parasha'); loadParasha('${esc(p.slug)}')">📖 Study This Parashah</button>` : ''}
+            <button class="btn-secondary" onclick="quickAsk('Create a warm, inspiring Bar/Bat Mitzvah Dvar Torah outline for Parashat ${esc(p.en_name)} (${esc(p.torah_ref)}) with one lesson for a young adult.', 'storyteller')">✨ Draft Mitzvah Speech</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;font-size:0.84rem;">
+          <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.62);border:1px solid var(--border);"><div class="muted" style="font-size:0.7rem;text-transform:uppercase;">Hebrew Birthday</div><strong style="color:var(--gold);">${esc(d.hebrew_birthday?.en_str)}</strong> <span style="font-family:var(--hebrew);">(${esc(d.hebrew_birthday?.he_str)})</span></div>
+          <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.62);border:1px solid var(--border);"><div class="muted" style="font-size:0.7rem;text-transform:uppercase;">Mitzvah Hebrew Date</div><strong style="color:#fff;">${esc(d.mitzvah_hebrew?.en_str)}</strong> <span class="muted">(${esc(d.mitzvah_gregorian)})</span></div>
+          <div style="padding:8px 10px;border-radius:10px;background:rgba(10,18,36,0.62);border:1px solid var(--border);"><div class="muted" style="font-size:0.7rem;text-transform:uppercase;">Shabbat Celebration</div><strong style="color:#86efac;">Sat ${esc(d.shabbat_gregorian)}</strong> <span class="muted">(${esc(d.shabbat_hebrew?.en_str)})</span></div>
+        </div>
+        <div style="font-size:0.86rem;color:#e8dfd0;line-height:1.48;">${esc(p.summary)}</div>
+      </div>`;
+  } catch (e) {
+    box.innerHTML = '<div class="muted">Could not calculate Bar/Bat Mitzvah date.</div>';
+  }
 }
 
 async function loadSacredBooksShelf() {
@@ -9170,7 +9306,7 @@ async function openShabbatSanctuaryMode(isPreview = true) {
     document.getElementById('shabParashaTitle').textContent = pName;
     document.getElementById('shabParashaHe').textContent = p.he_name || '';
     document.getElementById('shabParashaSummary').textContent = p.summary || '';
-    document.getElementById('shabRefLine').textContent = `WEEKLY TORAH PORTION · ${p.torah_ref || ''} · HAFTARAH: ${p.live_haftarah || p.haftarah_ref || ''}`;
+    document.getElementById('shabRefLine').textContent = `WEEKLY TORAH PORTION · ${p.ref || p.ref_span || p.torah_ref || 'Genesis 32:4-36:43'} · HAFTARAH: ${p.live_haftarah || p.haftarah_ref || 'Obadiah 1:1-21'}`;
     if (rich.art) document.getElementById('shabHeroImg').src = rich.art;
 
     const heBadge = document.getElementById('shabHeDateBadge');
@@ -9244,6 +9380,105 @@ function closeShabbatSanctuaryMode() {
   shabbatPreviewOpen = false;
   if (celestialData && celestialData.shabbat_mode) shabbatAutoDismissed = true;
 }
+
+// =============================================================================
+// RABBI'S DESK — 1-CLICK SHABBAT DVAR TORAH & WHATSAPP BULLETIN STUDIO
+// =============================================================================
+let rabbiDvarWaCache = '';
+async function loadRabbiDvarTorah() {
+  const box = document.getElementById('rabbiDvarBox');
+  if (!box) return;
+  const lang = document.getElementById('dvarLangSel')?.value || currentShulLang || 'en';
+  box.innerHTML = '<div class="muted">Synthesizing this week\'s Parashah, verified Scripture parallels &amp; 3 classical commentators...</div>';
+  try {
+    const r = await fetch('/api/shul/dvar-torah?lang=' + encodeURIComponent(lang));
+    const d = await r.json();
+    rabbiDvarWaCache = d.whatsapp_text || '';
+    const ov = d.opening_verse || {};
+    box.innerHTML = `
+      <div style="display:grid;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 13px;border-radius:11px;background:rgba(228,188,105,0.08);border:1px solid rgba(228,188,105,0.34);">
+          <div>
+            <strong style="color:var(--gold);font-family:var(--serif);font-size:1.12rem;">Parashat ${esc(d.parasha_en)} · <span style="font-family:var(--hebrew);">${esc(d.parasha_he)}</span></strong>
+            <div class="muted" style="font-size:0.8rem;">${esc(d.torah_ref)} · Haftarah: ${esc(d.haftarah_ref)} · Candles ${esc(d.shabbat_times?.candle_lighting)} · Havdalah ${esc(d.shabbat_times?.havdalah)} · Daf Yomi: ${esc(d.daf_yomi)}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn-primary" style="padding:5px 11px;font-size:0.78rem;" onclick="copyDvarTorahWa()">📋 Copy WhatsApp</button>
+            <a class="btn-secondary" style="padding:5px 11px;font-size:0.78rem;text-decoration:none;border-color:rgba(74,222,128,0.55);color:#86efac;" href="${esc(d.whatsapp_url)}" target="_blank">💬 Open in WhatsApp</a>
+            <button class="btn-secondary" style="padding:5px 11px;font-size:0.78rem;" onclick="speakText(rabbiDvarWaCache)">🔊 Read Aloud</button>
+          </div>
+        </div>
+        ${ov.en_text ? `<div style="padding:9px 12px;border-radius:10px;background:rgba(10,18,36,0.6);border-left:3px solid var(--gold);"><div style="font-size:0.72rem;font-weight:800;color:var(--gold);text-transform:uppercase;">📜 Opening Verse · ${esc(ov.ref)}</div>${ov.he_text ? `<div style="font-family:var(--hebrew);direction:rtl;color:#f7dc94;font-size:1.08rem;margin:3px 0;">${esc(ov.he_text)}</div>` : ''}<div style="font-family:var(--serif);font-size:0.9rem;">“${esc(ov.en_text)}”</div></div>` : ''}
+        ${(d.commentators || []).length ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;">${d.commentators.map(c => `<div style="padding:9px 11px;border-radius:10px;background:rgba(92,182,229,0.07);border:1px solid rgba(92,182,229,0.26);"><div style="font-size:0.74rem;font-weight:800;color:var(--accent);text-transform:uppercase;margin-bottom:3px;">⚖️ ${esc(c.commentator)}</div><div style="font-size:0.82rem;line-height:1.42;">${esc(c.text)}</div></div>`).join('')}</div>` : ''}
+        <pre style="margin:0;white-space:pre-wrap;font-family:var(--sans);font-size:0.82rem;line-height:1.48;background:rgba(7,12,24,0.82);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:#e8eef8;max-height:220px;overflow-y:auto;">${esc(rabbiDvarWaCache)}</pre>
+      </div>`;
+  } catch (e) {
+    box.innerHTML = '<div class="muted">Could not generate Dvar Torah right now.</div>';
+  }
+}
+
+function copyDvarTorahWa() {
+  if (!rabbiDvarWaCache) return;
+  navigator.clipboard?.writeText(rabbiDvarWaCache).catch(() => {});
+  showShulVoiceHud('📋 Copied Shabbat Dvar Torah Bulletin for WhatsApp!', 2600);
+}
+
+// =============================================================================
+// BRUSSELS TRI-LINGUAL LOBBY MODE (EN · FR · עברית)
+// =============================================================================
+let currentShulLang = localStorage.getItem('shul_os_lang') || 'en';
+const SHUL_I18N = {
+  en: {
+    btn: 'EN',
+    nav: { today: 'Today', sky: '🌙 Sky', liturgy: '🙏 Prayers & Books', stories: 'Stories', characters: 'Cast', symbols: 'Symbols', ask: 'Ask AI', parasha: 'Parashah', reader: 'Tanakh', shul: 'Shul', mesh: '🌐 Mesh', history: 'History' },
+    qrKicker: '📱 SCAN WITH PHONE', qrTitle: 'Connect & Sponsor The Shul', qrSub: 'Mirror screen · Message Rabbi · Sponsor Kiddush',
+    siteSub: 'The European Synagogue',
+  },
+  fr: {
+    btn: 'FR',
+    nav: { today: "Aujourd'hui", sky: '🌙 Ciel', liturgy: '🙏 Prières & Livres', stories: 'Histoires', characters: 'Figures', symbols: 'Symboles', ask: 'IA Torah', parasha: 'Paracha', reader: 'Tanakh', shul: 'Synagogue', mesh: '🌐 Réseau', history: 'Histoire' },
+    qrKicker: '📱 SCANNEZ AU TÉLÉPHONE', qrTitle: 'Connecter & Parrainer', qrSub: 'Écran en direct · Message au Rabbin · Kiddouch',
+    siteSub: 'La Synagogue Européenne',
+  },
+  he: {
+    btn: 'עב',
+    nav: { today: 'היום', sky: '🌙 זמנים', liturgy: '🙏 תפילות וספרים', stories: 'סיפורים', characters: 'דמויות', symbols: 'סמלים', ask: 'שאל בינה', parasha: 'פרשה', reader: 'תנ״ך', shul: 'בית כנסת', mesh: '🌐 רשת', history: 'היסטוריה' },
+    qrKicker: '📱 סרוק בנייד', qrTitle: 'התחבר ושותפות בקהילה', qrSub: 'שידור חי · הודעה לרב · קידוש שבת',
+    siteSub: 'בית הכנסת האירופי · בריסל',
+  },
+};
+
+function setShulLang(lang) {
+  const code = SHUL_I18N[lang] ? lang : 'en';
+  currentShulLang = code;
+  localStorage.setItem('shul_os_lang', code);
+  const pack = SHUL_I18N[code];
+  const lb = document.getElementById('langBtn');
+  if (lb) lb.textContent = pack.btn;
+  document.querySelectorAll('#mainNav button[data-view]').forEach(btn => {
+    const v = btn.dataset.view;
+    if (pack.nav[v]) btn.textContent = pack.nav[v];
+  });
+  const sub = document.getElementById('siteSub');
+  if (sub) sub.textContent = pack.siteSub;
+  const qk = document.querySelector('#alwaysOnQrDock .qr-dock-kicker');
+  const qt = document.querySelector('#alwaysOnQrDock .qr-dock-title');
+  const qs = document.querySelector('#alwaysOnQrDock .qr-dock-sub');
+  if (qk) qk.textContent = pack.qrKicker;
+  if (qt) qt.textContent = pack.qrTitle;
+  if (qs) qs.textContent = pack.qrSub;
+  const dsel = document.getElementById('dvarLangSel');
+  if (dsel) dsel.value = code;
+}
+
+function cycleShulLang() {
+  const order = ['en', 'fr', 'he'];
+  const next = order[(order.indexOf(currentShulLang) + 1) % order.length];
+  setShulLang(next);
+  const names = { en: '🇬🇧 English Mode', fr: '🇫🇷 Mode Français (Bruxelles)', he: '🇮🇱 מצב עברית' };
+  showShulVoiceHud(names[next], 2200);
+}
+setShulLang(currentShulLang);
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {

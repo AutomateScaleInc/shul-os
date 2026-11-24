@@ -26,7 +26,19 @@
     border: 1.5px solid rgba(228,188,105,0.5);
     box-shadow: 0 18px 40px rgba(0,0,0,0.45);
     margin-bottom: 16px;
+    position: relative;
   }
+  .lang-bar {
+    display: inline-flex; gap: 5px; justify-content: center;
+    background: rgba(8,15,30,0.72); border: 1px solid var(--border);
+    border-radius: 999px; padding: 3px 5px; margin-bottom: 10px;
+  }
+  .lang-pill {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 0.74rem; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+    cursor: pointer; letter-spacing: 0.04em;
+  }
+  .lang-pill.active { background: var(--gold); color: #091122; }
   .emblem {
     width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 50%;
     background: var(--gold-soft); border: 1.5px solid var(--gold);
@@ -102,29 +114,34 @@
 <body>
 <div class="wrap">
   <div class="hero">
+    <div class="lang-bar" role="group" aria-label="Language">
+      <button type="button" class="lang-pill active" data-lang="en" onclick="setGiveLang('en')">EN · English</button>
+      <button type="button" class="lang-pill" data-lang="fr" onclick="setGiveLang('fr')">FR · Français</button>
+      <button type="button" class="lang-pill" data-lang="he" onclick="setGiveLang('he')">עב · עברית</button>
+    </div>
     <div class="emblem">✡</div>
     <div class="kicker" id="shulName">THE EUROPEAN SYNAGOGUE · OHEL ELIEZER</div>
-    <h1>Sponsor a Mitzvah &amp; Connect to This Screen</h1>
-    <p class="sub">Partner with Rabbi Michoel Rosenblum &amp; our Brussels community—sponsor a Shabbat Kiddush, Kids Shul, Day of Learning, or connect straight to the live Torah Sanctuary screen in your hands.</p>
+    <h1 id="heroTitle">Sponsor a Mitzvah &amp; Connect to This Screen</h1>
+    <p class="sub" id="heroSub">Partner with Rabbi Michoel Rosenblum &amp; our Brussels community—sponsor a Shabbat Kiddush, Kids Shul, Day of Learning, or connect straight to the live Torah Sanctuary screen in your hands.</p>
     <div class="live-bar" id="liveBar">Loading this week's Parashah &amp; Shabbat times...</div>
     <div class="quick-actions">
-      <a class="btn-gold" href="#pledgeForm">💛 Sponsor Now</a>
-      <a class="btn-outline" href="#dedicationCard">🕯 Yahrzeit &amp; Honor Plaque</a>
-      <a class="btn-outline" href="#connectCard">💬 Connect &amp; Message</a>
+      <a class="btn-gold" id="btnSponsorNow" href="#pledgeForm">💛 Sponsor Now</a>
+      <a class="btn-outline" id="btnPlaque" href="#dedicationCard">🕯 Yahrzeit &amp; Honor Plaque</a>
+      <a class="btn-outline" id="btnConnect" href="#connectCard">💬 Connect &amp; Message</a>
       <a class="btn-outline" id="rabbiWaBtn" href="#" target="_blank" rel="noopener" style="display:none;border-color:rgba(74,222,128,0.6);color:#86efac;">💬 WhatsApp Rabbi</a>
-      <a class="btn-outline" href="/watch">📺 Live Screen</a>
-      <a class="btn-outline" href="/under-the-hood" style="border-color:rgba(228,188,105,0.65);color:#fde68a;">🚀 Get Shul.OS</a>
+      <a class="btn-outline" id="btnLiveScreen" href="/watch">📺 Live Screen</a>
+      <a class="btn-outline" id="btnGetShul" href="/under-the-hood" style="border-color:rgba(228,188,105,0.65);color:#fde68a;">🚀 Get Shul.OS</a>
     </div>
   </div>
 
   <div class="section-title">
-    <span>✨ Choose an Item or Event to Sponsor</span>
-    <span style="font-family:var(--sans);font-size:0.76rem;color:var(--muted);">Tap any card below</span>
+    <span id="secItemsTitle">✨ Choose an Item or Event to Sponsor</span>
+    <span id="secItemsHint" style="font-family:var(--sans);font-size:0.76rem;color:var(--muted);">Tap any card below</span>
   </div>
   <div id="itemsList">Loading sponsorships...</div>
 
   <div class="pledge-card" id="pledgeForm">
-    <div class="kicker">💛 TZEDAKAH &amp; SPONSORSHIP DEDICATION</div>
+    <div class="kicker" id="pledgeKicker">💛 TZEDAKAH &amp; SPONSORSHIP DEDICATION</div>
     <h2 id="selectedTitle" style="font-family:var(--serif);margin:4px 0 6px;font-size:1.25rem;color:#fff;">General Tzedakah &amp; Synagogue Support</h2>
     <div class="chai-row" id="chaiRow">
       <button type="button" class="chai-btn" onclick="pickAmount(18)">€18 (Chai)</button>
@@ -134,17 +151,17 @@
       <button type="button" class="chai-btn" onclick="pickAmount(360)">€360</button>
       <button type="button" class="chai-btn" onclick="pickAmount(540)">€540</button>
     </div>
-    <label for="fAmount">Contribution Amount (EUR €)</label>
+    <label for="fAmount" id="lblAmount">Contribution Amount (EUR €)</label>
     <input type="number" id="fAmount" min="1" value="36">
-    <label for="fName">Your Name *</label>
+    <label for="fName" id="lblName">Your Name *</label>
     <input type="text" id="fName" placeholder="e.g. David &amp; Sarah Cohen">
-    <label for="fEmail">Email (for receipt &amp; weekly shul updates)</label>
+    <label for="fEmail" id="lblEmail">Email (for receipt &amp; weekly shul updates)</label>
     <input type="email" id="fEmail" placeholder="you@example.com">
-    <label for="fPhone">WhatsApp / Phone (optional)</label>
+    <label for="fPhone" id="lblPhone">WhatsApp / Phone (optional)</label>
     <input type="tel" id="fPhone" placeholder="+32 ...">
-    <label for="fDedication">Dedication (In honor of / In memory of / Refuah Shleimah)</label>
+    <label for="fDedication" id="lblDedication">Dedication (In honor of / In memory of / Refuah Shleimah)</label>
     <textarea id="fDedication" rows="2" placeholder="Optional dedication to display on the Shabbat Kiddush &amp; Sanctuary screen..."></textarea>
-    <button type="button" class="btn-gold" style="width:100%;justify-content:center;font-size:1rem;padding:13px;" onclick="submitPledge()">💛 Confirm Sponsorship &amp; Proceed</button>
+    <button type="button" id="btnConfirmPledge" class="btn-gold" style="width:100%;justify-content:center;font-size:1rem;padding:13px;" onclick="submitPledge()">💛 Confirm Sponsorship &amp; Proceed</button>
     <div id="pledgeErr" style="color:#fca5a5;font-size:0.85rem;margin-top:8px;"></div>
   </div>
 
@@ -161,40 +178,40 @@
 
   <!-- COMMUNITY YAHRZEIT MEMORIAL & KIDDUSH / SIMCHA / REFUAH PLAQUE -->
   <div class="pledge-card" id="dedicationCard" style="border-color:rgba(228,188,105,0.65);">
-    <div class="kicker">🕯 LIVE SANCTUARY PLAQUE · YAHRZEIT, KIDDUSH &amp; REFUAH SHLEIMAH</div>
-    <h2 style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Place a Dedication on the Shul.OS Screen</h2>
-    <p class="sub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Light a virtual <em>Ner Neshama</em> Yahrzeit memorial, honor a Shabbat Kiddush, celebrate a Simcha, or add a name for healing (<em>Refuah Shleimah</em>) — displayed gracefully in the gold Community Chronicle plaque on our synagogue screen.</p>
-    <label for="dKind">Dedication Type</label>
+    <div class="kicker" id="dedKicker">🕯 LIVE SANCTUARY PLAQUE · YAHRZEIT, KIDDUSH &amp; REFUAH SHLEIMAH</div>
+    <h2 id="dedTitle" style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Place a Dedication on the Shul.OS Screen</h2>
+    <p class="sub" id="dedSub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Light a virtual <em>Ner Neshama</em> Yahrzeit memorial, honor a Shabbat Kiddush, celebrate a Simcha, or add a name for healing (<em>Refuah Shleimah</em>) — displayed gracefully in the gold Community Chronicle plaque on our synagogue screen.</p>
+    <label for="dKind" id="lblDKind">Dedication Type</label>
     <select id="dKind" style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(8,15,30,0.85);color:#fff;font-size:0.95rem;margin-bottom:11px;">
       <option value="yahrzeit">🕯 In Loving Memory (Yahrzeit · Ner Neshama)</option>
       <option value="kiddush">🥂 Shabbat Kiddush Honor</option>
       <option value="refuah">💚 Prayer for Healing (Refuah Shleimah)</option>
       <option value="simcha">🎉 Simcha / Mazal Tov Announcement</option>
     </select>
-    <label for="dHonoree">Honoree / Loved One's Name (English or Hebrew) *</label>
+    <label for="dHonoree" id="lblDHonoree">Honoree / Loved One's Name (English or Hebrew) *</label>
     <input type="text" id="dHonoree" placeholder="e.g. Eliezer ben Avraham (ז״ל) or The Levy Family">
-    <label for="dDate">Hebrew Date or Occasion (optional)</label>
+    <label for="dDate" id="lblDDate">Hebrew Date or Occasion (optional)</label>
     <input type="text" id="dDate" placeholder="e.g. 15 Kislev · This Shabbat · Birthday">
-    <label for="dBy">Dedicated By (optional)</label>
+    <label for="dBy" id="lblDBy">Dedicated By (optional)</label>
     <input type="text" id="dBy" placeholder="e.g. Sarah &amp; Family">
-    <label for="dMsg">Short Dedication Note (optional)</label>
+    <label for="dMsg" id="lblDMsg">Short Dedication Note (optional)</label>
     <textarea id="dMsg" rows="2" placeholder="Optional blessing or loving remembrance..."></textarea>
-    <button type="button" class="btn-gold" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitDedication()">🕯 Place on Shul.OS Dedication Plaque</button>
+    <button type="button" id="btnSubmitDed" class="btn-gold" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitDedication()">🕯 Place on Shul.OS Dedication Plaque</button>
     <div id="dedStatus" style="font-size:0.86rem;margin-top:9px;"></div>
   </div>
 
   <!-- DIRECT CONNECT & MESSAGING WITH RABBI MICHOEL / THE SHUL -->
   <div class="pledge-card" id="connectCard" style="border-color:rgba(92,182,229,0.58);">
-    <div class="kicker" style="color:var(--accent);">💬 DIRECT SHUL CONNECT · MESSAGING &amp; PRAYER REQUESTS</div>
-    <h2 style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Say Shalom &amp; Stay Connected Directly</h2>
-    <p class="sub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Leave your WhatsApp or email so Rabbi Michoel can message you directly—ask a Torah question, RSVP for Shabbat dinner, share a Simcha, or add a name for healing (<em>Mi Sheberach</em>).</p>
-    <label for="cName">Your Name *</label>
+    <div class="kicker" id="connKicker" style="color:var(--accent);">💬 DIRECT SHUL CONNECT · MESSAGING &amp; PRAYER REQUESTS</div>
+    <h2 id="connTitle" style="font-family:var(--serif);margin:4px 0 6px;font-size:1.2rem;color:#fff;">Say Shalom &amp; Stay Connected Directly</h2>
+    <p class="sub" id="connSub" style="text-align:left;margin:0 0 12px;font-size:0.84rem;">Leave your WhatsApp or email so Rabbi Michoel can message you directly—ask a Torah question, RSVP for Shabbat dinner, share a Simcha, or add a name for healing (<em>Mi Sheberach</em>).</p>
+    <label for="cName" id="lblCName">Your Name *</label>
     <input type="text" id="cName" placeholder="e.g. Miriam Levy">
-    <label for="cPhone">WhatsApp / Mobile Number</label>
+    <label for="cPhone" id="lblCPhone">WhatsApp / Mobile Number</label>
     <input type="tel" id="cPhone" placeholder="+32 ...">
-    <label for="cEmail">Email (optional)</label>
+    <label for="cEmail" id="lblCEmail">Email (optional)</label>
     <input type="email" id="cEmail" placeholder="you@example.com">
-    <label for="cTopic">How Can We Connect?</label>
+    <label for="cTopic" id="lblCTopic">How Can We Connect?</label>
     <select id="cTopic" style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(8,15,30,0.85);color:#fff;font-size:0.95rem;margin-bottom:11px;">
       <option value="Connect & Direct Shul Messages">Say Shalom &amp; Join Direct Shul Updates</option>
       <option value="Shabbat Dinner / Kiddush RSVP">RSVP for Friday Night / Shabbat Kiddush</option>
@@ -202,9 +219,9 @@
       <option value="Mi Sheberach (Healing Prayer)">Add a Name for Healing (Mi Sheberach)</option>
       <option value="Yahrzeit / Kaddish Remembrance">Submit a Yahrzeit / Memorial Date</option>
     </select>
-    <label for="cMsg">Message / Name for Prayer / Question (optional)</label>
+    <label for="cMsg" id="lblCMsg">Message / Name for Prayer / Question (optional)</label>
     <textarea id="cMsg" rows="2" placeholder="Write a quick note for Rabbi Michoel..."></textarea>
-    <button type="button" class="btn-outline" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitConnect()">💬 Send &amp; Connect With The Shul</button>
+    <button type="button" id="btnSubmitConn" class="btn-outline" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;" onclick="submitConnect()">💬 Send &amp; Connect With The Shul</button>
     <div id="connectStatus" style="font-size:0.86rem;margin-top:9px;"></div>
   </div>
 
@@ -228,6 +245,136 @@ let items = [];
 let selectedItem = { slug: 'general-tzedakah', title: 'General Tzedakah & Synagogue Support', amount: 36, currency: 'EUR' };
 let rabbiWaDigits = '';
 let rabbiShortName = 'Rabbi Michoel';
+let giveLang = 'en';
+
+const GIVE_I18N = {
+  en: {
+    dir: 'ltr',
+    heroTitle: 'Sponsor a Mitzvah & Connect to This Screen',
+    heroSub: 'Partner with Rabbi Michoel Rosenblum & our Brussels community—sponsor a Shabbat Kiddush, Kids Shul, Day of Learning, or connect straight to the live Torah Sanctuary screen in your hands.',
+    btnSponsorNow: '💛 Sponsor Now',
+    btnPlaque: '🕯 Yahrzeit & Honor Plaque',
+    btnConnect: '💬 Connect & Message',
+    btnLiveScreen: '📺 Live Screen',
+    btnGetShul: '🚀 Get Shul.OS',
+    secItemsTitle: '✨ Choose an Item or Event to Sponsor',
+    secItemsHint: 'Tap any card below',
+    pledgeKicker: '💛 TZEDAKAH & SPONSORSHIP DEDICATION',
+    lblAmount: 'Contribution Amount (EUR €)',
+    lblName: 'Your Name *',
+    lblEmail: 'Email (for receipt & weekly shul updates)',
+    lblPhone: 'WhatsApp / Phone (optional)',
+    lblDedication: 'Dedication (In honor of / In memory of / Refuah Shleimah)',
+    btnConfirmPledge: '💛 Confirm Sponsorship & Proceed',
+    dedKicker: '🕯 LIVE SANCTUARY PLAQUE · YAHRZEIT, KIDDUSH & REFUAH SHLEIMAH',
+    dedTitle: 'Place a Dedication on the Shul.OS Screen',
+    dedSub: 'Light a virtual Ner Neshama Yahrzeit memorial, honor a Shabbat Kiddush, celebrate a Simcha, or add a name for healing (Refuah Shleimah) — displayed gracefully in the gold Community Chronicle plaque on our synagogue screen.',
+    lblDKind: 'Dedication Type',
+    lblDHonoree: "Honoree / Loved One's Name (English or Hebrew) *",
+    lblDDate: 'Hebrew Date or Occasion (optional)',
+    lblDBy: 'Dedicated By (optional)',
+    lblDMsg: 'Short Dedication Note (optional)',
+    btnSubmitDed: '🕯 Place on Shul.OS Dedication Plaque',
+    connKicker: '💬 DIRECT SHUL CONNECT · MESSAGING & PRAYER REQUESTS',
+    connTitle: 'Say Shalom & Stay Connected Directly',
+    connSub: 'Leave your WhatsApp or email so Rabbi Michoel can message you directly—ask a Torah question, RSVP for Shabbat dinner, share a Simcha, or add a name for healing (Mi Sheberach).',
+    lblCName: 'Your Name *',
+    lblCPhone: 'WhatsApp / Mobile Number',
+    lblCEmail: 'Email (optional)',
+    lblCTopic: 'How Can We Connect?',
+    lblCMsg: 'Message / Name for Prayer / Question (optional)',
+    btnSubmitConn: '💬 Send & Connect With The Shul',
+  },
+  fr: {
+    dir: 'ltr',
+    heroTitle: 'Parrainer une Mitsva & Se Connecter à l’Écran',
+    heroSub: 'Associez-vous au Rav Michoel Rosenblum et à notre communauté de Bruxelles : parrainez un Kiddouch de Chabbat, le Kids Shul, une journée d’étude, ou connectez-vous à l’écran en direct.',
+    btnSponsorNow: '💛 Parrainer',
+    btnPlaque: '🕯 Plaque Yahrzeit & Hommage',
+    btnConnect: '💬 Contacter le Rav',
+    btnLiveScreen: '📺 Écran en Direct',
+    btnGetShul: '🚀 Installer Shul.OS',
+    secItemsTitle: '✨ Choisissez une Mitsva ou un Événement',
+    secItemsHint: 'Touchez une carte ci-dessous',
+    pledgeKicker: '💛 TSEDAKA & DÉDICACE DE PARRAINAGE',
+    lblAmount: 'Montant de la participation (EUR €)',
+    lblName: 'Votre nom *',
+    lblEmail: 'E-mail (pour le reçu et les nouvelles de la synagogue)',
+    lblPhone: 'WhatsApp / Téléphone (optionnel)',
+    lblDedication: 'Dédicace (En l’honneur de / À la mémoire de / Refoua Chlema)',
+    btnConfirmPledge: '💛 Confirmer le Parrainage',
+    dedKicker: '🕯 PLAQUE EN DIRECT · YAHRZEIT, KIDDOUCH & REFOUA CHLEMA',
+    dedTitle: 'Afficher une Dédicace sur l’Écran Shul.OS',
+    dedSub: 'Allumez une bougie virtuelle Ner Nechama (Yahrzeit), honorez un Kiddouch de Chabbat, célébrez une Simha ou ajoutez un nom pour une Refoua Chlema — affiché sur la plaque dorée de la synagogue.',
+    lblDKind: 'Type de dédicace',
+    lblDHonoree: 'Nom de la personne honorée / disparue (FR ou Hébreu) *',
+    lblDDate: 'Date hébraïque ou occasion (optionnel)',
+    lblDBy: 'Dédié par (optionnel)',
+    lblDMsg: 'Message ou bénédiction (optionnel)',
+    btnSubmitDed: '🕯 Afficher sur la Plaque Shul.OS',
+    connKicker: '💬 CONNEXION DIRECTE · MESSAGES & PRIÈRES',
+    connTitle: 'Dire Chalom & Rester en Contact',
+    connSub: 'Laissez votre WhatsApp ou e-mail pour échanger directement avec le Rav Michoel : question de Torah, inscription au repas de Chabbat, Simha ou nom pour un Mi Chéberakh.',
+    lblCName: 'Votre nom *',
+    lblCPhone: 'Numéro WhatsApp / Mobile',
+    lblCEmail: 'E-mail (optionnel)',
+    lblCTopic: 'Comment pouvons-nous vous aider ?',
+    lblCMsg: 'Message / Nom pour prière / Question (optionnel)',
+    btnSubmitConn: '💬 Envoyer à la Synagogue',
+  },
+  he: {
+    dir: 'rtl',
+    heroTitle: 'שותפות במצווה וחיבור למסך בית הכנסת',
+    heroSub: 'הצטרפו לרב מיכאל רוזנבלום ולקהילת בריסל — קידוש שבת, בית כנסת לילדים, יום לימוד, הקדשה לזכר יקירים או חיבור ישיר למסך החי.',
+    btnSponsorNow: '💛 תרומה והקדשה',
+    btnPlaque: '🕯 לוח יארצייט והוקרה',
+    btnConnect: '💬 קשר ישיר עם הרב',
+    btnLiveScreen: '📺 מסך חי',
+    btnGetShul: '🚀 התקנת Shul.OS',
+    secItemsTitle: '✨ בחרו מצווה או אירוע להקדשה',
+    secItemsHint: 'לחצו על כרטיסייה למטה',
+    pledgeKicker: '💛 צדקה והקדשה לקהילה',
+    lblAmount: 'סכום התרומה (אירו €)',
+    lblName: 'שמכם המלא *',
+    lblEmail: 'אימייל (לקבלה ועדכוני שבת)',
+    lblPhone: 'וואטסאפ / טלפון (אופציונלי)',
+    lblDedication: 'הקדשה (לעילוי נשמת / להצלחת / לרפואה שלמה)',
+    btnConfirmPledge: '💛 אישור ההקדשה והמשך',
+    dedKicker: '🕯 לוח הקדשות חי · יארצייט, קידוש ורפואה שלמה',
+    dedTitle: 'הוספת הקדשה למסך Shul.OS',
+    dedSub: 'הדליקו נר נשמה וירטואלי ליארצייט, הקדישו קידוש שבת, שתפו שמחה או הוסיפו שם לרפואה שלמה — שיופיעו בכבוד על לוח הקהילה המוזהב בבית הכנסת.',
+    lblDKind: 'סוג ההקדשה',
+    lblDHonoree: 'שם המוקדש / הנפטר (בעברית או אנגלית) *',
+    lblDDate: 'תאריך עברי או אירוע (אופציונלי)',
+    lblDBy: 'מוקדש על ידי (אופציונלי)',
+    lblDMsg: 'ברכה או הערה קצרה (אופציונלי)',
+    btnSubmitDed: '🕯 הוסף ללוח ההקדשות של Shul.OS',
+    connKicker: '💬 קשר ישיר עם הרב ובית הכנסת',
+    connTitle: 'שלום! בואו נשמור על קשר',
+    connSub: 'השאירו וואטסאפ או אימייל כדי שהרב מיכאל יוכל לשלוח לכם הודעה ישירה — שאלה בהלכה, הרשמה לסעודת שבת, שמחה או שם למי שברך לרפואה.',
+    lblCName: 'שמכם *',
+    lblCPhone: 'מספר וואטסאפ / נייד',
+    lblCEmail: 'אימייל (אופציונלי)',
+    lblCTopic: 'באיזה נושא?',
+    lblCMsg: 'הודעה / שם לתפילה / שאלה (אופציונלי)',
+    btnSubmitConn: '💬 שלח והתחבר לקהילה',
+  }
+};
+
+function setGiveLang(lang) {
+  if (!GIVE_I18N[lang]) lang = 'en';
+  giveLang = lang;
+  try { localStorage.setItem('shul_lang', lang); } catch(e) {}
+  const dict = GIVE_I18N[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = dict.dir || 'ltr';
+  document.querySelectorAll('.lang-pill').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  Object.keys(dict).forEach(k => {
+    if (k === 'dir') return;
+    const el = document.getElementById(k);
+    if (el) el.textContent = dict[k];
+  });
+}
 
 function buildRabbiWaUrl(text) {
   return rabbiWaDigits ? `https://wa.me/${rabbiWaDigits}?text=${encodeURIComponent(text)}` : '';
@@ -408,6 +555,9 @@ async function submitDedication() {
   }
 }
 
+const _qLang = new URLSearchParams(location.search).get('lang');
+const _savedLang = (() => { try { return localStorage.getItem('shul_lang'); } catch(e) { return null; } })();
+setGiveLang(_qLang || _savedLang || 'en');
 initGivePage();
 </script>
 </body>
