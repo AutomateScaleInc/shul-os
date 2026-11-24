@@ -676,6 +676,11 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(torah_scribe.get_scribe_status())
             return
 
+        if path == "/api/scribe/dreams":
+            lim = int(qs.get("limit", ["8"])[0] or 8)
+            self._send_json(torah_scribe.get_dreams_and_facts(limit=max(1, min(lim, 25))))
+            return
+
         if path == "/api/shul/events":
             force_ics = qs.get("refresh", ["0"])[0] == "1"
             self._send_json(shul_events.list_events(force_ics=force_ics))
@@ -898,10 +903,22 @@ class TorahHandler(http.server.BaseHTTPRequestHandler):
             body = self._read_json_body()
             mission = (body.get("mission") or "").strip()
             cmd = ["python3", str(BASE_DIR / "torah_scribe.py"), "--force"]
-            if mission and mission in ("ingest_commentary", "enrich_parasha", "enrich_tanakh_book"):
+            if mission and mission in ("ingest_commentary", "enrich_parasha", "enrich_tanakh_book", "daily_website_sync", "dream_inference"):
                 cmd.append(f"--mission={mission}")
             subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             self._send_json({"ok": True, "started": True, "mission": mission or "auto"})
+            return
+
+        if path == "/api/scribe/sync-website":
+            cmd = ["python3", str(BASE_DIR / "torah_scribe.py"), "--force", "--mission=daily_website_sync"]
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self._send_json({"ok": True, "started": True, "mission": "daily_website_sync"})
+            return
+
+        if path == "/api/scribe/dream-now":
+            cmd = ["python3", str(BASE_DIR / "torah_scribe.py"), "--force", "--mission=dream_inference"]
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self._send_json({"ok": True, "started": True, "mission": "dream_inference"})
             return
 
         if path == "/api/config":

@@ -2939,16 +2939,18 @@
             <div id="healthDetails" class="muted">Loading...</div>
             <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-              <h2 style="margin:0;">🧠 Mini-Orca · Living Torah Scribe</h2>
+              <h2 style="margin:0;">🧠 Mini-Orca · Living Scribe, Daily Sync &amp; Dream Engine</h2>
               <span class="comm-badge" id="scribeBadge">Loading...</span>
             </div>
-            <p class="muted" style="font-size:0.85rem;margin-top:0;">Autonomously strengthens this node every 30 minutes (pauses automatically for Shabbat Stillness): expands classical commentaries (<em>Or HaChaim, Kli Yakar, Chizkuni, Rashbam, Metzudat David</em>) and authors grounded Parashah &amp; Tanakh study sheets indexed directly into the local AI brain.</p>
+            <p class="muted" style="font-size:0.85rem;margin-top:0;">Runs daily at <strong>06:15 AM</strong> (syncing synagogue website/ICS/RSS events &amp; contextual facts) plus every 30 minutes (expanding commentaries, authoring study sheets, and running resource-aware <strong>Local Dream Inference</strong> when CPU/RAM are idle). Automatically pauses on Shabbat.</p>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">
-              <button class="btn-primary" onclick="triggerScribe('')">⚡ Run Mini-Orca Cycle Now</button>
+              <button class="btn-primary" onclick="triggerScribe('')">⚡ Run Cycle</button>
+              <button class="btn-secondary" onclick="triggerScribe('daily_website_sync')">🌐 Sync Website &amp; Events</button>
+              <button class="btn-secondary" style="border-color:rgba(192,132,252,0.55);color:#e9d5ff;" onclick="triggerScribe('dream_inference')">🌙 Dream Inference Now</button>
               <button class="btn-secondary" onclick="triggerScribe('ingest_commentary')">📚 Expand Commentaries</button>
-              <button class="btn-secondary" onclick="triggerScribe('enrich_parasha')">✍️ Author Parashah Guide</button>
+              <button class="btn-secondary" onclick="triggerScribe('enrich_parasha')">✍️ Parashah Guide</button>
             </div>
-            <div id="scribeDetails" class="muted" style="font-size:0.85rem;">Loading Mini-Orca activity journal...</div>
+            <div id="scribeDetails" class="muted" style="font-size:0.85rem;">Loading Mini-Orca &amp; Dream Journal...</div>
           </div>
 
           <div class="card" style="margin-bottom:0;border-color:rgba(92,182,229,0.4);">
@@ -3076,7 +3078,8 @@
               <label class="settings-check"><input type="checkbox" id="cfgOsColorSync" checked> Living Shul.OS: Sync Display Warmth (hyprsunset) with Sun &amp; Halachic Watch</label>
               <label class="settings-check"><input type="checkbox" id="cfgOsBrightSync" checked> Living Shul.OS: Auto-Dim Hardware Backlight Gently at Twilight &amp; Night</label>
               <label class="settings-check"><input type="checkbox" id="cfgScribeEnabled" checked> Mini-Orca Living Scribe: Continuously Enrich Library Every 30 Min (Pauses for Shabbat)</label>
-              <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Ingest Or HaChaim, Kli Yakar, Chizkuni &amp; Rashbam</label>
+              <label class="settings-check"><input type="checkbox" id="cfgScribeOnline" checked> Mini-Orca Online Expansion: Daily Website/Calendar Sync + Classical Commentaries</label>
+              <label class="settings-check"><input type="checkbox" id="cfgDreamEnabled" checked> 🌙 Idle Dream Inference: Articulate Needs, Wants &amp; Contextual Facts Locally When Idle</label>
               <label class="settings-check"><input type="checkbox" id="cfgAutoUpdate" checked> Shabbat-Safe Fleet Auto-Update: Pull open-source Shul.OS improvements nightly (pauses for Shabbat)</label>
             </div>
 
@@ -3107,8 +3110,8 @@
                 <label class="settings-field">Shul Calendar ICS Feed (.ics)
                   <input class="form-input" id="cfgIcsUrl" placeholder="https://.../calendar.ics">
                 </label>
-                <label class="settings-field">Synagogue Donation Checkout URL
-                  <input class="form-input" id="cfgDonateUrl" placeholder="https://www.theshul.eu">
+                <label class="settings-field">Synagogue RSS / Atom Feed URL (Daily Auto-Sync)
+                  <input class="form-input" id="cfgRssUrl" placeholder="https://.../feed.xml">
                 </label>
               </div>
               <div class="settings-row-2">
@@ -3119,6 +3122,9 @@
                   <input class="form-input" id="cfgSynHook" placeholder="https://... (Zapier / n8n / Twilio)">
                 </label>
               </div>
+              <label class="settings-field">Synagogue Donation Checkout URL
+                <input class="form-input" id="cfgDonateUrl" placeholder="https://www.theshul.eu">
+              </label>
             </div>
 
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -8026,8 +8032,48 @@ async function loadScribeStatus() {
         <span style="color:var(--gold);">${esc((run.ts || '').slice(5, 16).replace('T', ' '))}</span> · <strong>${esc(run.mission)}</strong> (${esc(run.status)}) — ${esc(run.summary)}
       </div>`
     ).join('') || '<div class="muted">Awaiting first autonomous cycle.</div>';
+
+    const ds = s.dreams_summary || {};
+    const hr = ds.headroom || {};
+    const ws = ds.last_website_sync || null;
+    const latestDream = (ds.dreams || [])[0] || null;
+    const facts = (ds.facts || []).slice(0, 6);
+
+    const headroomPill = hr.can_dream
+      ? `<span style="color:#86efac;font-weight:700;">🟢 Idle Headroom Ready</span> (load ${hr.load_1m ?? '—'} · ${hr.mem_avail_mb ?? '—'}MB free${hr.cpu_temp_c ? ` · ${hr.cpu_temp_c}°C` : ''})`
+      : `<span style="color:#fde68a;font-weight:700;">🟡 Conserving Resources</span> (${esc(hr.reason || 'busy')})`;
+
+    const webSyncHtml = ws
+      ? `<div style="padding:8px 10px;border-radius:10px;background:rgba(92,182,229,0.08);border:1px solid rgba(92,182,229,0.28);margin:8px 0;font-size:0.81rem;">
+          <div style="font-weight:800;color:#7dd3fc;">🌐 Daily Website &amp; Calendar Sync · ${esc((ws.ts || '').slice(0, 16).replace('T', ' '))} (${esc(ws.website_status)})</div>
+          <div style="margin-top:3px;color:var(--text);">${esc(ws.summary)}</div>
+          ${ws.website_note ? `<div style="margin-top:3px;color:var(--muted);font-size:0.78rem;">${esc(ws.website_note)}</div>` : ''}
+        </div>`
+      : `<div style="padding:7px 10px;border-radius:10px;background:rgba(92,182,229,0.06);border:1px solid rgba(92,182,229,0.22);margin:8px 0;font-size:0.8rem;">🌐 Daily 06:15 AM Website &amp; Calendar Sync scheduled — click <strong>Sync Website &amp; Events</strong> to run now.</div>`;
+
+    const dreamHtml = latestDream
+      ? `<div style="padding:10px 12px;border-radius:12px;background:linear-gradient(145deg,rgba(192,132,252,0.10),rgba(20,30,58,0.6));border:1px solid rgba(192,132,252,0.38);margin:10px 0;">
+          <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+            <span style="font-weight:800;color:#e9d5ff;">🌙 Latest Dream Reflection · ${esc(latestDream.hebrew_date)}</span>
+            <span style="font-size:0.74rem;color:var(--muted);">${esc((latestDream.ts || '').slice(0, 16).replace('T', ' '))} · ${esc(latestDream.model)}</span>
+          </div>
+          ${(latestDream.needs || []).length ? `<div style="margin-bottom:6px;"><strong style="color:#fde68a;">Needs Identified:</strong><ul style="margin:3px 0 0 18px;padding:0;font-size:0.81rem;">${latestDream.needs.map(n => `<li>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+          ${(latestDream.wants || []).length ? `<div style="margin-bottom:6px;"><strong style="color:#7dd3fc;">Wants &amp; Aspirations:</strong><ul style="margin:3px 0 0 18px;padding:0;font-size:0.81rem;">${latestDream.wants.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
+          ${latestDream.dream_plan ? `<div style="font-size:0.82rem;color:#f3e8ff;line-height:1.45;"><strong>✨ Self-Evolution Dream:</strong> ${esc(latestDream.dream_plan)}</div>` : ''}
+        </div>`
+      : `<div style="padding:8px 10px;border-radius:10px;background:rgba(192,132,252,0.08);border:1px solid rgba(192,132,252,0.26);margin:8px 0;font-size:0.81rem;">🌙 No Dream Inference logged yet — click <strong>Dream Inference Now</strong> to let Shul.OS reflect locally on its needs, wants &amp; contextual growth.</div>`;
+
+    const factsHtml = facts.length
+      ? facts.map(f => `<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:0.8rem;"><span class="trait-pill" style="font-size:0.68rem;">${esc(f.category)}</span> <strong>${esc(f.title)}</strong> — <span class="muted">${esc((f.content || '').slice(0, 140))}${(f.content || '').length > 140 ? '…' : ''}</span></div>`).join('')
+      : '<div class="muted" style="font-size:0.8rem;">Contextual facts will populate automatically during Daily Sync &amp; Dream Inference.</div>';
+
     el.innerHTML = `
-      <div style="margin-bottom:8px;"><strong>Status:</strong> ${esc(s.current_task)} · <strong>Completed Cycles:</strong> ${s.total_completed_cycles} · <strong>Total Commentaries:</strong> ${(s.total_commentaries || 0).toLocaleString()} · <strong>Scribe Study Sheets:</strong> ${s.total_scribe_docs}</div>
+      <div style="margin-bottom:6px;"><strong>Status:</strong> ${esc(s.current_task)} · <strong>Cycles:</strong> ${s.total_completed_cycles} · <strong>Commentaries:</strong> ${(s.total_commentaries || 0).toLocaleString()} · <strong>Dreams:</strong> ${ds.total_dreams || 0} · <strong>Contextual Facts:</strong> ${ds.total_facts || 0}</div>
+      <div style="margin-bottom:8px;font-size:0.8rem;">${headroomPill}</div>
+      ${webSyncHtml}
+      ${dreamHtml}
+      <div style="font-weight:700;color:var(--gold);margin:8px 0 4px;">📌 Living Contextual Facts (Indexed into Local RAG)</div>
+      <div style="margin-bottom:10px;">${factsHtml}</div>
       <div style="margin-bottom:10px;">${commTags}</div>
       <div style="font-weight:700;color:var(--gold);margin:8px 0 4px;">Newly Authored Study Sheets (Indexed into Local AI)</div>
       <div style="margin-bottom:10px;">${docsHtml}</div>
@@ -8071,6 +8117,7 @@ async function loadSettings() {
   if (document.getElementById('cfgOsBrightSync')) document.getElementById('cfgOsBrightSync').checked = c.os_brightness_sync !== false;
   document.getElementById('cfgScribeEnabled').checked = c.scribe_enabled !== false;
   document.getElementById('cfgScribeOnline').checked = c.scribe_online_ingest !== false;
+  if (document.getElementById('cfgDreamEnabled')) document.getElementById('cfgDreamEnabled').checked = c.dream_inference_enabled !== false;
   document.getElementById('cfgOllamaModel').value = c.ollama_model || 'qwen2.5:1.5b';
   document.getElementById('cfgCloudProv').value = c.cloud_provider || 'none';
   document.getElementById('cfgCloudModel').value = c.cloud_model || '';
@@ -8080,6 +8127,7 @@ async function loadSettings() {
   currentVoiceProfile = c.voice_profile || 'grand_narrator';
   autoSpeakReplies = c.auto_speak !== false;
   document.getElementById('cfgIcsUrl').value = c.calendar_ics_url || '';
+  if (document.getElementById('cfgRssUrl')) document.getElementById('cfgRssUrl').value = c.shul_rss_url || '';
   document.getElementById('cfgMailHook').value = c.mailing_webhook_url || '';
   document.getElementById('cfgBroadcastBase').value = c.broadcast_public_base_url || '';
   document.getElementById('cfgBroadcastFollow').value = c.broadcast_follow_url || '';
@@ -8111,6 +8159,7 @@ async function saveSettings() {
     os_brightness_sync: document.getElementById('cfgOsBrightSync') ? document.getElementById('cfgOsBrightSync').checked : true,
     scribe_enabled: document.getElementById('cfgScribeEnabled').checked,
     scribe_online_ingest: document.getElementById('cfgScribeOnline').checked,
+    dream_inference_enabled: document.getElementById('cfgDreamEnabled') ? document.getElementById('cfgDreamEnabled').checked : true,
     ollama_model: document.getElementById('cfgOllamaModel').value.trim() || 'qwen2.5:1.5b',
     cloud_provider: document.getElementById('cfgCloudProv').value,
     cloud_model: document.getElementById('cfgCloudModel').value.trim(),
@@ -8118,6 +8167,7 @@ async function saveSettings() {
     voice_profile: document.getElementById('cfgVoiceProf').value,
     auto_speak: document.getElementById('cfgAutoSpeak').checked,
     calendar_ics_url: document.getElementById('cfgIcsUrl').value.trim(),
+    shul_rss_url: document.getElementById('cfgRssUrl') ? document.getElementById('cfgRssUrl').value.trim() : '',
     mailing_webhook_url: document.getElementById('cfgMailHook').value.trim(),
     broadcast_public_base_url: document.getElementById('cfgBroadcastBase').value.trim(),
     broadcast_follow_url: document.getElementById('cfgBroadcastFollow').value.trim(),

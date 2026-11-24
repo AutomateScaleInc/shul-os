@@ -16,6 +16,7 @@ Continuously enriches and strengthens this Torah Sanctuary node in the backgroun
 """
 import datetime
 import fcntl
+import hashlib
 import html
 import json
 import os
@@ -27,12 +28,15 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
 import ai_engine
 import sacred_astronomy
+import sacred_books
+import shul_events
 import torah_db
 
 DB_PATH = torah_db.DB_PATH
@@ -121,7 +125,154 @@ def ensure_scribe_tables():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS shul_facts (
+                slug TEXT PRIMARY KEY,
+                category TEXT NOT NULL DEFAULT 'community',
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                source TEXT NOT NULL DEFAULT 'shul_os',
+                confidence REAL NOT NULL DEFAULT 0.9,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS dream_journal (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts TEXT NOT NULL,
+                hebrew_date TEXT NOT NULL DEFAULT '',
+                parasha_slug TEXT NOT NULL DEFAULT '',
+                model TEXT NOT NULL DEFAULT '',
+                resource_json TEXT NOT NULL DEFAULT '{}',
+                needs_json TEXT NOT NULL DEFAULT '[]',
+                wants_json TEXT NOT NULL DEFAULT '[]',
+                dream_plan TEXT NOT NULL DEFAULT '',
+                new_facts_added INTEGER NOT NULL DEFAULT 0
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS website_sync_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts TEXT NOT NULL,
+                website_url TEXT NOT NULL DEFAULT '',
+                website_status TEXT NOT NULL DEFAULT 'skipped',
+                website_note TEXT NOT NULL DEFAULT '',
+                ics_events_synced INTEGER NOT NULL DEFAULT 0,
+                rss_items_synced INTEGER NOT NULL DEFAULT 0,
+                facts_updated INTEGER NOT NULL DEFAULT 0,
+                summary TEXT NOT NULL DEFAULT ''
+            )
+            """
+        )
         conn.commit()
+
+
+def upsert_shul_fact(slug: str, category: str, title: str, content: str, source: str = "shul_os", confidence: float = 0.9) -> bool:
+    """Persist a contextual synagogue/community fact and index it into documents_fts for local RAG."""
+    ensure_scribe_tables()
+    clean_slug = re.sub(r"[^a-z0-9\-]+", "-", (slug or "").lower()).strip("-")[:80]
+    if not clean_slug or not title or not content:
+        return False
+    ts = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+    title_c = re.sub(r"\s+", " ", str(title)).strip()[:180]
+    content_c = re.sub(r"\s+", " ", str(content)).strip()[:1400]
+    doc_slug = f"shul-fact-{clean_slug}"
+    with torah_db.get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO shul_facts (slug, category, title, content, source, confidence, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(slug) DO UPDATE SET
+                category = excluded.category,
+                title = excluded.title,
+                content = excluded.content,
+                source = excluded.source,
+                confidence = excluded.confidence,
+                updated_at = excluded.updated_at
+            """,
+            (clean_slug, category[:40], title_c, content_c, source[:80], float(confidence), ts),
+        )
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO documents
+                (slug, category, title, he_title, subtitle, refs, kid_story, adult_analysis, commentators_note, discussion_questions, body_md)
+            VALUES (?, 'shul_fact', ?, '', ?, ?, '', ?, '', '', ?)
+            """,
+            (
+                doc_slug,
+                title_c,
+                f"Living Shul.OS Fact ({category}) · Source: {source} · Updated {ts[:10]}",
+                category,
+                content_c,
+                f"## {title_c}\n\n{content_c}\n\n*Category: {category} · Source: {source} · Updated: {ts}*",
+            ),
+        )
+        conn.execute("INSERT INTO documents_fts(documents_fts) VALUES('rebuild')")
+        conn.commit()
+    return True
+
+
+def check_resource_headroom() -> dict:
+    """Inspect real Linux load average, available RAM, and CPU thermal headroom before running local Dream Inference."""
+    cfg = ai_engine.load_config()
+    max_load = float(cfg.get("dream_max_load_avg", 1.6) or 1.6)
+    min_ram_mb = int(cfg.get("dream_min_free_ram_mb", 900) or 900)
+    load_1m = 0.0
+    mem_avail_mb = 0
+    mem_total_mb = 0
+    cpu_temp_c = None
+
+    try:
+        load_1m = round(os.getloadavg()[0], 2)
+    except Exception:
+        pass
+    try:
+        meminfo = pathlib.Path("/proc/meminfo").read_text(encoding="utf-8", errors="ignore")
+        m_av = re.search(r"MemAvailable:\s+(\d+)\s+kB", meminfo)
+        m_tot = re.search(r"MemTotal:\s+(\d+)\s+kB", meminfo)
+        if m_av:
+            mem_avail_mb = int(m_av.group(1)) // 1024
+        if m_tot:
+            mem_total_mb = int(m_tot.group(1)) // 1024
+    except Exception:
+        pass
+    try:
+        temps = []
+        for p in pathlib.Path("/sys/class/thermal").glob("thermal_zone*/temp"):
+            try:
+                v = int(p.read_text().strip())
+                if 10000 < v < 120000:
+                    temps.append(v / 1000.0)
+            except Exception:
+                pass
+        if temps:
+            cpu_temp_c = round(max(temps), 1)
+    except Exception:
+        pass
+
+    reasons = []
+    if load_1m > max_load:
+        reasons.append(f"CPU load {load_1m} > {max_load}")
+    if mem_avail_mb and mem_avail_mb < min_ram_mb:
+        reasons.append(f"Available RAM {mem_avail_mb}MB < {min_ram_mb}MB")
+    if cpu_temp_c is not None and cpu_temp_c >= 82.0:
+        reasons.append(f"CPU temp {cpu_temp_c}°C >= 82°C")
+
+    return {
+        "can_dream": len(reasons) == 0,
+        "reason": "Idle headroom available for local Dream Inference" if not reasons else "; ".join(reasons),
+        "load_1m": load_1m,
+        "max_load_avg": max_load,
+        "mem_avail_mb": mem_avail_mb,
+        "mem_total_mb": mem_total_mb,
+        "min_free_ram_mb": min_ram_mb,
+        "cpu_temp_c": cpu_temp_c,
+    }
 
 
 def log_run(mission: str, target: str, status: str, summary: str, items_added: int = 0, duration_s: float = 0.0):
@@ -190,6 +341,7 @@ def get_scribe_status() -> dict:
     return {
         "enabled": cfg.get("scribe_enabled", True),
         "online_ingest_enabled": cfg.get("scribe_online_ingest", True),
+        "dream_inference_enabled": cfg.get("dream_inference_enabled", True),
         "is_running": is_running,
         "current_task": live_state.get("current_task", "Idle — awaiting next scheduled cycle") if is_running else "Idle — ready",
         "shabbat_paused": bool(snap.get("shabbat_mode", False)),
@@ -199,6 +351,7 @@ def get_scribe_status() -> dict:
         "scribe_docs": [dict(r) for r in scribe_docs],
         "total_completed_cycles": total_runs,
         "recent_runs": recent_runs,
+        "dreams_summary": get_dreams_and_facts(limit=5),
     }
 
 
@@ -501,6 +654,522 @@ def mission_enrich_next_tanakh_book() -> tuple[bool, str, int]:
     return True, f"Authored Living Scribe Tanakh guide for Book of {target['title']} ({len(body)} chars, indexed into RAG)", 1
 
 
+def _looks_like_bot_challenge(status_code: int, body: str) -> bool:
+    low = (body or "").lower()
+    if status_code in (403, 429, 503) and any(k in low for k in ("just a moment", "cf_chl_opt", "challenges.cloudflare.com", "turnstile", "captcha", "verify you are human")):
+        return True
+    if "challenges.cloudflare.com" in low or "_cf_chl_opt" in low:
+        return True
+    return False
+
+
+def _polite_fetch_text(url: str, timeout: float = 10.0) -> tuple[str, int, str]:
+    """Fetch public webpage/feed politely. Never bypasses CAPTCHAs or anti-bot challenges."""
+    if not url or not re.match(r"^https?://", url.strip(), re.I):
+        return ("skipped", 0, "")
+    req = urllib.request.Request(
+        url.strip(),
+        headers={
+            "User-Agent": "ShulOS-DailySync/1.0 (+https://github.com/AutomateScaleInc/shul-os)",
+            "Accept": "text/html,application/rss+xml,application/atom+xml,application/xml,text/calendar,application/json;q=0.9,*/*;q=0.8",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            status = getattr(r, "status", 200)
+            body = r.read(350_000).decode("utf-8", "ignore")
+            if _looks_like_bot_challenge(status, body):
+                return ("challenge_protected", status, "")
+            return ("ok", status, body)
+    except urllib.error.HTTPError as e:
+        err_body = ""
+        try:
+            err_body = e.read(32_000).decode("utf-8", "ignore")
+        except Exception:
+            pass
+        if _looks_like_bot_challenge(e.code, err_body) or e.code == 403:
+            return ("challenge_protected", e.code, "")
+        return ("http_error", e.code, "")
+    except Exception:
+        return ("offline", 0, "")
+
+
+def _upsert_synced_event(slug: str, title: str, event_date: str, event_time: str, category: str, host: str, location: str, description: str, rsvp_url: str) -> bool:
+    """Safely insert or refresh an event discovered from the synagogue's public calendar/website/RSS."""
+    shul_events.init_tables()
+    clean_slug = re.sub(r"[^a-z0-9\-]+", "-", (slug or "").lower()).strip("-")[:90]
+    title_c = re.sub(r"\s+", " ", clean_html(title)).strip()[:160]
+    if not clean_slug or not title_c:
+        return False
+    desc_c = re.sub(r"\s+", " ", clean_html(description)).strip()[:480]
+    with shul_events.get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO shul_events
+                (slug, title, event_date, event_time, category, host, location, description, rsvp_url, recurring, featured_ticker)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)
+            ON CONFLICT(slug) DO UPDATE SET
+                title = excluded.title,
+                event_date = excluded.event_date,
+                event_time = excluded.event_time,
+                category = excluded.category,
+                description = excluded.description,
+                rsvp_url = excluded.rsvp_url
+            """,
+            (
+                clean_slug,
+                title_c,
+                (event_date or "Upcoming")[:40],
+                (event_time or "See website")[:40],
+                (category or "Community")[:40],
+                (host or "Synagogue")[:80],
+                (location or "")[:140],
+                desc_c,
+                (rsvp_url or "")[:240],
+            ),
+        )
+        conn.commit()
+    return True
+
+
+def _parse_rss_or_atom(xml_text: str) -> list[dict]:
+    """Pure-stdlib RSS 2.0 & Atom feed parser returning up to 10 sanitized posts/events."""
+    items = []
+    try:
+        root = ET.fromstring(xml_text.strip())
+    except Exception:
+        return items
+
+    def _txt(el, *names):
+        for n in names:
+            for child in el:
+                tag = child.tag.split("}")[-1].lower()
+                if tag == n and (child.text or "").strip():
+                    return clean_html(child.text)
+        return ""
+
+    # RSS 2.0 <item>
+    for el in root.iter():
+        tag = el.tag.split("}")[-1].lower()
+        if tag in ("item", "entry"):
+            title = _txt(el, "title")
+            link = _txt(el, "link")
+            if not link:
+                for child in el:
+                    if child.tag.split("}")[-1].lower() == "link" and child.attrib.get("href"):
+                        link = child.attrib["href"]
+                        break
+            desc = _txt(el, "description", "summary", "content")
+            pub = _txt(el, "pubdate", "published", "updated")
+            if title:
+                items.append({"title": title[:160], "link": link[:240], "description": desc[:480], "date": pub[:32]})
+            if len(items) >= 10:
+                break
+    return items
+
+
+def _extract_jsonld_events(html_text: str) -> list[dict]:
+    """Extract schema.org Event entries from JSON-LD blocks on public synagogue pages."""
+    found = []
+    for raw in re.findall(r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', html_text, re.S | re.I):
+        try:
+            obj = json.loads(raw.strip())
+        except Exception:
+            continue
+        stack = obj if isinstance(obj, list) else [obj]
+        while stack:
+            cur = stack.pop(0)
+            if not isinstance(cur, dict):
+                continue
+            if "@graph" in cur and isinstance(cur["@graph"], list):
+                stack.extend(cur["@graph"])
+            t = cur.get("@type")
+            types = [t] if isinstance(t, str) else (t if isinstance(t, list) else [])
+            if any("Event" in str(x) for x in types):
+                name = clean_html(cur.get("name", ""))
+                start = str(cur.get("startDate", ""))
+                desc = clean_html(cur.get("description", ""))
+                loc = cur.get("location")
+                loc_name = loc.get("name", "") if isinstance(loc, dict) else clean_html(loc or "")
+                url = str(cur.get("url", ""))
+                if name:
+                    found.append({
+                        "title": name[:160],
+                        "date": start[:10] if len(start) >= 10 else "Upcoming",
+                        "time": start[11:16] if len(start) >= 16 and "T" in start else "See website",
+                        "location": loc_name[:120],
+                        "description": desc[:480],
+                        "url": url[:240],
+                    })
+    return found[:12]
+
+
+def mission_daily_website_sync() -> tuple[bool, str, int]:
+    """Daily cron sync: refresh Hebcal Shabbat/Holidays, ICS calendar, RSS/Atom feed, and public synagogue website."""
+    ensure_scribe_tables()
+    cfg = ai_engine.load_config()
+    write_live_state({"current_task": "Daily sync: refreshing Shabbat times, calendar, RSS & synagogue website..."})
+
+    shul_name = cfg.get("synagogue_name") or shul_events.SHUL_INFO["name"]
+    rabbi_name = cfg.get("rabbi_name") or shul_events.SHUL_INFO["rabbi"]
+    address = cfg.get("shul_address") or shul_events.SHUL_INFO["address"]
+    website_url = (cfg.get("shul_website") or shul_events.SHUL_INFO["website"] or "").strip()
+    ics_url = (cfg.get("calendar_ics_url") or "").strip()
+    rss_url = (cfg.get("shul_rss_url") or "").strip()
+
+    facts_updated = 0
+    ics_synced = 0
+    rss_synced = 0
+    web_events = 0
+
+    # 1. Always refresh live Shabbat times, Daf Yomi & upcoming holidays as fresh contextual facts
+    shab = shul_events.get_brussels_shabbat_and_holidays()
+    snap = sacred_astronomy.get_sacred_moment()
+    daf = sacred_books.get_daily_daf_yomi()
+    parasha = torah_db.get_weekly_parasha()
+    shab_fact = (
+        f"This week at {shul_name} ({address}, led by {rabbi_name}): "
+        f"Hebrew Date {snap['hebrew_date']['en_str']} ({snap['hebrew_date']['he_str']}), "
+        f"Parashat {parasha.get('en_name', '')} ({parasha.get('ref', '')}), "
+        f"Candle Lighting {shab.get('candle_lighting', '')}, Havdalah {shab.get('havdalah', '')}, "
+        f"Daily Daf Yomi {daf.get('display_en', '')} ({daf.get('display_he', '')})."
+    )
+    if upsert_shul_fact("weekly-shabbat-schedule", "schedule", f"Weekly Shabbat & Parashah Schedule — {shul_name}", shab_fact, source="daily_sync"):
+        facts_updated += 1
+
+    hols = shab.get("upcoming_holidays") or []
+    if hols:
+        hol_lines = "; ".join(f"{h.get('title', '')} ({h.get('date', '')})" for h in hols[:6])
+        if upsert_shul_fact("upcoming-holidays-window", "calendar", "Upcoming Jewish Holidays & Rosh Chodesh (Next 60 Days)", f"Upcoming dates for {shab.get('city', 'Brussels')}: {hol_lines}.", source="daily_sync"):
+            facts_updated += 1
+
+    # 2. Sync public iCalendar (ICS) feed if configured
+    if ics_url:
+        st_ics, _code, ics_text = _polite_fetch_text(ics_url, timeout=10.0)
+        if st_ics == "ok" and "BEGIN:VEVENT" in ics_text:
+            for ev in shul_events._parse_ics_events(ics_text)[:15]:
+                slug = "ics-" + hashlib.sha1(f"{ev.get('title','')}|{ev.get('event_date','')}".encode("utf-8")).hexdigest()[:12]
+                if _upsert_synced_event(
+                    slug,
+                    ev.get("title", ""),
+                    ev.get("event_date", ""),
+                    ev.get("event_time", ""),
+                    "Calendar Sync",
+                    rabbi_name,
+                    ev.get("location") or address,
+                    ev.get("description", ""),
+                    website_url,
+                ):
+                    ics_synced += 1
+            if ics_synced:
+                upsert_shul_fact("ics-calendar-events", "events", f"Synced Calendar Events ({ics_synced})", f"Loaded {ics_synced} live events from configured synagogue ICS calendar feed.", source="ics_feed")
+                facts_updated += 1
+
+    # 3. Sync public RSS / Atom feed if configured
+    if rss_url:
+        st_rss, _code, rss_text = _polite_fetch_text(rss_url, timeout=10.0)
+        if st_rss == "ok" and rss_text:
+            posts = _parse_rss_or_atom(rss_text)
+            for p in posts[:8]:
+                slug = "rss-" + hashlib.sha1(f"{p['title']}|{p['date']}".encode("utf-8")).hexdigest()[:12]
+                if _upsert_synced_event(
+                    slug,
+                    p["title"],
+                    p["date"][:16] or "Recent Update",
+                    "Website Update",
+                    "Website News",
+                    rabbi_name,
+                    address,
+                    p["description"],
+                    p["link"] or website_url,
+                ):
+                    rss_synced += 1
+                if upsert_shul_fact(slug, "website_fact", p["title"], f"{p['description']} (Published: {p['date']}, Link: {p['link']})", source="rss_feed"):
+                    facts_updated += 1
+
+    # 4. Polite public synagogue website check (strictly respects Cloudflare/anti-bot challenges!)
+    web_status = "skipped"
+    web_note = "No synagogue website URL configured."
+    if website_url:
+        st_web, code_web, html_body = _polite_fetch_text(website_url, timeout=10.0)
+        web_status = st_web
+        if st_web == "challenge_protected":
+            web_note = (
+                f"{website_url} returned an anti-bot/Cloudflare challenge (HTTP {code_web}). "
+                "Shul.OS strictly respects anti-bot protections without bypassing them. "
+                "To auto-sync live website events daily, paste a public Google Calendar ICS URL or RSS/Atom feed URL in Settings, "
+                "or allowlist this Shul.OS node in your Cloudflare WAF."
+            )
+            upsert_shul_fact("website-sync-guidance", "capability", "Synagogue Website Feed Setup Note", web_note, source="daily_sync")
+            facts_updated += 1
+        elif st_web == "ok" and html_body:
+            # Parse JSON-LD schema.org Events & basic public metadata safely as data
+            j_events = _extract_jsonld_events(html_body)
+            for ev in j_events:
+                slug = "web-" + hashlib.sha1(f"{ev['title']}|{ev['date']}".encode("utf-8")).hexdigest()[:12]
+                if _upsert_synced_event(
+                    slug,
+                    ev["title"],
+                    ev["date"],
+                    ev["time"],
+                    "Website Event",
+                    rabbi_name,
+                    ev["location"] or address,
+                    ev["description"],
+                    ev["url"] or website_url,
+                ):
+                    web_events += 1
+            m_title = re.search(r"<title[^>]*>(.*?)</title>", html_body, re.S | re.I)
+            m_desc = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', html_body, re.S | re.I)
+            page_title = clean_html(m_title.group(1)) if m_title else shul_name
+            page_desc = clean_html(m_desc.group(1)) if m_desc else ""
+            if page_desc or web_events:
+                fact_txt = f"Public summary from {website_url}: {page_title}. {page_desc}".strip()
+                if web_events:
+                    fact_txt += f" Discovered {web_events} structured calendar events."
+                upsert_shul_fact("website-public-profile", "website_fact", f"Website Profile — {page_title}", fact_txt, source=website_url)
+                facts_updated += 1
+            web_note = f"Synced {website_url} cleanly ({web_events} structured events, metadata refreshed)."
+        elif st_web == "offline":
+            web_note = f"Could not reach {website_url} right now (offline or timeout) — offline calendar & local facts refreshed."
+        else:
+            web_note = f"{website_url} returned HTTP {code_web} — offline calendar & local facts refreshed."
+
+    summary = (
+        f"Daily sync complete: {facts_updated} contextual facts updated, "
+        f"{ics_synced} ICS events, {rss_synced} RSS posts, {web_events} website events "
+        f"(website: {web_status})."
+    )
+    ts = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+    with torah_db.get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO website_sync_log
+                (ts, website_url, website_status, website_note, ics_events_synced, rss_items_synced, facts_updated, summary)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (ts, website_url, web_status, web_note, ics_synced, rss_synced, facts_updated, summary),
+        )
+        conn.commit()
+    return True, summary, facts_updated + ics_synced + rss_synced + web_events
+
+
+def _parse_dream_output(raw_text: str, parasha_en: str, next_holiday_str: str) -> dict:
+    """Parse structured JSON or markdown output from local Ollama Dream Inference safely."""
+    txt = (raw_text or "").strip()
+    # Try JSON extraction first
+    m_json = re.search(r"\{.*\}", txt, re.S)
+    if m_json:
+        try:
+            obj = json.loads(m_json.group(0))
+            needs = [str(x).strip() for x in (obj.get("needs") or []) if str(x).strip()][:4]
+            wants = [str(x).strip() for x in (obj.get("wants") or []) if str(x).strip()][:4]
+            plan = str(obj.get("dream_plan") or obj.get("self_improvement") or "").strip()
+            new_facts = []
+            for f in (obj.get("new_facts") or []):
+                if isinstance(f, dict) and f.get("title") and f.get("content"):
+                    new_facts.append({
+                        "category": str(f.get("category") or "community")[:32],
+                        "title": str(f["title"]).strip()[:140],
+                        "content": str(f["content"]).strip()[:600],
+                    })
+            if needs or wants or plan:
+                return {"needs": needs, "wants": wants, "dream_plan": plan, "new_facts": new_facts[:3]}
+        except Exception:
+            pass
+
+    # Clean markdown fallback parser
+    def _bullets(section_name: str) -> list[str]:
+        m = re.search(rf"(?:##|\*\*)\s*{section_name}[^\n]*\n(.*?)(?=\n(?:##|\*\*[A-Z])|\Z)", txt, re.S | re.I)
+        if not m:
+            return []
+        lines = []
+        for ln in m.group(1).splitlines():
+            ln = re.sub(r"^[\s\-\*\d\.\)]+", "", ln).strip()
+            if len(ln) > 12:
+                lines.append(ln[:260])
+        return lines[:4]
+
+    needs = _bullets("Needs") or [f"Prepare contextual study & community notices for Parashat {parasha_en} and {next_holiday_str}."]
+    wants = _bullets("Wants") or [f"Deepen tri-lingual (EN/FR/HE) family storytelling and hospitality touchpoints around Parashat {parasha_en}."]
+    plan_lines = _bullets("Dream|Self|How")
+    plan = " ".join(plan_lines) if plan_lines else (txt[:500] or f"Expand local commentary depth and seasonal community readiness for {next_holiday_str}.")
+    fact_lines = _bullets("Facts|Contextual")
+    new_facts = [
+        {"category": "dream_insight", "title": f"Contextual Preparation — {parasha_en} (#{i+1})", "content": fl}
+        for i, fl in enumerate(fact_lines[:2])
+    ]
+    return {"needs": needs, "wants": wants, "dream_plan": plan, "new_facts": new_facts}
+
+
+def mission_dream_inference(force: bool = False) -> tuple[bool, str, int]:
+    """Resource-aware local Ollama 'Needs, Wants & Self-Evolution Dream' inference cycle."""
+    ensure_scribe_tables()
+    cfg = ai_engine.load_config()
+    if not force and not cfg.get("dream_inference_enabled", True):
+        return False, "Dream Inference is disabled in Settings.", 0
+
+    headroom = check_resource_headroom()
+    if not force and not headroom["can_dream"]:
+        return False, f"Deferring Dream Inference (preserving kiosk smoothness): {headroom['reason']}", 0
+
+    write_live_state({"current_task": "Dream Inference: reflecting on Shul.OS needs, wants & contextual growth..."})
+
+    snap = sacred_astronomy.get_sacred_moment()
+    parasha = torah_db.get_weekly_parasha()
+    daf = sacred_books.get_daily_daf_yomi()
+    shab = shul_events.get_brussels_shabbat_and_holidays()
+    hols = shab.get("upcoming_holidays") or []
+    next_hol = f"{hols[0]['title']} ({hols[0]['date']})" if hols else "Upcoming Shabbat & Rosh Chodesh"
+
+    with torah_db.get_conn() as conn:
+        st_verses = conn.execute("SELECT COUNT(*) FROM verses").fetchone()[0]
+        st_comms = conn.execute("SELECT COUNT(*) FROM commentaries").fetchone()[0]
+        st_docs = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+        st_facts = conn.execute("SELECT COUNT(*) FROM shul_facts").fetchone()[0]
+        st_events = conn.execute("SELECT COUNT(*) FROM shul_events").fetchone()[0]
+        recent_facts = [r["title"] for r in conn.execute("SELECT title FROM shul_facts ORDER BY updated_at DESC LIMIT 8")]
+        past_dreams = [r["dream_plan"][:120] for r in conn.execute("SELECT dream_plan FROM dream_journal ORDER BY id DESC LIMIT 4")]
+        last_sync = conn.execute("SELECT website_status, website_note FROM website_sync_log ORDER BY id DESC LIMIT 1").fetchone()
+
+    sync_line = f"{last_sync['website_status']} ({last_sync['website_note'][:140]})" if last_sync else "not synced yet"
+    shul_name = cfg.get("synagogue_name") or shul_events.SHUL_INFO["name"]
+    rabbi_name = cfg.get("rabbi_name") or shul_events.SHUL_INFO["rabbi"]
+    city = (cfg.get("location") or {}).get("city") or "Brussels, Belgium"
+
+    sys_prompt = (
+        "You are the reflective inner consciousness of Shul.OS, an open-source, Orthodox-respectful Living Synagogue Operating System. "
+        "During quiet idle moments, you run 'Dream Inference' to articulate your concrete NEEDS (gaps to fill), WANTS (ways to delight "
+        "families, rabbis, and guests), a SELF-EVOLUTION DREAM PLAN (how to become wiser and more contextually aware), and 2 concise "
+        "verified contextual facts about this week's Torah portion, calendar, or community readiness. "
+        "Respond ONLY with valid JSON matching this exact schema: "
+        '{"needs": ["...","..."], "wants": ["...","..."], "dream_plan": "...", "new_facts": [{"category": "community|calendar|study", "title": "...", "content": "..."}]}'
+    )
+    user_prompt = (
+        f"SYNAGOGUE NODE STATE:\n"
+        f"- Synagogue: {shul_name} ({city}), led by {rabbi_name}\n"
+        f"- Hebrew Date: {snap['hebrew_date']['en_str']} ({snap['hebrew_date']['he_str']})\n"
+        f"- Weekly Parashah: {parasha.get('en_name', '')} ({parasha.get('ref', '')}) — {parasha.get('summary', '')[:180]}\n"
+        f"- Daily Daf Yomi: {daf.get('display_en', '')} ({daf.get('theme', '')[:100]})\n"
+        f"- Upcoming Holiday: {next_hol}\n"
+        f"- Library: {st_verses} verses, {st_comms} commentaries, {st_docs} study docs, {st_facts} shul_facts, {st_events} events\n"
+        f"- Daily Website Sync Status: {sync_line}\n"
+        f"- Hardware Headroom: load={headroom['load_1m']}, freeRAM={headroom['mem_avail_mb']}MB, temp={headroom['cpu_temp_c']}C\n"
+        f"- Already Stored Facts: {', '.join(recent_facts) if recent_facts else 'none yet'}\n"
+        f"- Previous Dreams (do NOT repeat): {' | '.join(past_dreams) if past_dreams else 'first dream'}\n\n"
+        "Reflect deeply and output strictly valid JSON with 2-3 specific NEEDS, 2-3 inspiring WANTS, a focused DREAM_PLAN, and 2 fresh NEW_FACTS."
+    )
+
+    raw = _call_local_ollama(sys_prompt, user_prompt, max_tokens=520)
+    if len(raw) < 40:
+        return False, "Local Ollama returned empty dream output.", 0
+
+    parsed = _parse_dream_output(raw, parasha.get("en_name", ""), next_hol)
+    added_facts = 0
+    ts = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+    for idx, nf in enumerate(parsed.get("new_facts") or []):
+        slug = f"dream-{ts[:10]}-{hashlib.sha1(nf['title'].encode('utf-8')).hexdigest()[:8]}"
+        if upsert_shul_fact(slug, nf.get("category", "dream_insight"), nf["title"], nf["content"], source="dream_inference", confidence=0.85):
+            added_facts += 1
+
+    with torah_db.get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO dream_journal
+                (ts, hebrew_date, parasha_slug, model, resource_json, needs_json, wants_json, dream_plan, new_facts_added)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                ts,
+                snap["hebrew_date"]["en_str"],
+                parasha.get("slug", ""),
+                cfg.get("ollama_model", "qwen2.5:3b"),
+                json.dumps(headroom, ensure_ascii=False),
+                json.dumps(parsed.get("needs") or [], ensure_ascii=False),
+                json.dumps(parsed.get("wants") or [], ensure_ascii=False),
+                parsed.get("dream_plan", "")[:1200],
+                added_facts,
+            ),
+        )
+        conn.commit()
+
+    summary = (
+        f"Dream Inference complete ({cfg.get('ollama_model', 'qwen2.5:3b')}): "
+        f"{len(parsed.get('needs', []))} needs, {len(parsed.get('wants', []))} wants articulated; "
+        f"{added_facts} contextual facts indexed into local RAG."
+    )
+    return True, summary, added_facts + 1
+
+
+def get_dreams_and_facts(limit: int = 8) -> dict:
+    """Return latest Dream Journal reflections, learned Shul Facts, daily website sync status & live resource headroom."""
+    ensure_scribe_tables()
+    headroom = check_resource_headroom()
+    with torah_db.get_conn() as conn:
+        dreams_rows = conn.execute(
+            "SELECT id, ts, hebrew_date, parasha_slug, model, resource_json, needs_json, wants_json, dream_plan, new_facts_added FROM dream_journal ORDER BY id DESC LIMIT ?",
+            (int(limit),),
+        ).fetchall()
+        facts_rows = conn.execute(
+            "SELECT slug, category, title, content, source, confidence, updated_at FROM shul_facts ORDER BY updated_at DESC LIMIT ?",
+            (int(max(limit * 2, 16)),),
+        ).fetchall()
+        sync_row = conn.execute(
+            "SELECT ts, website_url, website_status, website_note, ics_events_synced, rss_items_synced, facts_updated, summary FROM website_sync_log ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        total_dreams = conn.execute("SELECT COUNT(*) FROM dream_journal").fetchone()[0]
+        total_facts = conn.execute("SELECT COUNT(*) FROM shul_facts").fetchone()[0]
+
+    dreams = []
+    for r in dreams_rows:
+        try:
+            needs = json.loads(r["needs_json"] or "[]")
+        except Exception:
+            needs = []
+        try:
+            wants = json.loads(r["wants_json"] or "[]")
+        except Exception:
+            wants = []
+        try:
+            res_snap = json.loads(r["resource_json"] or "{}")
+        except Exception:
+            res_snap = {}
+        dreams.append({
+            "id": r["id"],
+            "ts": r["ts"],
+            "hebrew_date": r["hebrew_date"],
+            "parasha_slug": r["parasha_slug"],
+            "model": r["model"],
+            "resource": res_snap,
+            "needs": needs,
+            "wants": wants,
+            "dream_plan": r["dream_plan"],
+            "new_facts_added": r["new_facts_added"],
+        })
+
+    return {
+        "headroom": headroom,
+        "total_dreams": total_dreams,
+        "total_facts": total_facts,
+        "last_website_sync": dict(sync_row) if sync_row else None,
+        "dreams": dreams,
+        "facts": [dict(r) for r in facts_rows],
+    }
+
+
+def _hours_since_last(table: str) -> float:
+    try:
+        with torah_db.get_conn() as conn:
+            row = conn.execute(f"SELECT ts FROM {table} ORDER BY id DESC LIMIT 1").fetchone()
+        if not row or not row["ts"]:
+            return 999.0
+        dt = datetime.datetime.fromisoformat(row["ts"])
+        now = datetime.datetime.now(dt.tzinfo) if dt.tzinfo else datetime.datetime.now()
+        return max(0.0, (now - dt).total_seconds() / 3600.0)
+    except Exception:
+        return 999.0
+
+
 def run_cycle(force: bool = False, mission_override: str = "") -> dict:
     ensure_scribe_tables()
     cfg = ai_engine.load_config()
@@ -521,24 +1190,38 @@ def run_cycle(force: bool = False, mission_override: str = "") -> dict:
 
         t0 = time.time()
         try:
-            # Choose mission cleanly (rotate: Online Commentary Expansion -> Parashah Dossier -> Tanakh Book Guide)
             with torah_db.get_conn() as conn:
                 run_count = conn.execute("SELECT COUNT(*) FROM scribe_runs WHERE status = 'ok'").fetchone()[0]
 
             online_ok = cfg.get("scribe_online_ingest", True)
+            dream_ok = cfg.get("dream_inference_enabled", True)
+
             if mission_override:
                 order = [mission_override]
-            elif online_ok and (run_count % 2 == 0):
-                order = ["ingest_commentary", "enrich_parasha", "enrich_tanakh_book"]
-            elif run_count % 3 == 1:
-                order = ["enrich_parasha", "enrich_tanakh_book", "ingest_commentary"]
             else:
-                order = ["enrich_tanakh_book", "enrich_parasha", "ingest_commentary"]
+                order = []
+                # 1. Daily website / calendar / facts sync if >18h stale
+                if _hours_since_last("website_sync_log") >= 18.0:
+                    order.append("daily_website_sync")
+                # 2. Resource-aware Dream Inference ("Needs, Wants & Self-Evolution") if >6h stale and system idle
+                if dream_ok and _hours_since_last("dream_journal") >= 6.0 and check_resource_headroom()["can_dream"]:
+                    order.append("dream_inference")
+                # 3. Standard rotating corpus & study sheet missions
+                if online_ok and (run_count % 2 == 0):
+                    order += ["ingest_commentary", "enrich_parasha", "enrich_tanakh_book"]
+                elif run_count % 3 == 1:
+                    order += ["enrich_parasha", "enrich_tanakh_book", "ingest_commentary"]
+                else:
+                    order += ["enrich_tanakh_book", "enrich_parasha", "ingest_commentary"]
 
             for m in order:
                 if m == "ingest_commentary" and not online_ok:
                     continue
-                if m == "ingest_commentary":
+                if m == "daily_website_sync":
+                    ok, summary, added = mission_daily_website_sync()
+                elif m == "dream_inference":
+                    ok, summary, added = mission_dream_inference(force=force and mission_override == "dream_inference")
+                elif m == "ingest_commentary":
                     ok, summary, added = mission_ingest_next_commentary(max_chapters=10)
                 elif m == "enrich_parasha":
                     ok, summary, added = mission_enrich_next_parasha()
@@ -571,5 +1254,7 @@ if __name__ == "__main__":
             mission = a.split("=", 1)[1].strip()
     if "--status" in sys.argv:
         print(json.dumps(get_scribe_status(), ensure_ascii=False, indent=2))
+    elif "--dreams" in sys.argv:
+        print(json.dumps(get_dreams_and_facts(), ensure_ascii=False, indent=2))
     else:
         print(json.dumps(run_cycle(force=force, mission_override=mission), ensure_ascii=False, indent=2))

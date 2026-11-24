@@ -179,9 +179,39 @@ WantedBy=timers.target
 EOF
 
 systemctl --user daemon-reload
+cat > "$HOME/.config/systemd/user/shul-daily-sync.service" << EOF
+[Unit]
+Description=Shul.OS Daily Synagogue Website, Calendar, RSS & Contextual Facts Sync
+After=torah-sanctuary.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=$INSTALL_DIR
+Nice=15
+IOSchedulingClass=idle
+CPUQuota=120%
+ExecStart=/usr/bin/python3 $INSTALL_DIR/torah_scribe.py --mission=daily_website_sync
+EOF
+
+cat > "$HOME/.config/systemd/user/shul-daily-sync.timer" << EOF
+[Unit]
+Description=Daily Shabbat-Safe Shul.OS Website, Calendar & Facts Sync (06:15 AM)
+
+[Timer]
+OnCalendar=*-*-* 06:15:00
+RandomizedDelaySec=10m
+Persistent=true
+Unit=shul-daily-sync.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl --user daemon-reload
 systemctl --user enable --now torah-sanctuary.service
 systemctl --user enable --now torah-celestial.timer || true
 systemctl --user enable --now torah-scribe.timer || true
+systemctl --user enable --now shul-daily-sync.timer || true
 systemctl --user enable --now shul-os-update.timer || true
 
 echo "✅ Shul.OS is LIVE at http://127.0.0.1:8080"

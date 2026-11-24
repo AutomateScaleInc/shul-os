@@ -263,6 +263,24 @@ class TestDatabaseAndRAG(unittest.TestCase):
         self.assertIn("short_sha", vinfo)
         self.assertIn("shabbat_stillness", vinfo)
 
+        import torah_scribe
+        hr = torah_scribe.check_resource_headroom()
+        self.assertIn("can_dream", hr)
+        self.assertIn("load_1m", hr)
+        self.assertTrue(torah_scribe._looks_like_bot_challenge(403, "<title>Just a moment...</title>challenges.cloudflare.com"))
+        j_evs = torah_scribe._extract_jsonld_events('<script type="application/ld+json">{"@type":"Event","name":"Shabbat Dinner","startDate":"2026-12-04T19:00"}</script>')
+        self.assertEqual(len(j_evs), 1)
+        self.assertEqual(j_evs[0]["title"], "Shabbat Dinner")
+        rss_items = torah_scribe._parse_rss_or_atom('<rss><channel><item><title>Chanukah Lighting</title><description>Public Menorah in Brussels</description><link>https://theshul.eu</link></item></channel></rss>')
+        self.assertEqual(len(rss_items), 1)
+        parsed_dream = torah_scribe._parse_dream_output('{"needs":["Connect public ICS feed"],"wants":["Add kids Chanukah quiz"],"dream_plan":"Deepen Brussels holiday context","new_facts":[{"category":"calendar","title":"Chanukah Prep","content":"Chanukah starts 25 Kislev."}]}', "Vayishlach", "Chanukah")
+        self.assertEqual(parsed_dream["needs"][0], "Connect public ICS feed")
+        self.assertEqual(len(parsed_dream["new_facts"]), 1)
+        df = torah_scribe.get_dreams_and_facts(limit=3)
+        self.assertIn("headroom", df)
+        self.assertIn("dreams", df)
+        self.assertIn("facts", df)
+
         ps23 = sacred_liturgy.get_psalm_chapter(23)
         self.assertEqual(ps23["chapter"], 23)
         self.assertEqual(ps23["verses_count"], 6)
@@ -328,6 +346,7 @@ class TestLiveHTTP(unittest.TestCase):
             "/api/shul/dvar-torah?lang=en",
             "/api/shul/dvar-torah?lang=fr",
             "/api/scribe/status",
+            "/api/scribe/dreams",
             "/api/broadcast/state",
             "/api/mesh/overview",
             "/api/mesh/beacon",

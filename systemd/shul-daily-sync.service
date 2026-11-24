@@ -1,0 +1,10 @@
+[Unit]
+Description=Shul.OS Daily Synagogue Website, Calendar, RSS & Contextual Facts Sync
+After=torah-sanctuary.service network-online.target
+
+[Service]
+Type=oneshot
+Nice=15
+IOSchedulingClass=idle
+CPUQuota=120%
+ExecStart=/usr/bin/python3 %h/torah-sanctuary/torah_scribe.py --mission=daily_website_sync

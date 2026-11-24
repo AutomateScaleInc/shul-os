@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Shabbat-Safe Shul.OS Website, Calendar & Facts Sync (06:15 AM)
+
+[Timer]
+OnCalendar=*-*-* 06:15:00
+RandomizedDelaySec=10m
+Persistent=true
+Unit=shul-daily-sync.service
+
+[Install]
+WantedBy=timers.target
