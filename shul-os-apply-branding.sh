@@ -15,7 +15,13 @@ echo "✡ Applying Shul.OS Native Boot Splash, Wallpaper & Sacred Screensaver...
 if [[ -f "$BRAND_DIR/shul-os-wallpaper.png" ]]; then
   mkdir -p "$HOME/.local/state/omarchy/current"
   ln -sfn "$BRAND_DIR/shul-os-wallpaper.png" "$HOME/.local/state/omarchy/current/background"
-  echo "  ✓ Shul.OS 1080p sanctuary wallpaper linked"
+  if command -v omarchy-shell >/dev/null 2>&1; then
+    XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}" OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}" \
+      omarchy-shell background setInstant "$BRAND_DIR/shul-os-wallpaper.png" >/dev/null 2>&1 || true
+    XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}" OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}" \
+      omarchy-shell background refresh >/dev/null 2>&1 || true
+  fi
+  echo "  ✓ Shul.OS 1080p sanctuary wallpaper linked & hot-swapped live"
 fi
 
 # 2. Update sacred dynamic screensaver & disable generic idle screensaver takeover
