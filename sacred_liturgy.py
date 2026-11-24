@@ -520,7 +520,7 @@ HOLIDAY_ENCYCLOPEDIA = [
         "emoji": "🕎",
         "hebrew_date_label": "25 Kislev – 2/3 Tevet (8 Nights)",
         "category": "Festival of Light",
-        "art": "/art/solomon-temple.jpg",
+        "art": "/art/chanukah-menorah.jpg",
         "biblical_origins": "Rooted in the Temple Menorah (Exodus 25:31–40; Numbers 8:1–4) and Prophet Zechariah's Haftarah vision (Zechariah 4:6): 'Not by might, nor by power, but by My spirit, says the Lord of Hosts!'",
         "deep_history": "In 167–164 BCE, Seleucid ruler Antiochus IV outlawed Shabbat, Torah study, and circumcision, desecrating the Second Temple. Mattathias and Judah the Maccabee led a stunning victory for religious freedom, entering Jerusalem on 25 Kislev 164 BCE. Finding only ONE pure cruse of olive oil sealed by the High Priest (enough for 1 day), the Menorah burned miraculously for 8 days — inspiring 'Pirsumei Nisa' (publicizing light in every window).",
         "prominent_celebrations": [

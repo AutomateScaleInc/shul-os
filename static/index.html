@@ -557,7 +557,123 @@
     overflow-y: auto;
     scrollbar-width: none;
     padding-right: 2px;
+    display: flex;
+    flex-direction: column;
   }
+  #spotlightContent > .sanctuary-reveal {
+    flex: 1 1 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .story-crown-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(228,188,105,0.22);
+    flex-shrink: 0;
+  }
+  .story-crown-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .story-crown-title {
+    font-family: var(--serif);
+    font-size: clamp(1.22rem, 2.05vh, 1.56rem);
+    color: #fff8e7;
+    font-weight: 700;
+    line-height: 1.18;
+    margin-top: 2px;
+  }
+  .story-crown-he {
+    font-family: var(--hebrew);
+    font-size: clamp(1.12rem, 1.95vh, 1.44rem);
+    color: var(--gold);
+    text-align: right;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+  .story-illustration-plate {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 185px;
+    max-height: 360px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1.5px solid rgba(228,188,105,0.52);
+    background: #070d1b;
+    box-shadow: inset 0 0 0 3px rgba(7,13,27,0.62), 0 14px 36px rgba(0,0,0,0.48);
+    cursor: pointer;
+  }
+  .story-illustration-plate img.plate-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    display: block;
+    transform-origin: center center;
+    animation: kenBurnsSanctuary 28s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  .story-illustration-plate::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(7,13,27,0.04) 0%, rgba(7,13,27,0.06) 62%, rgba(7,13,27,0.74) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .story-plate-caption {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 9px;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+  }
+  .story-plate-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(7,13,27,0.76);
+    border: 1px solid rgba(228,188,105,0.42);
+    backdrop-filter: blur(6px);
+    font-family: var(--serif);
+    font-size: 0.77rem;
+    color: #f6e7c4;
+    letter-spacing: 0.02em;
+  }
+  .story-plate-pill .sp-star { color: var(--gold); font-size: 0.75rem; }
+  .story-plate-hint {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(243,215,150,0.78);
+    background: rgba(7,13,27,0.62);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .story-body-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  [data-theme="parchment"] .story-crown-title { color: #221910; }
+  [data-theme="parchment"] .story-crown-bar { border-bottom-color: rgba(154,105,24,0.28); }
   #spotlightContent::-webkit-scrollbar { display: none; }
   .spot-progress {
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -4925,8 +5041,8 @@ function renderSpotlight() {
     const allies = (an.angels_and_allies || []).slice(0, 2);
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(an.art || slideArt, 'clamp(120px, 14vh, 175px)', capHtml, '', 'margin-bottom:8px;')}
-        <div class="anatomy-grid">
+        ${renderLivingScene(an.art || slideArt, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
+        <div class="anatomy-grid" style="margin:0;flex-shrink:0;">
           <div class="anatomy-card protag" style="animation-delay:0.05s;">
             <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:0.72rem;font-weight:800;color:var(--gold);">${esc(an.protagonist.tag)}</span><span style="font-family:var(--hebrew);color:var(--gold);">${esc(an.protagonist.he)}</span></div>
             <div style="font-family:var(--serif);font-size:1.08rem;font-weight:700;color:#fff;margin:2px 0 4px;">${esc(an.protagonist.emoji)} ${esc(an.protagonist.name)}</div>
@@ -4956,8 +5072,9 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.25rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">מְקוֹמוֹת וּדְפוּסִים</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(an.art || slideArt, 'clamp(120px, 14vh, 175px)', capHtml, '', 'margin-bottom:10px;')}
-        <div class="anatomy-grid" style="margin-top:0;margin-bottom:10px;">
+        ${renderLivingScene(an.art || slideArt, 'clamp(165px, 22vh, 255px)', capHtml, '', 'flex:1 1 auto;min-height:165px;')}
+        <div class="story-body-stack">
+        <div class="anatomy-grid" style="margin-top:0;margin-bottom:4px;">
           <div class="anatomy-card angel">
             <div style="font-size:0.72rem;font-weight:800;color:#5cb6e5;text-transform:uppercase;">📍 Geographic Area &amp; Journey</div>
             <div style="font-size:0.9rem;font-weight:700;color:#fff;margin-top:3px;">${esc(stg.area)}</div>
@@ -4973,11 +5090,12 @@ function renderSpotlight() {
             ${(an.patterns || []).map(pt => `<li style="margin-bottom:4px;">${esc(pt)}</li>`).join('')}
           </ul>
         </div>
+        </div>
       </div>`;
   } else if (s.kind === 'character_scene' && s.scene) {
     const sc = s.scene;
     const stageHtml = `
-      <div class="living-stage" style="height:clamp(145px, 18vh, 215px);margin-bottom:10px;">
+      <div class="living-stage" style="flex:1 1 auto;min-height:185px;max-height:300px;">
         <img class="living-img" src="${esc(sc.art)}" alt="${esc(sc.title)}">
         ${getLivingOverlaySvg(sc.art)}
         <div class="char-stage-actors">
@@ -5033,8 +5151,8 @@ function renderSpotlight() {
     const letters = ['A', 'B', 'C', 'D'];
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(q.art || slideArt, 'clamp(115px, 13.5vh, 175px)', capHtml, '', 'margin-bottom:8px;')}
-        <div class="quiz-wrap">
+        ${renderLivingScene(q.art || slideArt, 'clamp(160px, 21vh, 250px)', capHtml, '', 'flex:1 1 auto;min-height:155px;')}
+        <div class="quiz-wrap" style="flex-shrink:0;">
           <div class="quiz-q">${esc(q.question)}</div>
           <div class="quiz-opts">
             ${(q.options || []).map((opt, i) => `
@@ -5075,7 +5193,8 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:2.1rem;text-shadow:0 2px 12px rgba(0,0,0,0.85);">${esc(hw.word_he)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(hw.art || slideArt, 'clamp(140px, 16vh, 200px)', capHtml, '', 'margin-bottom:10px;')}
+        ${renderLivingScene(hw.art || slideArt, 'clamp(180px, 24vh, 275px)', capHtml, '', 'flex:1 1 auto;min-height:175px;')}
+        <div class="story-body-stack">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
             <div class="muted" style="font-size:0.76rem;text-transform:uppercase;letter-spacing:0.08em;">Meaning</div>
@@ -5088,10 +5207,11 @@ function renderSpotlight() {
             </div>
           </div>
         </div>
-        <div class="spot-comm" style="margin-top:10px;"><div class="c-label">In the Torah &amp; Tanakh</div><div>${esc(hw.verse)}</div></div>
-        <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+        <div class="spot-comm" style="margin-top:0;"><div class="c-label">In the Torah &amp; Tanakh</div><div>${esc(hw.verse)}</div></div>
+        <div class="today-box" style="margin-top:0;padding:10px 14px;">
           <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Living This Word Today</h4>
           <div style="font-size:0.9rem;">${esc(hw.today)}</div>
+        </div>
         </div>
       </div>`;
   } else if (s.kind === 'symbol_feature' && s.symbol) {
@@ -5107,12 +5227,14 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.35rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sym.he_name)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(sym.art || slideArt, 'clamp(155px, 18.5vh, 225px)', capHtml, "switchView('symbols')", 'margin-bottom:12px;cursor:pointer;')}
-        <div class="spot-en" style="font-size:1.06rem;">${esc(sym.meaning)}</div>
-        <div class="spot-comm"><div class="c-label">What the Sages Teach</div><div>${esc(sym.classical)}</div></div>
-        <div class="today-box" style="margin-top:10px;padding:10px 14px;">
+        ${renderLivingScene(sym.art || slideArt, 'clamp(195px, 26vh, 300px)', capHtml, "switchView('symbols')", 'flex:1 1 auto;min-height:190px;cursor:pointer;')}
+        <div class="story-body-stack">
+        <div class="spot-en" style="font-size:1.04rem;margin:0;">${esc(sym.meaning)}</div>
+        <div class="spot-comm" style="margin:0;"><div class="c-label">What the Sages Teach</div><div>${esc(sym.classical)}</div></div>
+        <div class="today-box" style="margin:0;padding:10px 14px;">
           <h4 style="margin-bottom:4px;font-size:0.9rem;">✨ Applying This Symbol in Today's Terms</h4>
           <div style="font-size:0.9rem;">${esc(sym.today)}</div>
+        </div>
         </div>
       </div>`;
   } else {
@@ -5156,19 +5278,33 @@ function renderSpotlight() {
     const commBodyHtml = s.commentary
       ? (s.kind === 'story' ? renderMarkdown(s.commentary) : formatClassicalCommentary(s.commentary, { compact: s.kind === 'verse', maxChars: 290 }))
       : '';
+    const plateCaption = s.art_caption || rich.art_caption || `Parashat ${(dailyData.parasha && dailyData.parasha.en_name) || 'Torah'} · Illuminated Plate`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${slideArt ? `<div style="position:relative;">${renderLivingScene(slideArt, 'clamp(135px, 16vh, 210px)', capHtml, "openPresentation('parasha','')", 'margin-bottom:10px;cursor:pointer;')}<div class="mid-popin" id="midPopIn"><div class="mp-k">${esc(popKicker)}</div><div class="mp-v">${esc(popMsg.slice(0, 105))}</div></div></div>` : `
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <span style="font-size:0.84rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;">${esc(s.kicker)}</span>
-          <span style="font-family:var(--hebrew);color:var(--gold);font-size:1.1rem;">${esc(s.he_kicker || '')}</span>
+        <div class="story-crown-bar">
+          <div style="min-width:0;">
+            <div class="story-crown-kicker" style="color:${esc(dayAccent)};">${esc(s.kicker)}${dayMood ? ' · ' + esc(dayMood) : ''}</div>
+            <div class="story-crown-title">${esc(s.title)}</div>
+          </div>
+          ${s.he_kicker ? `<div class="story-crown-he" style="color:${esc(dayAccent)};">${esc(s.he_kicker)}</div>` : ''}
         </div>
-        <h2 style="font-family:var(--serif);font-size:1.75rem;color:var(--gold);margin:6px 0 4px;">${esc(s.title)}</h2>`}
-        ${s.he_text ? `<div class="spot-he-wrap"><div class="verse-micro-badge" title="Illuminated Verse Emblem">${getVerseMicroEmblem(s)}</div><div class="spot-he" style="margin:0;flex:1;">${esc(s.he_text)}</div></div>` : ''}
-        <div class="spot-en">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
-        ${s.commentary ? `<div class="spot-comm"><div class="c-head"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div>${commMoreBtn}</div>${commBodyHtml}</div>` : ''}
-        ${todayHint}
-        ${richBar}
+        ${slideArt ? `
+        <div class="story-illustration-plate" onclick="openPresentation('parasha','')" title="Click to open Full-Screen Presentation">
+          <img class="plate-img" src="${esc(slideArt)}" alt="${esc(plateCaption)}">
+          ${getLivingOverlaySvg(slideArt)}
+          <div class="mid-popin" id="midPopIn"><div class="mp-k">${esc(popKicker)}</div><div class="mp-v">${esc(popMsg.slice(0, 105))}</div></div>
+          <div class="story-plate-caption">
+            <span class="story-plate-pill"><span class="sp-star">✦</span> ${esc(plateCaption)}</span>
+            <span class="story-plate-hint">🎬 Full Presentation</span>
+          </div>
+        </div>` : ''}
+        <div class="story-body-stack">
+          ${s.he_text ? `<div class="spot-he-wrap" style="margin:0;"><div class="verse-micro-badge" title="Illuminated Verse Emblem">${getVerseMicroEmblem(s)}</div><div class="spot-he" style="margin:0;flex:1;">${esc(s.he_text)}</div></div>` : ''}
+          <div class="spot-en" style="margin:0;">${s.kind === 'story' ? renderMarkdown(s.en_text) : esc(s.en_text)}</div>
+          ${s.commentary ? `<div class="spot-comm" style="margin:0;"><div class="c-head"><div class="c-label">${esc(s.commentator || 'Classical Insight')}</div>${commMoreBtn}</div>${commBodyHtml}</div>` : ''}
+          ${todayHint}
+          ${richBar}
+        </div>
       </div>`;
     // Mid-slide animated pop-in pill at 3.8s so viewers always see what's coming up next!
     showBeatTimers.push(setTimeout(() => {
@@ -9399,7 +9535,7 @@ async function openShabbatSanctuaryMode(isPreview = true) {
     document.getElementById('shabParashaHe').textContent = p.he_name || '';
     document.getElementById('shabParashaSummary').textContent = p.summary || '';
     document.getElementById('shabRefLine').textContent = `WEEKLY TORAH PORTION · ${p.ref || p.ref_span || p.torah_ref || 'Genesis 32:4-36:43'} · HAFTARAH: ${p.live_haftarah || p.haftarah_ref || 'Obadiah 1:1-21'}`;
-    if (rich.art) document.getElementById('shabHeroImg').src = rich.art;
+    document.getElementById('shabHeroImg').src = '/art/shabbat-table-candles.jpg';
 
     const heBadge = document.getElementById('shabHeDateBadge');
     if (heBadge) heBadge.textContent = sh.shabbat_hebrew_date || (celestialData && celestialData.hebrew_date ? celestialData.hebrew_date.en_str : '');
