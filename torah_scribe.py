@@ -467,7 +467,7 @@ def _call_local_ollama(system_prompt: str, user_prompt: str, max_tokens: int = 4
     payload = {
         "model": model,
         "stream": True,
-        "options": {"temperature": 0.35, "num_predict": max_tokens, "num_ctx": 2048},
+        "options": {"temperature": 0.35, "num_predict": max_tokens, "num_ctx": 2048, "num_thread": 2},
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
