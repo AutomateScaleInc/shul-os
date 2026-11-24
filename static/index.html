@@ -5174,11 +5174,10 @@ function renderSpotlight() {
       </div>`;
   } else if (s.kind === 'character_scene' && s.scene) {
     const sc = s.scene;
-    const scArt = slideArt || sc.art;
+    const scArt = slideArt || '';
     const stageHtml = `
       <div class="living-stage" style="flex:1 1 auto;min-height:185px;max-height:300px;">
-        <img class="living-img" src="${esc(scArt)}" alt="${esc(sc.title)}">
-        ${getLivingOverlaySvg(scArt)}
+        ${scArt ? `<img class="living-img" src="${esc(scArt)}" alt="${esc(sc.title)}">${getLivingOverlaySvg(scArt)}` : ''}
         <div class="char-stage-actors">
           <div class="char-actor">
             <div class="char-orb">${esc(sc.left.badge)}</div>
@@ -5232,7 +5231,7 @@ function renderSpotlight() {
     const letters = ['A', 'B', 'C', 'D'];
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(slideArt || q.art, 'clamp(160px, 21vh, 250px)', capHtml, '', 'flex:1 1 auto;min-height:155px;')}
+        ${slideArt ? renderLivingScene(slideArt, 'clamp(160px, 21vh, 250px)', capHtml, '', 'flex:1 1 auto;min-height:155px;') : `<div class="story-crown-bar"><div style="min-width:0;"><div class="story-crown-kicker" style="color:#4ade80;">❓ ${esc(q.badge)} · GUESS OUT LOUD!</div><div class="story-crown-title">Can You Solve This Before the Reveal?</div></div><div class="story-crown-he">חִידַת תּוֹרָה</div></div>`}
         <div class="quiz-wrap" style="flex-shrink:0;">
           <div class="quiz-q">${esc(q.question)}</div>
           <div class="quiz-opts">
@@ -5274,7 +5273,7 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:2.1rem;text-shadow:0 2px 12px rgba(0,0,0,0.85);">${esc(hw.word_he)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(slideArt || hw.art, 'clamp(180px, 24vh, 275px)', capHtml, '', 'flex:1 1 auto;min-height:175px;')}
+        ${slideArt ? renderLivingScene(slideArt, 'clamp(180px, 24vh, 275px)', capHtml, '', 'flex:1 1 auto;min-height:175px;') : `<div class="story-crown-bar"><div style="min-width:0;"><div class="story-crown-kicker" style="color:var(--gold);">🔤 LIVING HEBREW ROOT · ${esc(hw.ref)}</div><div class="story-crown-title">${esc(hw.translit)} (${esc(hw.pronounce)})</div></div><div class="story-crown-he">${esc(hw.word_he)}</div></div>`}
         <div class="story-body-stack">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
@@ -5308,7 +5307,7 @@ function renderSpotlight() {
       <div style="font-family:var(--hebrew);color:#f3d796;font-size:1.35rem;text-shadow:0 2px 10px rgba(0,0,0,0.8);">${esc(sym.he_name)}</div>`;
     document.getElementById('spotlightContent').innerHTML = `
       <div class="sanctuary-reveal">
-        ${renderLivingScene(slideArt || sym.art, 'clamp(195px, 26vh, 300px)', capHtml, "switchView('symbols')", 'flex:1 1 auto;min-height:190px;cursor:pointer;')}
+        ${slideArt ? renderLivingScene(slideArt, 'clamp(195px, 26vh, 300px)', capHtml, "switchView('symbols')", 'flex:1 1 auto;min-height:190px;cursor:pointer;') : `<div class="story-crown-bar"><div style="display:flex;align-items:center;gap:12px;"><div class="sym-icon" style="width:46px;height:46px;">${sym.svg}</div><div><div class="story-crown-kicker" style="color:var(--gold);">✡ SACRED SYMBOL · ${esc(sym.source_ref)}</div><div class="story-crown-title">${esc(sym.name)}</div></div></div><div class="story-crown-he">${esc(sym.he_name)}</div></div>`}
         <div class="story-body-stack">
         <div class="spot-en" style="font-size:1.04rem;margin:0;">${esc(sym.meaning)}</div>
         <div class="spot-comm" style="margin:0;"><div class="c-label">What the Sages Teach</div><div>${esc(sym.classical)}</div></div>
