@@ -2321,6 +2321,22 @@ ALL_ILLUMINATED_ARTS = [
     "/art/joseph-coat-shechem.jpg",
     "/art/passover-seder-table.jpg",
     "/art/sukkot-arba-minim.jpg",
+    "/art/shechem-valley-gates.jpg",
+    "/art/hebron-oaks-mamre.jpg",
+    "/art/jordan-valley-dawn.jpg",
+    "/art/canaan-olive-groves.jpg",
+    "/art/samson-wheat-fields.jpg",
+    "/art/psalms-harp-jerusalem.jpg",
+    "/art/daniel-babylon-window.jpg",
+    "/art/nehemiah-walls-dawn.jpg",
+    "/art/shavuot-bikkurim-basket.jpg",
+    "/art/rosh-hashanah-shofar.jpg",
+    "/art/yom-kippur-white-ark.jpg",
+    "/art/havdalah-braided-candle.jpg",
+    "/art/torah-scribe-sofer.jpg",
+    "/art/galilee-kinneret-stars.jpg",
+    "/art/negev-desert-pillars.jpg",
+    "/art/jerusalem-western-wall-dawn.jpg",
 ]
 
 ART_CAPTIONS = {
@@ -2338,6 +2354,22 @@ ART_CAPTIONS = {
     "/art/bethel-altar-stones.jpg": "The Anointed Pillar of Bethel Beneath the Ancient Oak · Vayishlach",
     "/art/rachel-road-bethlehem.jpg": "The Quiet Stone Road to Bethlehem at Twilight · Vayishlach",
     "/art/joseph-coat-shechem.jpg": "The Woven Tunic of Colors in the Valley of Shechem · Vayeshev",
+    "/art/shechem-valley-gates.jpg": "The Gates of Ancient Shechem Between Gerizim & Ebal · Vayishlach",
+    "/art/hebron-oaks-mamre.jpg": "The Ancient Oaks of Mamre in the Hills of Hebron · Vayera & Vayishlach",
+    "/art/jordan-valley-dawn.jpg": "Sunrise Over the Jordan Valley & Hills of Gilead · Land of Promise",
+    "/art/canaan-olive-groves.jpg": "Terraced Olive Groves & Pomegranates of Judea · Eretz Yisrael",
+    "/art/samson-wheat-fields.jpg": "Golden Wheat Fields & Vineyards of Judea · Book of Judges",
+    "/art/psalms-harp-jerusalem.jpg": "The Cedar Harp Overlooking Jerusalem at Twilight · Tehillim",
+    "/art/daniel-babylon-window.jpg": "Window Facing Jerusalem Beneath the Babylonian Stars · Book of Daniel",
+    "/art/nehemiah-walls-dawn.jpg": "Rebuilding the Golden Walls of Jerusalem at Dawn · Book of Nehemiah",
+    "/art/shavuot-bikkurim-basket.jpg": "Basket of Bikkurim — The Seven Species of Israel · Shavuot",
+    "/art/rosh-hashanah-shofar.jpg": "Shofar, Apples & Golden Honey on White Linen · Rosh Hashanah",
+    "/art/yom-kippur-white-ark.jpg": "The White Parochet & Eternal Ner Tamid · Yom Kippur",
+    "/art/havdalah-braided-candle.jpg": "Braided Havdalah Flame, Silver Cup & Spice Tower · Motzaei Shabbat",
+    "/art/torah-scribe-sofer.jpg": "Kosher Parchment (Klaf) & Quill of the Sofer · Sacred Study",
+    "/art/galilee-kinneret-stars.jpg": "Starlit Waters of the Kinneret & Hills of Safed · Night Watch",
+    "/art/negev-desert-pillars.jpg": "Crimson Sandstone Canyons of the Paran Wilderness · Bamidbar",
+    "/art/jerusalem-western-wall-dawn.jpg": "Pre-Dawn Rose-Gold Light Upon the Stones of Jerusalem · Kotel",
     "/art/joseph-egypt.jpg": "Joseph's Dreams & Wisdom in Egypt · Vayeshev & Miketz",
     "/art/burning-bush.jpg": "The Burning Bush at Mount Horeb · Shemot",
     "/art/exodus-sea.jpg": "Crossing the Sea of Reeds · Beshalach",
@@ -2419,14 +2451,28 @@ def select_slide_illustration(slide: dict, parasha_key: str = "", fallback_art: 
         (("david", "psalm", "harp", "goliath"), "/art/david-harp.jpg"),
         (("solomon", "temple", "zion", "jerusalem"), "/art/solomon-temple.jpg"),
         (("elijah", "still small voice", "carmel"), "/art/elijah-horeb.jpg"),
+        (("shechem", "hamor", "dinah", "gate of the city", "city gate"), "/art/shechem-valley-gates.jpg"),
+        (("hebron", "mamre", "kiryat arba", "isaac"), "/art/hebron-oaks-mamre.jpg"),
+        (("jordan", "gilead", "valley", "river", "crossed over"), "/art/jordan-valley-dawn.jpg"),
+        (("canaan", "olive", "vineyard", "pomegranate", "land of"), "/art/canaan-olive-groves.jpg"),
+        (("wheat", "harvest", "barley", "field", "samson"), "/art/samson-wheat-fields.jpg"),
+        (("psalm", "song", "harp", "lyre", "sing"), "/art/psalms-harp-jerusalem.jpg"),
+        (("daniel", "babylon", "window", "east"), "/art/daniel-babylon-window.jpg"),
+        (("nehemiah", "rebuild", "walls of jerusalem", "stones"), "/art/nehemiah-walls-dawn.jpg"),
+        (("shavuot", "first fruits", "bikkurim", "seven species"), "/art/shavuot-bikkurim-basket.jpg"),
+        (("shofar", "rosh hashanah", "trumpet", "honey", "new year"), "/art/rosh-hashanah-shofar.jpg"),
+        (("yom kippur", "atonement", "fast", "white", "parochet"), "/art/yom-kippur-white-ark.jpg"),
+        (("havdalah", "spice", "besamim", "braided", "separation"), "/art/havdalah-braided-candle.jpg"),
+        (("scribe", "sofer", "scroll", "parchment", "write", "book of"), "/art/torah-scribe-sofer.jpg"),
+        (("galilee", "kinneret", "safed", "constellation", "night sky"), "/art/galilee-kinneret-stars.jpg"),
+        (("desert", "wilderness", "negev", "paran", "sinai desert", "wandering"), "/art/negev-desert-pillars.jpg"),
+        (("kotel", "western wall", "jerusalem", "holy city"), "/art/jerusalem-western-wall-dawn.jpg"),
         (("esther", "shushan", "mordechai", "purim"), "/art/esther-shushan.jpg"),
     ]
     for keys, art_path in keyword_rules:
         if art_path not in used and any(k in blob for k in keys):
             return art_path, ART_CAPTIONS.get(art_path, "Illuminated Torah Sanctuary Plate")
 
-    # For banner/overview/story slides, ALWAYS ensure a fresh unused painting;
-    # for intermediate verse slides where no fresh scene matches, return "" (clean Illuminated Manuscript Typography Folio — zero repetition!)
     if slide.get("kind") == "verse":
         return "", ""
 
@@ -2439,10 +2485,17 @@ def select_slide_illustration(slide: dict, parasha_key: str = "", fallback_art: 
 
 
 def assign_unique_slide_illustrations(slides: list, parasha_key: str = "", day_index: int = 0, primary_art: str = "") -> list:
-    """Curate a STRICTLY ZERO-REPEAT gallery across all base slides of a day (and rest on clean manuscript typography rather than repeating)."""
+    """2-Pass Full-Gallery Zero-Repeat Curator:
+    Pass 1: Claim hero plate (slide 0) + exact scene-matched paintings first.
+    Pass 2: Distribute ALL remaining unused paintings from the 48-painting museum library
+            across every remaining verse/story slide (day-rotated, ZERO duplicates!).
+    """
     used = set()
     p_slug = (parasha_key or "").lower().replace(" ", "-")
     day_fallback = primary_art or "/art/jerusalem-scroll.jpg"
+    week_seed = sum((i + 1) * ord(ch) for i, ch in enumerate(p_slug or "torah"))
+
+    # Pass 1: Hero slide + exact semantic matches
     for idx, sl in enumerate(slides):
         if idx == 0 and day_fallback and day_fallback not in used:
             art_path = day_fallback
@@ -2453,6 +2506,21 @@ def assign_unique_slide_illustrations(slides: list, parasha_key: str = "", day_i
             used.add(art_path)
         sl["art"] = art_path
         sl["art_caption"] = art_cap
+
+    # Pass 2: Never leave museum paintings unused on the bench while slides stay blank!
+    remaining_pool = [a for a in ALL_ILLUMINATED_ARTS if a not in used]
+    if remaining_pool:
+        rot = (int(day_index or 0) * 11 + week_seed) % len(remaining_pool)
+        remaining_pool = remaining_pool[rot:] + remaining_pool[:rot]
+    pool_iter = iter(remaining_pool)
+
+    for sl in slides:
+        if not sl.get("art"):
+            nxt = next(pool_iter, "")
+            if nxt and nxt not in used:
+                used.add(nxt)
+                sl["art"] = nxt
+                sl["art_caption"] = ART_CAPTIONS.get(nxt, "Illuminated Torah Sanctuary Plate")
     return slides
 
 DAY_VISUAL_PALETTES = [

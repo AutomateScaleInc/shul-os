@@ -3796,6 +3796,12 @@ function weaveLivingShow(d) {
     '/art/david-harp.jpg', '/art/solomon-temple.jpg', '/art/elijah-horeb.jpg',
     '/art/esther-shushan.jpg', '/art/jonah-sea.jpg', '/art/chanukah-menorah.jpg',
     '/art/shabbat-table-candles.jpg', '/art/sacred-symbols.jpg',
+    '/art/shechem-valley-gates.jpg', '/art/hebron-oaks-mamre.jpg', '/art/jordan-valley-dawn.jpg',
+    '/art/canaan-olive-groves.jpg', '/art/samson-wheat-fields.jpg', '/art/psalms-harp-jerusalem.jpg',
+    '/art/daniel-babylon-window.jpg', '/art/nehemiah-walls-dawn.jpg', '/art/shavuot-bikkurim-basket.jpg',
+    '/art/rosh-hashanah-shofar.jpg', '/art/yom-kippur-white-ark.jpg', '/art/havdalah-braided-candle.jpg',
+    '/art/torah-scribe-sofer.jpg', '/art/galilee-kinneret-stars.jpg', '/art/negev-desert-pillars.jpg',
+    '/art/jerusalem-western-wall-dawn.jpg',
   ];
   // Rotate fallback gallery uniquely per day of week so Sun..Sat never share the same sequence!
   const dayOff = ((Number(d.selected_day_index || 0) * 5) + (d.parasha && d.parasha.en_name ? d.parasha.en_name.length : 0)) % allGallery.length;
@@ -3895,7 +3901,10 @@ function weaveLivingShow(d) {
     }
   });
 
-  // STRICT ZERO-REPEAT VISUAL CURATOR: no painting may EVER appear twice in the same day's show!
+  // STRICT ZERO-REPEAT FULL-GALLERY CURATOR (2-Pass):
+  // Pass 1: Keep every unique server-matched painting first.
+  // Pass 2: Claim EVERY remaining unused painting from the full 48-painting museum library
+  //         before ever stepping back to an Illuminated Manuscript Folio — ZERO repeats!
   const usedArts = new Set();
   const claimUnused = () => {
     for (const candidate of uniquePool) {
@@ -3908,22 +3917,19 @@ function weaveLivingShow(d) {
   };
 
   out.forEach((sl) => {
-    // Verse slides deliberately left without art by the server stay clean Illuminated Manuscript Folios (zero repetition!)
-    if (sl.kind === 'verse' && !sl.art) {
-      sl.art = '';
-      sl.art_caption = '';
-      return;
-    }
     const preferred = sl.art || '';
     if (preferred && !usedArts.has(preferred)) {
       usedArts.add(preferred);
       sl.art = preferred;
       if (!sl.art_caption) sl.art_caption = catalog[preferred] || '';
-    } else if (sl.kind === 'verse') {
-      // Never repeat a painting on a verse slide — gracefully step back to an Illuminated Manuscript Folio!
+    } else {
       sl.art = '';
       sl.art_caption = '';
-    } else {
+    }
+  });
+
+  out.forEach((sl) => {
+    if (!sl.art) {
       const fresh = claimUnused();
       sl.art = fresh;
       sl.art_caption = fresh ? (catalog[fresh] || '') : '';
