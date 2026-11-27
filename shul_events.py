@@ -213,8 +213,12 @@ def _compute_offline_shabbat_zmanim() -> dict:
     }
 
 
+_HEBCAL_FAIL_UNTIL = 0.0
+
+
 def get_brussels_shabbat_and_holidays() -> dict:
-    """Fetch live Brussels Shabbat candle-lighting, Havdalah, Hebrew date, and upcoming holidays from Hebcal (cached 6h)."""
+    """Fetch live Brussels Shabbat candle-lighting, Havdalah, Hebrew date, and upcoming holidays from Hebcal (cached 6h, fast offline fallback)."""
+    global _HEBCAL_FAIL_UNTIL
     now = time.time()
     cached = None
     if HEBCAL_CACHE.exists():
@@ -235,13 +239,34 @@ def get_brussels_shabbat_and_holidays() -> dict:
         "upcoming_holidays": [],
         "source": "offline",
     }
+
+    # If we recently detected offline/unreachable network, skip network wait for 5 minutes and serve instant offline astronomy!
+    if now < _HEBCAL_FAIL_UNTIL:
+        if cached and cached.get("data"):
+            return cached["data"]
+        try:
+            off = _compute_offline_shabbat_zmanim()
+            data["city"] = off["city"]
+            data["candle_lighting"] = off["candle_lighting"]
+            data["candle_date"] = off["friday_date"]
+            data["havdalah"] = off["havdalah"]
+            data["hebrew_date"] = off["hebrew_date"]
+            data["upcoming_holidays"] = [
+                {"title": h["name"], "hebrew": h["he"], "date": h["gregorian_date"], "category": "holiday", "memo": f"in {h['days_away']}d"}
+                for h in off["upcoming_holidays"][:6]
+            ]
+            data["source"] = "offline_astronomy"
+        except Exception:
+            pass
+        return data
+
     try:
         # 1. This week's Shabbat times for Brussels (geonameid=2800866)
         req1 = urllib.request.Request(
             f"https://www.hebcal.com/shabbat?cfg=json&geonameid={SHUL_INFO['geonameid']}&M=on&lg=en",
             headers={"User-Agent": "TorahSanctuary/1.0"},
         )
-        with urllib.request.urlopen(req1, timeout=6) as r:
+        with urllib.request.urlopen(req1, timeout=2.5) as r:
             sh = json.loads(r.read().decode("utf-8"))
         for it in sh.get("items", []):
             cat = it.get("category")
@@ -263,7 +288,7 @@ def get_brussels_shabbat_and_holidays() -> dict:
             f"&geonameid={SHUL_INFO['geonameid']}"
         )
         req2 = urllib.request.Request(url2, headers={"User-Agent": "TorahSanctuary/1.0"})
-        with urllib.request.urlopen(req2, timeout=6) as r:
+        with urllib.request.urlopen(req2, timeout=2.5) as r:
             cal = json.loads(r.read().decode("utf-8"))
         hols = []
         for it in cal.get("items", []):
@@ -280,6 +305,7 @@ def get_brussels_shabbat_and_holidays() -> dict:
         HEBCAL_CACHE.write_text(json.dumps({"fetched_at": now, "data": data}, ensure_ascii=False), encoding="utf-8")
         return data
     except Exception:
+        _HEBCAL_FAIL_UNTIL = now + 300.0
         if cached and cached.get("data"):
             return cached["data"]
         try:
@@ -358,7 +384,7 @@ def get_ics_feed_events(force_refresh: bool = False) -> list:
             pass
     try:
         req = urllib.request.Request(ics_url, headers={"User-Agent": "TorahSanctuary/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with urllib.request.urlopen(req, timeout=3) as r:
             raw = r.read().decode("utf-8", "ignore")
         evs = _parse_ics_events(raw)
         ICS_CACHE.write_text(json.dumps({"url": ics_url, "fetched_at": now, "events": evs}, ensure_ascii=False), encoding="utf-8")
